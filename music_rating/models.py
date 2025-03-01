@@ -4,8 +4,6 @@ from django.db import models
 class Rating(models.Model):
     score = models.FloatField()
 
-"""TODO I need to make it so that if artist name is left blank, it assumes the
-artist name of the album, and I need to be able to leave the feat name field blank"""
 
 class Song(models.Model):
     song_name = models.CharField(max_length=200)
