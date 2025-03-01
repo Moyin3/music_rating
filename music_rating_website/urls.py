@@ -28,4 +28,5 @@ urlpatterns = [
     path("albums/", views.albumpage, name = "albums"),
     path("songs/", views.songspage, name = "songs"),
     path("community/", views.compage, name = "community"),
+    path('album/<int:album_id>/', views.album_detail, name='album_detail'),  # Detail page for a single album
 ] + debug_toolbar_urls()

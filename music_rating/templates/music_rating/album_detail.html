@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ album.album_name }} - Details</title>
+</head>
+<body>
+    <h1>{{ album.album_name }} by {{ album.artist_name }}</h1>
+    <p>Rating: {{ album.album_rating.score }}</p>
+    <p>{{ album.optional_writing }}</p>
+
+    <h2>Songs</h2>
+    <ul>
+        {% for song in album.songs.all %}
+            <li>{{ song.song_name }} - {{ song.no_of_streams }} streams</li>
+        {% endfor %}
+    </ul>
+    
+    <a href="{% url 'music_rating/albumpage.html' %}">Back to Album List</a>
+</body>
+</html>
