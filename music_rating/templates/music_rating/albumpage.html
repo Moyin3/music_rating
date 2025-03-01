@@ -28,5 +28,18 @@
             </form>
         </div>
         </nav>
+
+        <div class = "album-list-container">
+            <h1>Album List</h1>
+            <ul>
+                {% for album in album_list %}
+                    <li>
+                        <a href="{% url 'album_detail' album.id %}">{{ album.album_name }}</a>
+                    </li>
+                {% empty %}
+                    <li>No albums available.</li>
+                {% endfor %}
+            </ul>
+        </div>
     </body>
 </html>
