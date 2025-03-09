@@ -10,7 +10,7 @@ class Song(models.Model):
     no_of_streams = models.IntegerField(null=True)
     no_of_minutes = models.IntegerField(null=True) 
     feat_artists = models.ManyToManyField("Artist", related_name="featured_songs", blank=True)
-    rating = models.ForeignKey(Rating, on_delete=models.CASCADE, null = True)
+    rating = models.ForeignKey(Rating, null = True, blank = True)
     optional_writing = models.TextField(blank = True, null=True)
     album = models.ForeignKey("Album", on_delete=models.CASCADE, related_name="songs_album", blank=True, null=True)
     ep = models.ForeignKey("EP", on_delete=models.CASCADE, related_name="songs_ep", blank = True, null = True)
