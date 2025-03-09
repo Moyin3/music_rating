@@ -35,7 +35,7 @@ class Album(models.Model):
     album_name = models.CharField(max_length=200)
     artist_name = models.CharField(max_length=200)
     songs = models.ManyToManyField(Song, related_name="album_songs")
-    album_rating = models.ForeignKey(Rating, on_delete=models.CASCADE, blank=True, null=True)
+    album_rating = models.ForeignKey(Rating, blank=True, null=True)
     optional_writing = models.TextField(blank = True, null = True)
 
     def __str__(self):
@@ -45,7 +45,7 @@ class Single(models.Model):
     single_name = models.CharField(max_length=200)
     artist_name = models.CharField(max_length=200)
     songs = models.ManyToManyField(Song, related_name="single_songs")
-    single_rating = models.ForeignKey(Rating, on_delete=models.CASCADE)
+    single_rating = models.ForeignKey(Rating, blank = True, null = True)
     optional_writing = models.TextField(blank = True, null = True)
 
     def __str__(self):
@@ -55,7 +55,7 @@ class EP(models.Model):
     ep_name = models.CharField(max_length=200)
     artist_name = models.CharField(max_length=200)
     songs = models.ManyToManyField(Song, related_name="ep_songs")
-    ep_rating = models.ForeignKey(Rating, on_delete=models.CASCADE)
+    ep_rating = models.ForeignKey(Rating, blank = True, null = True)
     optional_writing = models.TextField(blank = True, null = True)
 
     def __str__(self):
@@ -66,6 +66,7 @@ class Artist(models.Model):
     albums = models.ManyToManyField(Album, blank = True)
     singles = models.ManyToManyField(Single, blank = True)
     eps = models.ManyToManyField(EP, blank = True)
+    artist_rating = models.ForeignKey(Rating, blank = True, null = True)
     optional_writing = models.TextField(blank = True, null = True)
 
     def __str__(self):
