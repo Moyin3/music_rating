@@ -11,16 +11,18 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import environ
+env = environ.Env()
+environ.Env.read_env()
+
+SECRET_KEY = env('DJANGO_SECRET_KEY')
+DATABASES = {
+    'default': env.db('DATABASE_URL')
+}
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-plh)ynn!vs&ox_f%54rxnzm_bboen!ft98s^rnoezp*h*ep!*9"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
