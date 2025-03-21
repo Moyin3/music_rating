@@ -12,9 +12,9 @@ class Song(models.Model):
     feat_artists = models.ManyToManyField("Artist", related_name="featured_songs", blank=True)
     rating = models.ForeignKey(Rating, on_delete=models.SET_NULL, null = True, blank = True)
     optional_writing = models.TextField(blank = True, null=True)
-    album = models.ForeignKey("Album", on_delete=models.CASCADE, related_name="songs_album", blank=True, null=True)
-    ep = models.ForeignKey("EP", on_delete=models.CASCADE, related_name="songs_ep", blank = True, null = True)
-    single = models.ForeignKey("Single", on_delete=models.CASCADE, related_name="songs_single", blank=True, null = True)
+    album = models.ForeignKey("Album", on_delete=models.SET_NULL, related_name="songs_album", blank=True, null=True)
+    ep = models.ForeignKey("EP", on_delete=models.SET_NULL, related_name="songs_ep", blank = True, null = True)
+    single = models.ForeignKey("Single", on_delete=models.SET_NULL, related_name="songs_single", blank=True, null = True)
 
     def __str__(self):
         return self.song_name
