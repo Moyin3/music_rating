@@ -8,7 +8,8 @@ class Rating(models.Model):
 class Song(models.Model):
     song_name = models.CharField(max_length=200)
     no_of_streams = models.IntegerField(null=True)
-    no_of_minutes = models.IntegerField(null=True) 
+    no_of_minutes = models.IntegerField(null=True)
+    artist_name = models.CharField(max_length=100, blank = True)
     feat_artists = models.ManyToManyField("Artist", related_name="featured_songs", blank=True)
     rating = models.ForeignKey(Rating, on_delete=models.SET_NULL, null = True, blank = True)
     optional_writing = models.TextField(blank = True, null=True)
@@ -28,6 +29,8 @@ class Song(models.Model):
             return self.ep.artist_name
         elif self.single:
             return self.single.artist_name
+        elif self.artist_name:
+            return self.artist_name
         else:
             return "Unknown"
     
