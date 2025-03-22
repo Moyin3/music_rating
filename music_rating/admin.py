@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Artist, Album, Song, Rating, EP, Single, RateSystem
+from .models import Artist, Album, Song, Rating, EP, Single
 
 admin.site.register([Artist, Rating, EP, Single])
 
