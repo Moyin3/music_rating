@@ -1,6 +1,15 @@
 from django.db import models
 
 
+"""Unsure about this but chat said could come in handy for consistency across models
+"""
+class RateSystem(models.Model):
+    name = models.CharField(max_length=255, default = 'OG')
+    description = models.TextField(null=True)
+
+    def __str__(self):
+        return self.name
+
 class Rating(models.Model):
     score = models.FloatField()
 
@@ -69,11 +78,9 @@ class Artist(models.Model):
     albums = models.ManyToManyField(Album, blank = True)
     singles = models.ManyToManyField(Single, blank = True)
     eps = models.ManyToManyField(EP, blank = True)
+    rate_system = models.ForeignKey(RateSystem, on_delete=models.CASCADE, default=1)
     artist_rating = models.ForeignKey(Rating, on_delete=models.SET_NULL, blank = True, null = True)
     optional_writing = models.TextField(blank = True, null = True)
 
     def __str__(self):
         return self.artist_name
-
-class RateSystem(models.Model):
-    artists = models.ManyToManyField(Artist)
