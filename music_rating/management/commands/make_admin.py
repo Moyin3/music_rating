@@ -1,32 +1,36 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
-from django.core.exceptions import PermissionDenied
+
+#TODO: Edit this script down the line if we have more people and I need someone that isn't me to make people admins while ensuring proper security.
 
 class Command(BaseCommand):
-    help = 'Make a user an admin (only if you are an admin)'
+    help = 'Makes a user an admin by their username.'
 
     def add_arguments(self, parser):
-        # Add a positional argument for the username
-        parser.add_argument('username', type=str)
+        parser.add_argument('username', type=str, help='The username of the user you want to promote to admin')
+        parser.add_argument('current_user', type=str, help='The username of the user running this command')
 
-    def handle(self, *args, **kwargs):
-        # Get the current user who is executing the command (this could be passed as an argument or set manually)
-        current_user = User.objects.get(username='current_admin')  # This should be the user running the command
-        
-        if not current_user.is_staff:
-            raise PermissionDenied("You must be an admin to run this command.")
+    def handle(self, *args, **options):
+        username = options['username']
+        current_user_username = options['current_user']
 
-        # Proceed with the rest of the logic to make another user an admin
-        username = kwargs['username']
+        # Check if the user running the command is an admin
         try:
-            # Get the user by username
+            current_user = User.objects.get(username=current_user_username)
+            if not current_user.is_staff:
+                self.stdout.write(self.style.ERROR('You must be an admin to run this command.'))
+                return
+        except User.DoesNotExist:
+            self.stdout.write(self.style.ERROR(f'User {current_user_username} does not exist.'))
+            return
+
+        # Promote the specified user to an admin
+        try:
             user = User.objects.get(username=username)
-            
-            # Make the user an admin
             user.is_staff = True
             user.is_superuser = True
             user.save()
-
-            self.stdout.write(self.style.SUCCESS(f"User {username} is now an admin."))
+            self.stdout.write(self.style.SUCCESS(f'User {username} is now an admin.'))
         except User.DoesNotExist:
-            self.stdout.write(self.style.ERROR(f"User {username} does not exist."))
+            self.stdout.write(self.style.ERROR(f'User {username} does not exist.'))
+            
