@@ -16,6 +16,9 @@ env = environ.Env()
 environ.Env.read_env()
 
 SECRET_KEY = env('DJANGO_SECRET_KEY')
+
+DEBUG = env.bool("DEBUG", default=False)
+
 DATABASES = {
     'default': env.db('DATABASE_URL')
 }
@@ -24,10 +27,7 @@ DATABASES = {
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -77,22 +77,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "music_rating_website.wsgi.application"
-
-
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "music_rating_db",
-        "USER": "yeeno3",
-        "PASSWORD": "Mitetonwoodcote26",
-        "HOST": "localhost",
-        "PORT": "5432",
-    }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
