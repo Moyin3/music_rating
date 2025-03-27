@@ -2,3 +2,6 @@
 .mypy_cache/
 .pytest_cache/
 migrations/
+__pycache__/
+*.pyc
+*.pyo
