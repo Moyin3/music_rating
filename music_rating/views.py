@@ -103,14 +103,7 @@ def spotify_search(request):
     
     query = request.GET.get('query', '')
     encoded_query = quote(query)
-    search_url = f'https://api.spotify.com/v1/search?q={encoded_query}&type=track&limit=5'
-    # params = {
-    #     'q': query,
-    #     'type': 'track',  # You can also use 'album', 'artist', etc.
-    #     'limit': 5
-    # }
-    # encoded_params = urlencode(params)
-    # search_url = f"https://api.spotify.com/v1/search?{encoded_params}"
+    search_url = f'https://api.spotify.com/v1/search?q={encoded_query}&type=track,album,artist&limit=5'
     
     headers = {
         'Authorization': f'Bearer {token}'
