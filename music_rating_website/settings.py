@@ -12,22 +12,26 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import environ
+
 env = environ.Env()
 environ.Env.read_env()
 
-SECRET_KEY = env('DJANGO_SECRET_KEY')
+SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 DEBUG = env.bool("DEBUG", default=False)
 
 DATABASES = {
-    'default': env.db('DATABASE_URL')
+    "default": env.db("DATABASE_URL"),
+    "TEST": {
+        "NAME": "test_postgres",
+    },
 }
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition

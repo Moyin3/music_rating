@@ -23,10 +23,12 @@ from music_rating import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("entries/", views.entrypage, name="entries"),
-    path("", views.userhome, name = "homepage"),
-    path("artists/", views.artistpage, name = "artists"),
-    path("albums/", views.albumpage, name = "albums"),
-    path("songs/", views.songspage, name = "songs"),
-    path("community/", views.compage, name = "community"),
-    path('album/<int:album_id>/', views.album_detail, name='album_detail'),  # Detail page for a single album
+    path("", views.userhome, name="homepage"),
+    path("artists/", views.artistpage, name="artists"),
+    path("albums/", views.albumpage, name="albums"),
+    path("songs/", views.songspage, name="songs"),
+    path("community/", views.compage, name="community"),
+    path(
+        "album/<int:album_id>/", views.album_detail, name="album_detail"
+    ),  # Detail page for a single album
 ] + debug_toolbar_urls()
