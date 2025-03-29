@@ -1,0 +1,83 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* Navbar styling */
+nav {
+    background-color: #333;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav a {
+    color: aliceblue;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+nav a:hover {
+    background-color: grey;
+    color: black;
+}
+.web_name a.active{
+    background-color: darkred;
+    font-weight: bold;
+    color: white;
+}
+.web_name{
+    font-size: 24px;
+    font-weight: bold;
+    color: aliceblue;
+}
+
+.web_name a {
+    color: aliceblue;
+    text-decoration: none;
+}
+.search_container {
+    position: relative;
+}
+
+/* Search box styling */
+.nav_search_bar {
+    width: 250px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+}
+
+/* Suggestions box styling */
+.suggestions {
+    position: absolute;
+    top: 35px; /* Adjust to make it hover below the search box */
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    max-height: 150px;
+    overflow-y: auto;
+    display: none;
+    z-index: 10;
+}
+
+.suggestions div {
+    padding: 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.suggestions div:hover {
+    background-color: #f1f1f1;
+}
+
+.search_results {
+    margin-top: 80px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
