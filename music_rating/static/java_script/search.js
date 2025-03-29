@@ -1,0 +1,132 @@
+
+const searchBox = document.getElementById("nav_search_bar");
+const suggestionsDiv = document.getElementById("suggestions");
+const resultDiv = document.getElementById("search_results");
+
+
+searchBox.addEventListener("input", async () => {
+    const query = searchBox.value.trim();
+    if (query.length < 2) {
+        suggestionsDiv.classList.remove('show');
+        suggestionsDiv.innerHTML = '';
+        return;
+    }
+    try {
+        const response = await fetch(`/spotify-search/?query=${encodeURIComponent(query)}`);
+        const data = await response.json();
+        if (data.tracks.total != 0 || data.artists.total != 0 || data.albums.total != 0) {
+            suggestionsDiv.innerHTML = '';
+            
+            const maxResults = 5;
+            let combinedResults = [];
+
+            combinedResults = combinedResults.concat(data.tracks.items);
+            combinedResults = combinedResults.concat(data.artists.items);
+            combinedResults = combinedResults.concat(data.albums.items);
+            sortedCombinedResults = sortByCloseness(combinedResults, query)
+            results = combinedResults.slice(0, maxResults);
+        
+            // Display the limited results
+            results.forEach(item => {
+                let itemElement;
+                if (item.type === 'track') {
+                    itemElement = document.createElement('div');
+                    itemElement.innerHTML = `TRACK: <strong>${item.name}</strong> by ${item.artists.map(artist => artist.name).join(', ')}`;
+                    itemElement.onclick = () => selectSuggestion(item);
+                } else if (item.type === 'artist') {
+                    itemElement = document.createElement('div');
+                    itemElement.innerHTML = `ARTIST: <strong>${item.name}</strong>`;
+                    itemElement.onclick = () => selectSuggestion(item);
+                } else if (item.type === 'album') {
+                    itemElement = document.createElement('div');
+                    itemElement.innerHTML = `ALBUM: <strong>${item.name}</strong> by ${item.artists.map(artist => artist.name).join(', ')}`;
+                    itemElement.onclick = () => selectSuggestion(item);
+                }
+        
+                // Append the item to the suggestions div
+                suggestionsDiv.appendChild(itemElement);
+            });
+        
+            // Show the suggestions
+            suggestionsDiv.style.display = 'block';
+            /*
+            data.tracks.items.forEach(track => {
+                const trackElement = document.createElement('div');
+                trackElement.innerHTML = `TRACK:      <strong>${track.name}</strong> by ${track.artists.map(artist => artist.name).join(', ')}`;
+                trackElement.onclick = () => selectSuggestion(track);
+                suggestionsDiv.appendChild(trackElement);
+                
+            });
+            data.artists.items.forEach(artist => {
+                const artistElement = document.createElement('div');
+                artistElement.innerHTML = `ARTIST:      <strong>${artist.name}</strong>`;
+                artistElement.onclick = () => selectSuggestion(artist);
+                suggestionsDiv.appendChild(artistElement);
+                
+            });
+            data.albums.items.forEach(album => {
+                const albumElement = document.createElement('div');
+                albumElement.innerHTML = `ALBUM:      <strong>${album.name}</strong> by ${album.artists.map(artist => artist.name).join(', ')}`;
+                albumElement.onclick = () => selectSuggestion(album);
+                suggestionsDiv.appendChild(albumElement);
+                
+            });
+
+            suggestionsDiv.style.display = 'block';
+            */
+
+        } else {
+            suggestionsDiv.innerHTML = '<p>No results found</p>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        suggestionsDiv.innerHTML = '<p>Error fetching suggestions</p>';
+    }
+});
+
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('.search_container')) {
+        suggestionsDiv.style.display = 'none';
+    }
+});
+    
+function selectSuggestion(suggestion) {
+    searchBox.value = suggestion.name;
+    suggestionsDiv.style.display = 'none';
+    displayResult(suggestion);
+}
+    
+function displayResult(suggestion) {
+    resultDiv.innerHTML = `<p>You selected: ${suggestion.name}</p>`;
+}
+
+function levenshtein(a, b) {
+    const tmp = [];
+    let i, j;
+    for (i = 0; i <= b.length; i++) {
+        tmp[i] = [i];
+    }
+    for (j = 0; j <= a.length; j++) {
+        tmp[0][j] = j;
+    }
+    for (i = 1; i <= b.length; i++) {
+        for (j = 1; j <= a.length; j++) {
+            tmp[i][j] = Math.min(
+                tmp[i - 1][j] + 1, // deletion
+                tmp[i][j - 1] + 1, // insertion
+                tmp[i - 1][j - 1] + (a[j - 1] === b[i - 1] ? 0 : 1) // substitution
+            );
+        }
+    }
+    return tmp[b.length][a.length];
+}
+
+// Function to sort items by how close they are to a given string
+function sortByCloseness(list, targetString) {
+    return list.sort((a, b) => {
+        const distA = levenshtein(a.name, targetString);
+        const distB = levenshtein(b.name, targetString);
+        return distA - distB; // Sort by smallest distance (more similar)
+    });
+}
+
