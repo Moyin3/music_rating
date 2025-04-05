@@ -59,7 +59,6 @@ TOKEN_URL = "https://accounts.spotify.com/api/token"
 def get_access_token(request):
 
     # case 1: token exists and hasn't expired
-    request.session['token_expiry_time'] = time.time() - 3600
     if 'access_token' in request.session and 'token_expiry_time' in request.session:
         token_expiry_time = request.session['token_expiry_time']
         if time.time() < token_expiry_time:
