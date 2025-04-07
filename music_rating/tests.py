@@ -143,7 +143,7 @@ class SpotifySearchTests(TestCase):
 
         client = Client()
         query = urlencode({'query': 'test'})
-        response = client.get(f'/spotify-search/?{query}')  # Replace with the actual URL for the view
+        response = client.get(f'/spotify-search/?{query}')  
         self.assertEqual(response.status_code, 400)
         self.assertIn('Failed to fetch data from Spotify', response.json()['error'])
 
