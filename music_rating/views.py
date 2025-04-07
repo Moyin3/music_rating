@@ -9,29 +9,36 @@ from urllib.parse import quote
 
 from .models import Song, Album
 
+
 def entrypage(request):
     template = loader.get_template("music_rating/entrypage.html")
     return HttpResponse(template.render({}, request))
+
 
 def userhome(request):
     template = loader.get_template("music_rating/userhome.html")
     return HttpResponse(template.render({}, request))
 
+
 def artistpage(request):
     template = loader.get_template("music_rating/artistpage.html")
     return HttpResponse(template.render({}, request))
 
+
 def albumpage(request):
     album_list = Album.objects.all()
-    return render(request, "music_rating/albumpage.html", {'album_list': album_list})
+    return render(request, "music_rating/albumpage.html", {"album_list": album_list})
+
 
 def songspage(request):
     template = loader.get_template("music_rating/songspage.html")
     return HttpResponse(template.render({}, request))
 
+
 def compage(request):
     template = loader.get_template("music_rating/compage.html")
     return HttpResponse(template.render({}, request))
+
 
 def album_detail(request, album_id):
     album = Album.objects.get(id=album_id)
@@ -52,7 +59,6 @@ TOKEN_URL = "https://accounts.spotify.com/api/token"
 def get_access_token(request):
 
     # case 1: token exists and hasn't expired
-    request.session['token_expiry_time'] = time.time() - 3600
     if 'access_token' in request.session and 'token_expiry_time' in request.session:
         token_expiry_time = request.session['token_expiry_time']
         if time.time() < token_expiry_time:

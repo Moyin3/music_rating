@@ -12,15 +12,19 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import environ
+
 env = environ.Env()
 environ.Env.read_env()
 
-SECRET_KEY = env('DJANGO_SECRET_KEY')
+SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 DEBUG = env.bool("DEBUG", default=False)
 
 DATABASES = {
-    'default': env.db('DATABASE_URL')
+    "default": env.db("DATABASE_URL"),
+    "TEST": {
+        "NAME": "test_postgres",
+    },
 }
 
 SPOTIFY_CLIENT_ID = env('SPOTIFY_CLIENT_ID')
@@ -30,7 +34,7 @@ SPOTIFY_CLIENT_SECRET = env('YOUR_SPOTIFY_CLIENT_SECRET')
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition

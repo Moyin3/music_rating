@@ -2,12 +2,14 @@
 
 from django.db import migrations, models
 
+
 def create_default_rate_system(apps, schema_editor):
     # Get the RateSystem model using apps.get_model
-    RateSystem = apps.get_model('music_rating', 'RateSystem')
-    
+    RateSystem = apps.get_model("music_rating", "RateSystem")
+
     # Create a default RateSystem if it doesn't exist
-    RateSystem.objects.get_or_create(name='OG')
+    RateSystem.objects.get_or_create(name="OG")
+
 
 class Migration(migrations.Migration):
 
@@ -17,15 +19,14 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='ratesystem',
-            name='name',
+            model_name="ratesystem",
+            name="name",
             field=models.CharField(max_length=255),
         ),
         migrations.AddField(
-            model_name='ratesystem',
-            name='description',  # Replace with your actual field name
+            model_name="ratesystem",
+            name="description",  # Replace with your actual field name
             field=models.TextField(null=True, blank=True),  # Adjust as needed
         ),
-
         migrations.RunPython(create_default_rate_system),
     ]
