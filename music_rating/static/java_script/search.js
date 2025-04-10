@@ -49,31 +49,6 @@ searchBox.addEventListener("input", async () => {
         
             // Show the suggestions
             suggestionsDiv.style.display = 'block';
-            /*
-            data.tracks.items.forEach(track => {
-                const trackElement = document.createElement('div');
-                trackElement.innerHTML = `TRACK:      <strong>${track.name}</strong> by ${track.artists.map(artist => artist.name).join(', ')}`;
-                trackElement.onclick = () => selectSuggestion(track);
-                suggestionsDiv.appendChild(trackElement);
-                
-            });
-            data.artists.items.forEach(artist => {
-                const artistElement = document.createElement('div');
-                artistElement.innerHTML = `ARTIST:      <strong>${artist.name}</strong>`;
-                artistElement.onclick = () => selectSuggestion(artist);
-                suggestionsDiv.appendChild(artistElement);
-                
-            });
-            data.albums.items.forEach(album => {
-                const albumElement = document.createElement('div');
-                albumElement.innerHTML = `ALBUM:      <strong>${album.name}</strong> by ${album.artists.map(artist => artist.name).join(', ')}`;
-                albumElement.onclick = () => selectSuggestion(album);
-                suggestionsDiv.appendChild(albumElement);
-                
-            });
-
-            suggestionsDiv.style.display = 'block';
-            */
 
         } else {
             suggestionsDiv.innerHTML = '<p>No results found</p>';
