@@ -30,4 +30,5 @@ urlpatterns = [
     path("community/", views.compage, name = "community"),
     path('album/<int:album_id>/', views.album_detail, name='album_detail'),  # Detail page for a single album
     path('spotify-search/', views.spotify_search, name='spotify_search'), # Return search
+    path('id-retrieval/', views.spotify_id_retrieval, name='id_retrieval'), # Return id
 ] + debug_toolbar_urls()

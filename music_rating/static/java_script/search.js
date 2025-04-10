@@ -49,31 +49,6 @@ searchBox.addEventListener("input", async () => {
         
             // Show the suggestions
             suggestionsDiv.style.display = 'block';
-            /*
-            data.tracks.items.forEach(track => {
-                const trackElement = document.createElement('div');
-                trackElement.innerHTML = `TRACK:      <strong>${track.name}</strong> by ${track.artists.map(artist => artist.name).join(', ')}`;
-                trackElement.onclick = () => selectSuggestion(track);
-                suggestionsDiv.appendChild(trackElement);
-                
-            });
-            data.artists.items.forEach(artist => {
-                const artistElement = document.createElement('div');
-                artistElement.innerHTML = `ARTIST:      <strong>${artist.name}</strong>`;
-                artistElement.onclick = () => selectSuggestion(artist);
-                suggestionsDiv.appendChild(artistElement);
-                
-            });
-            data.albums.items.forEach(album => {
-                const albumElement = document.createElement('div');
-                albumElement.innerHTML = `ALBUM:      <strong>${album.name}</strong> by ${album.artists.map(artist => artist.name).join(', ')}`;
-                albumElement.onclick = () => selectSuggestion(album);
-                suggestionsDiv.appendChild(albumElement);
-                
-            });
-
-            suggestionsDiv.style.display = 'block';
-            */
 
         } else {
             suggestionsDiv.innerHTML = '<p>No results found</p>';
@@ -91,13 +66,20 @@ document.addEventListener('click', function(event) {
 });
     
 function selectSuggestion(suggestion) {
-    searchBox.value = suggestion.name;
     suggestionsDiv.style.display = 'none';
-    displayResult(suggestion);
+    id_retrieval(suggestion.type + "s", suggestion.id);
 }
     
-function displayResult(suggestion) {
-    resultDiv.innerHTML = `<p>You selected: ${suggestion.name}</p>`;
+function displayResult(data) {
+    console.log(data)
+    console.log(data.id)
+    resultDiv.innerHTML = `<p>You selected: ${data['id']}</p>`;
+}
+
+async function id_retrieval(itemType, itemId) {
+    const response = await fetch(`/id-retrieval/?type=${encodeURIComponent(itemType)}&spotify_id=${encodeURIComponent(itemId)}`);
+    const data = await response.json();
+    displayResult(data)
 }
 
 function levenshtein(a, b) {
