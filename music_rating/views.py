@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from django.conf import settings
@@ -7,7 +7,7 @@ import time
 import base64
 from urllib.parse import quote
 
-from .models import Song, Album
+from .models import Song, Album, Artist
 
 
 def entrypage(request):
@@ -40,9 +40,17 @@ def compage(request):
     return HttpResponse(template.render({}, request))
 
 
-def album_detail(request, album_id):
-    album = Album.objects.get(id=album_id)
+def album_detail(request, spotify_id):
+    album = get_object_or_404(Album, id=spotify_id)
     return render(request, 'music_rating/album_detail.html', {'album': album})
+
+def track_detail(request, spotify_id):
+    track = get_object_or_404(Song, id=spotify_id)
+    return render(request, 'music_rating/track_detail.html', {'track': track})
+
+def artist_detail(request, spotify_id):
+    artist = get_object_or_404(Artist, id=spotify_id)
+    return render(request, 'music_rating/artist_detail.html', {'artist': artist})
 
 
 

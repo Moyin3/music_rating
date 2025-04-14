@@ -25,13 +25,22 @@
             </div>
         </nav>
 
+        <script src="{% static 'java_script/search.js' %}"></script> 
 
+        <h1>{{ album.album_name }}</h1>
 
-        <div id="search_results" class = "search_results">
-            <p>Filler</p>
-        </div>
-
-        <script src="{% static 'java_script/search.js' %}"></script>
+        <h2>Songs</h2>
+        <ul>
+            {% for track in album.tracks.all %}
+                <li>{{ track.track_name }}</li>
+            {% empty %}
+                <li>No tracks available</li>
+            {% endfor %}
+        </ul>
+        <h2>Rating</h2>
+        <p>Rating: {{ album.rating }}</p>
+        <h2>Optional Notes</h2>
+        <p>{{ album.optional_writing|default:"No additional information available." }}</p>
         
 
 

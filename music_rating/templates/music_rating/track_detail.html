@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ track.track_name }}</title>
+    <link rel="stylesheet" href="{% static 'music_rating/general.css' %}">
+    <script src="{% static 'java_script/search.js' %}"></script>
+</head>
+<body>
+    <nav>
+        <div class="web_name">
+            <a href="{% url 'homepage' %}" class = "active">Good Name</a>
+        </div>
+        <div class="search_container">
+            <input type="text" id="nav_search_bar" class="nav_search_bar" placeholder="Search for a song, artist...">
+            <div id="suggestions" class = "suggestions"></div>
+        </div>
+        <div class="navbar-links">
+            <a href="{% url 'albums' %}">Albums</a>
+            <a href="{% url 'artists' %}">Artists</a>
+            <a href="{% url 'community' %}">Community Page</a>
+            <a href="{% url 'entries' %}">Rating Entries</a>
+            <a href="{% url 'songs' %}">Songs</a>
+        </div>
+    </nav>
+    <h1>{{ track.track_name }}</h1>
+
+    <h2>Rating</h2>
+    <p>Rating: {{ track.rating }}</p>
+    <h2>Optional Notes</h2>
+    <p>{{ track.optional_writing|default:"No additional information available." }}</p>
+</body>
+</html>

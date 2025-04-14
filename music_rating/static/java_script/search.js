@@ -91,13 +91,14 @@ document.addEventListener('click', function(event) {
 });
     
 function selectSuggestion(suggestion) {
-    searchBox.value = suggestion.name;
-    suggestionsDiv.style.display = 'none';
-    displayResult(suggestion);
-}
-    
-function displayResult(suggestion) {
-    resultDiv.innerHTML = `<p>You selected: ${suggestion.name}</p>`;
+    // Determine the type of the suggestion and redirect to the appropriate view
+    if (suggestion.type === 'track') {
+        window.location.href = `/track/${suggestion.id}/`; // Redirect to track view
+    } else if (suggestion.type === 'artist') {
+        window.location.href = `/artist/${suggestion.id}/`; // Redirect to artist view
+    } else if (suggestion.type === 'album') {
+        window.location.href = `/album/${suggestion.id}/`; // Redirect to album view
+    }
 }
 
 function levenshtein(a, b) {

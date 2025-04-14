@@ -28,6 +28,8 @@ urlpatterns = [
     path("albums/", views.albumpage, name = "albums"),
     path("songs/", views.songspage, name = "songs"),
     path("community/", views.compage, name = "community"),
-    path('album/<int:album_id>/', views.album_detail, name='album_detail'),  # Detail page for a single album
+    path('album/<str:spotify_id>/', views.album_detail, name='album_detail'),  # Detail page for a single album
     path('spotify-search/', views.spotify_search, name='spotify_search'), # Return search
+    path('track/<str:spotify_id>/', views.track_detail, name='track_detail'),  # Detail page for a single track
+    path('artist/<str:spotify_id>/', views.artist_detail, name='artist_detail'),  # Detail page for a single artist
 ] + debug_toolbar_urls()

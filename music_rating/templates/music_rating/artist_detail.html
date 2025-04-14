@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'music_rating/general.css' %}">
+    <script src="{% static 'java_script/search.js' %}"></script>
+    <title>{{ artist.artist_name }}</title>
+</head>
+<body>
+    <nav>
+        <div class="web_name">
+            <a href="{% url 'homepage' %}" class = "active">Good Name</a>
+        </div>
+        <div class="search_container">
+            <input type="text" id="nav_search_bar" class="nav_search_bar" placeholder="Search for a song, artist...">
+            <div id="suggestions" class = "suggestions"></div>
+        </div>
+        <div class="navbar-links">
+            <a href="{% url 'albums' %}">Albums</a>
+            <a href="{% url 'artists' %}">Artists</a>
+            <a href="{% url 'community' %}">Community Page</a>
+            <a href="{% url 'entries' %}">Rating Entries</a>
+            <a href="{% url 'songs' %}">Songs</a>
+        </div>
+    </nav>
+    <h1>{{ artist.artist_name }}</h1>
+
+    <h2>Albums</h2>
+    <ul>
+        {% for album in artist.albums.all %}
+            <li>{{ album.album_name }}</li>
+        {% empty %}
+            <li>No albums available</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Singles</h2>
+    <ul>
+        {% for single in artist.singles.all %}
+            <li>{{ single.single_name }}</li>
+        {% empty %}
+            <li>No singles available</li>
+        {% endfor %}
+    </ul>
+
+    <h2>EPs</h2>
+    <ul>
+        {% for ep in artist.eps.all %}
+            <li>{{ ep.ep_name }}</li>
+        {% empty %}
+            <li>No EPs available</li>
+        {% endfor %}
+    </ul>
+    <h2>Rating</h2>
+    <p>Rating: {{ artist.rating }}</p>
+    <h2>Optional Notes</h2>
+    <p>{{ artist.optional_writing|default:"No additional information available." }}</p>
+</body>
+</html>
