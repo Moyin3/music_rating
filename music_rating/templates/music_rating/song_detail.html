@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,7 +26,7 @@
             <a href="{% url 'songs' %}">Songs</a>
         </div>
     </nav>
-    <h1>{{ track.track_name }}</h1>
+    <h1>{{ song.song_name }}</h1>
 
     <h2>Rating</h2>
     <p>Rating: {{ track.rating }}</p>

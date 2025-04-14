@@ -1,8 +1,12 @@
-from django.test import TestCase, Client
+from django.test import TestCase, Client, RequestFactory
 from .models import Song, Artist, Album, Single, EP, Rating, RateSystem
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 from urllib.parse import urlencode
 from django.conf import settings
+from django.urls import reverse
+from music_rating.utils.spotify import SpotifyUtils
+import time
+import json
 
 
 class ArtistModelTest(TestCase):
@@ -114,7 +118,7 @@ class RateSystemModelTest(TestCase):
     def test_rate_system_str(self):
         self.assertEqual(str(self.rate_system), "Custom Rate System")
 
-class TemplateViewTests(TestCase):
+class ViewTests(TestCase):
     def test_entrypage_view(self):
         client = Client()
         response = client.get('/entries/') 
@@ -150,16 +154,306 @@ class TemplateViewTests(TestCase):
         response = client.get('/community/')
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'music_rating/compage.html')
+
+    def setUp(self):
+         # Create test data for Album, Song, and Artist
+        self.album = Album.objects.create(spotify_id="album123", album_name="Test Album")
+        self.song = Song.objects.create(spotify_id="song123", song_name="Test Song")
+        self.artist = Artist.objects.create(spotify_id="artist123", artist_name="Test Artist")
     
     def test_album_detail_view(self):
-        testArtist = Artist.objects.create(artist_name="Wizkid")
-        testAlbum = Album.objects.create(album_name="Made in Lagos")
-        testAlbum.artists.set([testArtist])
-        testSong = Song.objects.create(song_name="Grace", album=testAlbum)
-        
         client = Client()
-        response = client.get(f'/album/{testAlbum.id}/')
+        response = client.get(reverse('album_detail', args=[self.album.spotify_id]))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'music_rating/album_detail.html')
+        self.assertContains(response, self.album.album_name)
+    
+    def test_song_detail_view(self):
+        client = Client()
+        response = client.get(reverse('song_detail', args=[self.song.spotify_id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'music_rating/song_detail.html')
+        self.assertContains(response, self.song.song_name)
+    
+    def test_artist_detail_view(self):
+        client = Client()
+        response = client.get(reverse('artist_detail', args=[self.artist.spotify_id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'music_rating/artist_detail.html')
+        self.assertContains(response, self.artist.artist_name)
+    
+    def test_album_detail_view_not_found(self):
+        client = Client()
+        response = client.get(reverse('album_detail', args=["nonexistent_album"]))
+        self.assertEqual(response.status_code, 404)
+    
+    def test_song_detail_view_not_found(self):
+        client = Client()
+        response = client.get(reverse('song_detail', args=["nonexistent_song"]))
+        self.assertEqual(response.status_code, 404)
+    
+    def test_artist_detail_view_not_found(self):
+        client = Client()
+        response = client.get(reverse('artist_detail', args=["nonexistent_artist"]))
+        self.assertEqual(response.status_code, 404)
+  
+class SpotifyUtilsTests(TestCase):
+    def setUp(self):
+        self.spotify_utils = SpotifyUtils()
+        self.factory = RequestFactory()
+    
+    @patch('music_rating.utils.spotify.requests.post')  # Mock requests.post
+    def test_get_access_token_success(self, mock_post):
+        # Mock a successful token response
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            'access_token': 'mock_access_token',
+            'expires_in': 3600
+        }
+        mock_post.return_value = mock_response
 
-#TODO: Need to write tests for the updated models page
+        # Simulate a request without a valid token in the session
+        request = self.factory.get('/')
+        request.session = {}
+
+        # Call the method
+        token = self.spotify_utils._get_access_token(request)
+
+        # Assertions
+        self.assertEqual(token, 'mock_access_token')
+        self.assertIn('access_token', request.session)
+        self.assertIn('token_expiry_time', request.session)
+        mock_post.assert_called_once()  # API call should be made
+
+    @patch('music_rating.utils.spotify.requests.post')
+    def test_get_access_token_failure(self, mock_post):
+        # Mock a failed token response
+        mock_response = Mock()
+        mock_response.status_code = 400
+        mock_post.return_value = mock_response
+
+        # Simulate a request
+        request = self.factory.get('/')
+        request.session = {}
+
+        # Call the method
+        token = self.spotify_utils._get_access_token(request)
+
+        # Assertions
+        self.assertIsNone(token)
+    
+    @patch('music_rating.utils.spotify.requests.post')  # Mock requests.post
+    def test_get_access_token_with_valid_token(self, mock_post):
+        # Simulate a request with a valid token in the session
+        request = self.factory.get('/')
+        request.session = {
+            'access_token': 'mock_access_token',
+            'token_expiry_time': time.time() + 3600  # Token expires in 1 hour
+        }
+
+        # Call the method
+        token = self.spotify_utils._get_access_token(request)
+
+        # Assertions
+        self.assertEqual(token, 'mock_access_token')  # Should return the existing token
+        mock_post.assert_not_called()  # No API call should be made
+    
+    @patch('music_rating.utils.spotify.requests.post')  # Mock requests.post
+    def test_get_access_token_expired_token(self, mock_post):
+        # Mock a successful token response
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            'access_token': 'new_mock_access_token',
+            'expires_in': 3600
+        }
+        mock_post.return_value = mock_response
+
+        # Simulate a request with an expired token in the session
+        request = self.factory.get('/')
+        request.session = {
+            'access_token': 'expired_mock_access_token',
+            'token_expiry_time': time.time() - 3600  # Token expired 1 hour ago
+        }
+
+        # Call the method
+        token = self.spotify_utils._get_access_token(request)
+
+        # Assertions
+        self.assertEqual(token, 'new_mock_access_token')  # Should retrieve a new token
+        self.assertIn('access_token', request.session)
+        self.assertIn('token_expiry_time', request.session)
+        self.assertGreater(request.session['token_expiry_time'], time.time())
+        mock_post.assert_called_once()  # API call should be made
+    
+    @patch('music_rating.utils.spotify.requests.get')  # Mock requests.get
+    @patch('music_rating.utils.spotify.SpotifyUtils._get_access_token')  # Mock _get_access_token
+    def test_spotify_search_success(self, mock_get_access_token, mock_requests_get):
+        # Mock the access token
+        mock_get_access_token.return_value = "mock_access_token"
+
+        # Mock the Spotify API response
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            'tracks': {
+                'items': [
+                    {'name': 'Test Track', 'id': 'track123'},
+                ]
+            }
+        }
+        mock_requests_get.return_value = mock_response
+
+        # Simulate a request
+        request = self.factory.get('/?query=Test')
+        request.session = {}
+
+        # Call the method
+        response = self.spotify_utils.spotify_search(request)
+
+        # Assertions
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content.decode('utf-8'))
+        self.assertIn('tracks', response_data)
+        self.assertEqual(response_data['tracks']['items'][0]['name'], 'Test Track')
+        self.assertEqual(response_data['tracks']['items'][0]['id'], 'track123')
+
+    @patch('music_rating.utils.spotify.requests.get')
+    @patch('music_rating.utils.spotify.SpotifyUtils._get_access_token')
+    def test_spotify_search_failure(self, mock_get_access_token, mock_requests_get):
+        # Mock the access token
+        mock_get_access_token.return_value = "mock_access_token"
+
+        # Mock a failed Spotify API response
+        mock_response = Mock()
+        mock_response.status_code = 400
+        mock_response.json.return_value = {'error': 'Failed to fetch data from Spotify'}
+        mock_requests_get.return_value = mock_response
+
+        # Simulate a request
+        request = self.factory.get('/?query=Test')
+        request.session = {}
+
+        # Call the method
+        response = self.spotify_utils.spotify_search(request)
+
+        # Assertions
+        self.assertEqual(response.status_code, 400)
+        
+        response_data = json.loads(response.content.decode('utf-8'))
+        self.assertIn('error', response_data)
+        self.assertEqual(response_data['error'], 'Failed to fetch data from Spotify')
+    
+    @patch('music_rating.utils.spotify.requests.get')  # Mock requests.get
+    @patch('music_rating.utils.spotify.cache')  # Mock cache
+    @patch('music_rating.utils.spotify.SpotifyUtils._get_access_token')  # Mock _get_access_token
+    def test_spotify_get_id_success(self, mock_get_access_token, mock_cache, mock_requests_get):
+        # Mock the access token
+        mock_get_access_token.return_value = "mock_access_token"
+
+        # Mock the cache
+        mock_cache.get.return_value = None  # No cached data
+
+        # Mock the Spotify API response
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            'id': 'test_spotify_id',
+            'type': 'track',
+            'name': 'Test Track',
+            'album': {'name': 'Test Album', 'id': 'album123'},
+            'artists': [{'name': 'Test Artist', 'id': 'artist123'}]
+        }
+        mock_requests_get.return_value = mock_response
+
+        # Simulate a request
+        request = self.factory.get('/?spotify_id=test_spotify_id&type=track')
+        request.session = {}
+
+class ParseSpotifyItemTests(TestCase):
+    def setUp(self):
+        self.spotify_utils = SpotifyUtils()
+
+    def test_parse_artist_data(self):
+        # Mock artist data
+        artist_data = {
+            'id': 'artist123',
+            'type': 'artist',
+            'name': 'Test Artist'
+        }
+
+        # Call the method
+        parsed = self.spotify_utils._parse_spotify_item(artist_data)
+
+        # Assertions
+        self.assertEqual(parsed['id'], 'artist123')
+        self.assertEqual(parsed['type'], 'artists')
+        self.assertEqual(parsed['artist_name'], 'Test Artist')
+
+    def test_parse_album_data(self):
+        # Mock album data
+        album_data = {
+            'id': 'album123',
+            'type': 'album',
+            'name': 'Test Album',
+            'artists': [
+                {'name': 'Artist One', 'id': 'artist1'},
+                {'name': 'Artist Two', 'id': 'artist2'}
+            ]
+        }
+
+        # Call the method
+        parsed = self.spotify_utils._parse_spotify_item(album_data)
+
+        # Assertions
+        self.assertEqual(parsed['id'], 'album123')
+        self.assertEqual(parsed['type'], 'albums')
+        self.assertEqual(parsed['album_name'], 'Test Album')
+        self.assertEqual(parsed['artist_name'], ['Artist One', 'Artist Two'])
+        self.assertEqual(parsed['artist_id'], ['artist1', 'artist2'])
+
+    def test_parse_track_data(self):
+        # Mock track data
+        track_data = {
+            'id': 'track123',
+            'type': 'track',
+            'name': 'Test Track',
+            'album': {'name': 'Test Album', 'id': 'album123'},
+            'artists': [
+                {'name': 'Artist One', 'id': 'artist1'},
+                {'name': 'Artist Two', 'id': 'artist2'}
+            ]
+        }
+
+        # Call the method
+        parsed = self.spotify_utils._parse_spotify_item(track_data)
+
+        # Assertions
+        self.assertEqual(parsed['id'], 'track123')
+        self.assertEqual(parsed['type'], 'tracks')
+        self.assertEqual(parsed['track_name'], 'Test Track')
+        self.assertEqual(parsed['album_name'], 'Test Album')
+        self.assertEqual(parsed['album_id'], 'album123')
+        self.assertEqual(parsed['artist_name'], ['Artist One', 'Artist Two'])
+        self.assertEqual(parsed['artist_id'], ['artist1', 'artist2'])
+
+    def test_parse_invalid_data(self):
+        # Mock invalid data
+        invalid_data = {
+            'id': 'invalid123',
+            'type': 'unknown'
+        }
+
+        # Call the method
+        parsed = self.spotify_utils._parse_spotify_item(invalid_data)
+
+        # Assertions
+        self.assertIsNone(parsed)
+
+    def test_parse_empty_data(self):
+        # Call the method with empty data
+        parsed = self.spotify_utils._parse_spotify_item(None)
+
+        # Assertions
+        self.assertIsNone(parsed)

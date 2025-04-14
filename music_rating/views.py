@@ -37,15 +37,15 @@ def compage(request):
 
 
 def album_detail(request, spotify_id):
-    album = get_object_or_404(Album, id=spotify_id)
+    album = get_object_or_404(Album, spotify_id=spotify_id)
     return render(request, 'music_rating/album_detail.html', {'album': album})
 
-def track_detail(request, spotify_id):
-    track = get_object_or_404(Song, id=spotify_id)
-    return render(request, 'music_rating/track_detail.html', {'track': track})
+def song_detail(request, spotify_id):
+    song = get_object_or_404(Song, spotify_id=spotify_id)
+    return render(request, 'music_rating/song_detail.html', {'song': song})
 
 def artist_detail(request, spotify_id):
-    artist = get_object_or_404(Artist, id=spotify_id)
+    artist = get_object_or_404(Artist, spotify_id=spotify_id)
     return render(request, 'music_rating/artist_detail.html', {'artist': artist})
 
 

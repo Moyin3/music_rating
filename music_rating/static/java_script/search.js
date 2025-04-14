@@ -1,8 +1,12 @@
+document.addEventListener("DOMContentLoaded", () => {
+    // Initialize the search box and suggestions div
+    const searchBox = document.getElementById("nav_search_bar");
+    const suggestionsDiv = document.getElementById("suggestions");
 
-const searchBox = document.getElementById("nav_search_bar");
-const suggestionsDiv = document.getElementById("suggestions");
-const resultDiv = document.getElementById("search_results");
-
+    if (!searchBox || !suggestionsDiv) {
+        console.error("One or more required DOM elements are missing.");
+        return;
+    }
 
 searchBox.addEventListener("input", async () => {
     const query = searchBox.value.trim();
@@ -23,11 +27,12 @@ searchBox.addEventListener("input", async () => {
             combinedResults = combinedResults.concat(data.tracks.items);
             combinedResults = combinedResults.concat(data.artists.items);
             combinedResults = combinedResults.concat(data.albums.items);
-            sortedCombinedResults = sortByCloseness(combinedResults, query)
-            results = combinedResults.slice(0, maxResults);
+            const sortedCombinedResults = sortByCloseness(combinedResults, query)
+            const results = sortedCombinedResults.slice(0, maxResults);
         
             // Display the limited results
             results.forEach(item => {
+                console.log("Processing item:", item);
                 let itemElement;
                 if (item.type === 'track') {
                     itemElement = document.createElement('div');
@@ -45,6 +50,7 @@ searchBox.addEventListener("input", async () => {
         
                 // Append the item to the suggestions div
                 suggestionsDiv.appendChild(itemElement);
+                console.log("Updated suggestionsDiv content:", suggestionsDiv.innerHTML);
             });
         
             // Show the suggestions
@@ -54,7 +60,7 @@ searchBox.addEventListener("input", async () => {
             suggestionsDiv.innerHTML = '<p>No results found</p>';
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error during fetch:', error);
         suggestionsDiv.innerHTML = '<p>Error fetching suggestions</p>';
     }
 });
@@ -64,11 +70,11 @@ document.addEventListener('click', function(event) {
         suggestionsDiv.style.display = 'none';
     }
 });
-    
+});
 function selectSuggestion(suggestion) {
     // Determine the type of the suggestion and redirect to the appropriate view
     if (suggestion.type === 'track') {
-        window.location.href = `/track/${suggestion.id}/`; // Redirect to track view
+        window.location.href = `/song/${suggestion.id}/`; // Redirect to track view
     } else if (suggestion.type === 'artist') {
         window.location.href = `/artist/${suggestion.id}/`; // Redirect to artist view
     } else if (suggestion.type === 'album') {
@@ -99,10 +105,24 @@ function levenshtein(a, b) {
 
 // Function to sort items by how close they are to a given string
 function sortByCloseness(list, targetString) {
-    return list.sort((a, b) => {
+    const sorted = list.sort((a, b) => {
         const distA = levenshtein(a.name, targetString);
         const distB = levenshtein(b.name, targetString);
-        return distA - distB; // Sort by smallest distance (more similar)
+        if (distA !== distB) {
+            return distA - distB;
+        }
+        return a.name.localeCompare(b.name);
     });
+    return sorted;
 }
 
+//Exporting functions so they can be tested
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        levenshtein,
+        sortByCloseness
+    };
+} else {
+    window.levenshtein = levenshtein;
+    window.sortByCloseness = sortByCloseness;
+}
