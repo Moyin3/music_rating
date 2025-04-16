@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_tags %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -26,11 +27,30 @@
             <a href="{% url 'songs' %}">Songs</a>
         </div>
     </nav>
-    <h1>{{ song.song_name }}</h1>
-
+    <div class="container">
+        <h1>{{ song.track_name }}</h1>
+    
+        <div class="section">
+            <p class="label">Album:</p>
+            <p>
+                <a href="{% url 'album_detail' song.album_id %}">{{ song.album_name }}</a>
+            </p>
+        </div>
+    
+        <div class="section">
+            <p class="label"> Artist{{ song.artist_name|length|pluralize }}:</p>
+            <ul>
+                {% for name, id in song.artist_name|zip_lists:song.artist_id %}
+                    <li><a href="{% url 'artist_detail' id %}">{{ name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <!--
     <h2>Rating</h2>
     <p>Rating: {{ track.rating }}</p>
     <h2>Optional Notes</h2>
     <p>{{ track.optional_writing|default:"No additional information available." }}</p>
+    -->
 </body>
 </html>

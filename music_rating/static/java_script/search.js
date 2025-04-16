@@ -71,8 +71,13 @@ document.addEventListener('click', function(event) {
     }
 });
 });
+
+
+
 function selectSuggestion(suggestion) {
+
     // Determine the type of the suggestion and redirect to the appropriate view
+    console.log("Here");
     if (suggestion.type === 'track') {
         window.location.href = `/song/${suggestion.id}/`; // Redirect to track view
     } else if (suggestion.type === 'artist') {
@@ -81,6 +86,7 @@ function selectSuggestion(suggestion) {
         window.location.href = `/album/${suggestion.id}/`; // Redirect to album view
     }
 }
+
 
 function levenshtein(a, b) {
     const tmp = [];
@@ -126,3 +132,11 @@ if (typeof module !== 'undefined' && module.exports) {
     window.levenshtein = levenshtein;
     window.sortByCloseness = sortByCloseness;
 }
+
+// Will need this function later
+
+// async function id_retrieval(itemType, itemId) {
+//     const response = await fetch(`/id-retrieval/?type=${encodeURIComponent(itemType)}&spotify_id=${encodeURIComponent(itemId)}`);
+//     const data = await response.json();
+//     return data
+// }

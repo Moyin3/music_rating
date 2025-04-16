@@ -2,9 +2,11 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from .utils.spotify import SpotifyUtils
+import json
 
 from .models import Song, Album, Artist
 
+spotify_handler = SpotifyUtils()
 
 def entrypage(request):
     template = loader.get_template("music_rating/entrypage.html")
@@ -37,26 +39,43 @@ def compage(request):
 
 
 def album_detail(request, spotify_id):
-    album = get_object_or_404(Album, spotify_id=spotify_id)
-    return render(request, 'music_rating/album_detail.html', {'album': album})
+    request.GET = request.GET.copy()
+    request.GET['type'] = 'albums'
+    request.GET['spotify_id'] = spotify_id
+    response = spotify_handler.spotify_get_id(request)# Get from cache or API
+    if isinstance(response, JsonResponse) and response.status_code == 200:
+        data = json.loads(response.content)
+        return render(request, 'music_rating/album_detail.html', {'album': data})
+    print("ERROR")
+    
 
 def song_detail(request, spotify_id):
-    song = get_object_or_404(Song, spotify_id=spotify_id)
-    return render(request, 'music_rating/song_detail.html', {'song': song})
+    request.GET = request.GET.copy()
+    request.GET['type'] = 'tracks'
+    request.GET['spotify_id'] = spotify_id
+    response = spotify_handler.spotify_get_id(request)# Get from cache or API
+    if isinstance(response, JsonResponse) and response.status_code == 200:
+        data = json.loads(response.content)
+        return render(request, 'music_rating/song_detail.html', {'song': data})
+    print("ERROR")
 
 def artist_detail(request, spotify_id):
-    artist = get_object_or_404(Artist, spotify_id=spotify_id)
-    return render(request, 'music_rating/artist_detail.html', {'artist': artist})
+    request.GET = request.GET.copy()
+    request.GET['type'] = 'artists'
+    request.GET['spotify_id'] = spotify_id
+    response = spotify_handler.spotify_get_id(request) # Get from cache or API
+    if isinstance(response, JsonResponse) and response.status_code == 200:
+        data = json.loads(response.content)
+        return render(request, 'music_rating/artist_detail.html', {'artist': data})
+    print("ERROR")
 
 
 
 ### Spotify Search
 
 def spotify_search(request):
-    spotify_service = SpotifyUtils()
-    return spotify_service.spotify_search(request)
+    return spotify_handler.spotify_search(request)
 
 def spotify_id_retrieval(request):
-    spotify_service = SpotifyUtils()
-    return spotify_service.spotify_get_id(request)
+    return spotify_handler.spotify_get_id(request)
 
