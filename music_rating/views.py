@@ -46,7 +46,11 @@ def album_detail(request, spotify_id):
     if isinstance(response, JsonResponse) and response.status_code == 200:
         data = json.loads(response.content)
         return render(request, 'music_rating/album_detail.html', {'album': data})
-    print("ERROR")
+    # Handle error cases explicitly
+    print("ERROR: Failed to retrieve album details")
+    if isinstance(response, JsonResponse):
+        return HttpResponse("Error retrieving album details", status=500)
+    return HttpResponse("Album not found", status=404)
     
 
 def song_detail(request, spotify_id):
@@ -57,7 +61,11 @@ def song_detail(request, spotify_id):
     if isinstance(response, JsonResponse) and response.status_code == 200:
         data = json.loads(response.content)
         return render(request, 'music_rating/song_detail.html', {'song': data})
-    print("ERROR")
+   # Handle error cases explicitly
+    print("ERROR: Failed to retrieve album details")
+    if isinstance(response, JsonResponse):
+        return HttpResponse("Error retrieving song details", status=500)
+    return HttpResponse("Album not found", status=404)
 
 def artist_detail(request, spotify_id):
     request.GET = request.GET.copy()
@@ -67,7 +75,11 @@ def artist_detail(request, spotify_id):
     if isinstance(response, JsonResponse) and response.status_code == 200:
         data = json.loads(response.content)
         return render(request, 'music_rating/artist_detail.html', {'artist': data})
-    print("ERROR")
+   # Handle error cases explicitly
+    print("ERROR: Failed to retrieve album details")
+    if isinstance(response, JsonResponse):
+        return HttpResponse("Error retrieving artist details", status=500)
+    return HttpResponse("Album not found", status=404)
 
 
 

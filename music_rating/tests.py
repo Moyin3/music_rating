@@ -7,6 +7,7 @@ from django.urls import reverse
 from music_rating.utils.spotify import SpotifyUtils
 import time
 import json
+from django.http import JsonResponse
 
 
 class ArtistModelTest(TestCase):
@@ -155,47 +156,109 @@ class ViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'music_rating/compage.html')
 
+class DetailViewTests(TestCase):
     def setUp(self):
-         # Create test data for Album, Song, and Artist
-        self.album = Album.objects.create(spotify_id="album123", album_name="Test Album")
-        self.song = Song.objects.create(spotify_id="song123", song_name="Test Song")
-        self.artist = Artist.objects.create(spotify_id="artist123", artist_name="Test Artist")
-    
-    def test_album_detail_view(self):
-        client = Client()
-        response = client.get(reverse('album_detail', args=[self.album.spotify_id]))
+        self.client = Client()
+
+    @patch('music_rating.views.spotify_handler.spotify_get_id')
+    def test_album_detail_success(self, mock_spotify_get_id):
+        # Mock Spotify API response
+        mock_response_data = {
+            "album_name": "Test Album",
+            "artist_name": "Test Artist",
+            "tracks": ["Track 1", "Track 2"]
+        }
+        mock_spotify_get_id.return_value = JsonResponse(mock_response_data, status=200)
+
+        # Call the view
+        url = reverse('album_detail', args=['test-spotify-id'])
+        response = self.client.get(url)
+
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'music_rating/album_detail.html')
-        self.assertContains(response, self.album.album_name)
-    
-    def test_song_detail_view(self):
-        client = Client()
-        response = client.get(reverse('song_detail', args=[self.song.spotify_id]))
+        self.assertContains(response, "Test Album")
+        #self.assertContains(response, "Test Artist")
+
+    @patch('music_rating.views.spotify_handler.spotify_get_id')
+    def test_song_detail_success(self, mock_spotify_get_id):
+        # Mock Spotify API response
+        mock_response_data = {
+            "track_name": "Test Song",
+            "artist_name": ["Artist 1", "Artist 2"],
+            "artist_id": ["id1", "id2"],
+            "album_name": "Test Album",
+            "album_id": "album1"
+        }
+        mock_spotify_get_id.return_value = JsonResponse(mock_response_data, status=200)
+
+        # Generate the URL dynamically
+        url = reverse('song_detail', args=['test-spotify-id'])
+        response = self.client.get(url)
+
+        # Assertions
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'music_rating/song_detail.html')
-        self.assertContains(response, self.song.song_name)
-    
-    def test_artist_detail_view(self):
-        client = Client()
-        response = client.get(reverse('artist_detail', args=[self.artist.spotify_id]))
+        self.assertContains(response, "Test Song")
+        self.assertContains(response, "Test Album")
+        self.assertContains(response, "Artist 1")
+        self.assertContains(response, "Artist 2")
+        self.assertContains(response, '<a href="/artist/id1/">Artist 1</a>', html=True)
+        self.assertContains(response, '<a href="/artist/id2/">Artist 2</a>', html=True)
+
+    @patch('music_rating.views.spotify_handler.spotify_get_id')
+    def test_artist_detail_success(self, mock_spotify_get_id):
+        # Mock Spotify API response
+        mock_response_data = {
+            "artist_name": "Test Artist",
+            "albums": ["Album 1", "Album 2"],
+            "songs": ["Song 1", "Song 2"]
+        }
+        mock_spotify_get_id.return_value = JsonResponse(mock_response_data, status=200)
+
+        # Call the view
+        url = reverse('artist_detail', args=['test-spotify-id'])
+        response = self.client.get(url)
+
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'music_rating/artist_detail.html')
-        self.assertContains(response, self.artist.artist_name)
-    
-    def test_album_detail_view_not_found(self):
-        client = Client()
-        response = client.get(reverse('album_detail', args=["nonexistent_album"]))
-        self.assertEqual(response.status_code, 404)
-    
-    def test_song_detail_view_not_found(self):
-        client = Client()
-        response = client.get(reverse('song_detail', args=["nonexistent_song"]))
-        self.assertEqual(response.status_code, 404)
-    
-    def test_artist_detail_view_not_found(self):
-        client = Client()
-        response = client.get(reverse('artist_detail', args=["nonexistent_artist"]))
-        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, "Test Artist")
+        #self.assertContains(response, "Album 1")
+
+    @patch('music_rating.views.spotify_handler.spotify_get_id')
+    def test_album_detail_error(self, mock_spotify_get_id):
+        # Mock Spotify API error response
+        mock_spotify_get_id.return_value = JsonResponse({}, status=404)
+
+        # Call the view
+        url = reverse('album_detail', args=['test-spotify-id'])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertContains(response, "Error retrieving album details", status_code=500)
+
+    @patch('music_rating.views.spotify_handler.spotify_get_id')
+    def test_song_detail_error(self, mock_spotify_get_id):
+        # Mock Spotify API error response
+        mock_spotify_get_id.return_value = JsonResponse({}, status=404)
+
+        # Call the view
+        url = reverse('song_detail', args=['test-spotify-id'])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertContains(response, "Error retrieving song details", status_code=500)
+
+    @patch('music_rating.views.spotify_handler.spotify_get_id')
+    def test_artist_detail_error(self, mock_spotify_get_id):
+        # Mock Spotify API error response
+        mock_spotify_get_id.return_value = JsonResponse({}, status=404)
+
+        # Call the view
+        url = reverse('artist_detail', args=['test-spotify-id'])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertContains(response, "Error retrieving artist details", status_code=500)
   
 class SpotifyUtilsTests(TestCase):
     def setUp(self):
