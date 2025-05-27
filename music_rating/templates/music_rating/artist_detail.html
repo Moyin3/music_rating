@@ -26,9 +26,9 @@
             <a href="{% url 'songs' %}">Songs</a>
         </div>
     </nav>
+    <script src="{% static 'java_script/search.js' %}?v={{ timestamp }}"></script>
     <h1>{{ artist.artist_name }}</h1>
 
-    <!--
     <h2>Albums</h2>
     <ul>
         {% for album in artist.albums.all %}
@@ -57,8 +57,7 @@
     </ul>
     <h2>Rating</h2>
     <p>Rating: {{ artist.rating }}</p>
-    <h2>Optional Notes</h2>
+    <h2>Information</h2>
     <p>{{ artist.optional_writing|default:"No additional information available." }}</p>
--->
 </body>
 </html>

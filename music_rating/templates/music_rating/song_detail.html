@@ -27,6 +27,7 @@
             <a href="{% url 'songs' %}">Songs</a>
         </div>
     </nav>
+    <script src="{% static 'java_script/search.js' %}?v={{ timestamp }}"></script>
     <div class="container">
         <h1>{{ song.track_name }}</h1>
     
