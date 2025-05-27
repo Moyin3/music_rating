@@ -27,11 +27,11 @@
     </nav>
     <script src="{% static 'java_script/search.js' %}?v={{ timestamp }}"></script>
     <h1>{{ album.album_name }}</h1>
-    <!--
+    
         <h2>Songs</h2>
         <ul>
-            {% for song in album.songs.all %}
-                <li>{{ song.song_name }}</li>
+            {% for track in tracks %}
+                <a href = "{% url 'song_detail' track.id%}"><li>{{ track.name }}</li></a>
             {% empty %}
                 <li>No tracks available</li>
             {% endfor %}
@@ -39,7 +39,6 @@
         <h2>Rating</h2>
         <p>Rating: {{ album.rating }}</p>
         <h2>Optional Notes</h2>
-        <p>{{ album.optional_writing|default:"No additional information available." }}</p>
-    -->    
+        <p>{{ album.optional_writing|default:"No additional information available." }}</p>  
 </body>
 </html>

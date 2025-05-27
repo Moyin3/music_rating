@@ -36,23 +36,7 @@ def songspage(request):
 
 def compage(request):
     template = loader.get_template("music_rating/compage.html")
-    return HttpResponse(template.render({}, request))
-
-
-def album_detail(request, spotify_id):
-    request.GET = request.GET.copy()
-    request.GET['type'] = 'albums'
-    request.GET['spotify_id'] = spotify_id
-    response = spotify_handler.spotify_get_id(request)# Get from cache or API
-    if isinstance(response, JsonResponse) and response.status_code == 200:
-        data = json.loads(response.content)
-        return render(request, 'music_rating/album_detail.html', {'album': data})
-    # Handle error cases explicitly
-    print("ERROR: Failed to retrieve album details")
-    if isinstance(response, JsonResponse):
-        return HttpResponse("Error retrieving album details", status=500)
-    return HttpResponse("Album not found", status=404)
-    
+    return HttpResponse(template.render({}, request))    
 
 def song_detail(request, spotify_id):
     request.GET = request.GET.copy()
@@ -67,6 +51,49 @@ def song_detail(request, spotify_id):
     if isinstance(response, JsonResponse):
         return HttpResponse("Error retrieving song details", status=500)
     return HttpResponse("Song not found", status=404)
+
+def album_detail(request, spotify_id):
+    # Spotify API endpoint for album details
+    album_url = f"https://api.spotify.com/v1/albums/{spotify_id}"
+    headers = {
+        "Authorization": f"Bearer {request.session.get('spotify_access_token')}"  # Use Spotify access token
+    }
+
+    # Make the API call
+    album_response = requests.get(album_url, headers=headers)
+
+    if album_response.status_code == 200:
+        album_data = album_response.json()
+        tracks = album_data.get('tracks', {}).get('items', [])  # Extract tracks from the album data
+        return render(request, 'music_rating/album_detail.html', {
+            'album': album_data,
+            'tracks': tracks,
+        })
+    elif album_response.status_code == 401:  # Unauthorized (invalid or expired token)
+        print("Access token expired. Refreshing token...")
+        new_token = spotify_handler._get_access_token(request)
+        if new_token:
+            # Update the session with the new token
+            request.session['spotify_access_token'] = new_token
+            headers["Authorization"] = f"Bearer {new_token}"
+            # Retry the API call
+            album_response = requests.get(album_url, headers=headers)
+            if album_response.status_code == 200:
+                album_data = album_response.json()
+                tracks = album_data.get('tracks', {}).get('items', [])
+                return render(request, 'music_rating/album_detail.html', {
+                    'album': album_data,
+                    'tracks': tracks,
+                })
+        print("ERROR: Failed to refresh access token")
+        return HttpResponse("Error refreshing access token", status=500)
+    elif album_response.status_code == 404:
+        print(f"Album not found: {spotify_id}")
+        return HttpResponse("Album not found", status=404)
+    else:
+        print(f"ERROR: Failed to retrieve album details. Status code: {album_response.status_code}")
+        print(f"Response: {album_response.text}")
+        return HttpResponse("Error retrieving album details", status=500)
 
 def artist_detail(request, spotify_id):
     # Fetch artist details
@@ -86,7 +113,19 @@ def artist_detail(request, spotify_id):
         }
         albums_response = requests.get(albums_url, headers=headers)
 
-        
+        if albums_response.status_code == 401:  # Unauthorized (invalid or expired token)
+            print("Access token expired. Refreshing token...")
+            # Refresh the access token
+            new_token = spotify_handler._get_access_token(request)
+            if new_token:
+                # Update the session with the new token
+                request.session['spotify_access_token'] = new_token
+                headers["Authorization"] = f"Bearer {new_token}"
+                # Retry the API call
+                albums_response = requests.get(albums_url, headers=headers)
+            else:
+                print("ERROR: Failed to refresh access token")
+                return HttpResponse("Error refreshing access token", status=500)
 
         if albums_response.status_code == 200:
             albums_data = albums_response.json()
@@ -95,7 +134,6 @@ def artist_detail(request, spotify_id):
         if album.get('album_type') == 'album'
     ]
         print(f"Albums API Response: {albums_response.status_code}")
-        print(f"Albums API Data: {albums_response.text}")
 
         # Pass both artist details and albums to the template
         return render(request, 'music_rating/artist_detail.html', {
