@@ -31,8 +31,8 @@
 
     <h2>Albums</h2>
     <ul>
-        {% for album in artist.albums.all %}
-            <li>{{ album.album_name }}</li>
+        {% for album in albums %}
+            <li>{{ album.name }}</li>
         {% empty %}
             <li>No albums available</li>
         {% endfor %}

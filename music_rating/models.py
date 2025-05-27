@@ -1,8 +1,5 @@
 from django.db import models
 
-
-"""Unsure about this but chat said could come in handy for consistency across models
-"""
 class RateSystem(models.Model):
     name = models.CharField(max_length=255, default = 'OG')
     description = models.TextField(null=True)
