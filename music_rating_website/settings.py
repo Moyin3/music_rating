@@ -21,10 +21,12 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 DEBUG = env.bool("DEBUG", default=False)
 
 DATABASES = {
-    "default": env.db("DATABASE_URL"),
-    "TEST": {
-        "NAME": "test_postgres",
-    },
+    "default": {
+        **env.db("DATABASE_URL"),
+        "TEST": {
+            "NAME": "test_postgres",
+        },
+    }
 }
 
 SPOTIFY_CLIENT_ID = env('SPOTIFY_CLIENT_ID')
