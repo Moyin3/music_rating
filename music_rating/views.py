@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from .utils.spotify import SpotifyUtils
@@ -6,6 +6,7 @@ import json
 import requests
 
 from .models import Song, Album, Artist
+from .forms import AlbumRatingForm
 
 spotify_handler = SpotifyUtils()
 
@@ -36,7 +37,17 @@ def songspage(request):
 
 def compage(request):
     template = loader.get_template("music_rating/compage.html")
-    return HttpResponse(template.render({}, request))    
+    return HttpResponse(template.render({}, request))
+
+def rate_album(request, spotify_id):
+    if request.method == 'POST':
+        form = AlbumRatingForm(request.POST)
+        if form.is_valid():
+            rating = form.cleaned_data['rating']
+            album = get_object_or_404(Album, spotify_id=spotify_id)
+            album.rating = rating
+            album.save()
+        return redirect('album_detail', spotify_id=spotify_id)
 
 def song_detail(request, spotify_id):
     request.GET = request.GET.copy()
@@ -65,9 +76,13 @@ def album_detail(request, spotify_id):
     if album_response.status_code == 200:
         album_data = album_response.json()
         tracks = album_data.get('tracks', {}).get('items', [])  # Extract tracks from the album data
+        album_object = Album.objects.filter(spotify_id=spotify_id).first()
+        form = AlbumRatingForm()  # Initialize the form for album rating
         return render(request, 'music_rating/album_detail.html', {
             'album': album_data,
             'tracks': tracks,
+            'album_obj': album_object,  # Pass the Album object if it exists
+            'form': form,  # Pass the form for album rating
         })
     elif album_response.status_code == 401:  # Unauthorized (invalid or expired token)
         print("Access token expired. Refreshing token...")
@@ -81,9 +96,13 @@ def album_detail(request, spotify_id):
             if album_response.status_code == 200:
                 album_data = album_response.json()
                 tracks = album_data.get('tracks', {}).get('items', [])
+                album_object = Album.objects.filter(spotify_id=spotify_id).first()
+                form = AlbumRatingForm()
                 return render(request, 'music_rating/album_detail.html', {
                     'album': album_data,
                     'tracks': tracks,
+                    'album_obj': album_object,  # Pass the Album object if it exists
+                    'form': form,  # Pass the form for album rating
                 })
         print("ERROR: Failed to refresh access token")
         return HttpResponse("Error refreshing access token", status=500)

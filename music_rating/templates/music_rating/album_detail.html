@@ -5,6 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ album.album_name }} - Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="{% static 'music_rating/general.css' %}">
     <script src="{% static 'java_script/search.js' %}"></script>
 </head>
@@ -36,9 +38,45 @@
                 <li>No tracks available</li>
             {% endfor %}
         </ul>
+        <div class = "rating_section">
         <h2>Rating</h2>
-        <p>Rating: {{ album.rating }}</p>
+        <p>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#rateModal{{ album.id }}">
+        Add Rating
+        </button>
+        </p>
+        <p>
+            {% if album_obj.album_rating %}
+                {{ album_obj.album_rating.score}}
+            {% else %}
+                You have not rated this album yet.
+            {% endif %}
+        </p>
+        <!--
         <h2>Optional Notes</h2>
-        <p>{{ album.optional_writing|default:"No additional information available." }}</p>  
+        <p>{{ album.optional_writing|default:"No additional information available." }}</p>
+        -->
+        </div>
+
+        <!-- Modal -->
+<div class="modal fade" id="rateModal{{ album.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        {% if album.id %}
+        <form method="POST" action="{% url 'rate_album' album.id %}">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Save Rating</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+
+        </form>
+        {% else %}
+        <p>Error: Missing Spotify ID</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </body>
 </html>
