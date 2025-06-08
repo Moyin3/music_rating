@@ -208,3 +208,30 @@ def spotify_search(request):
 def spotify_id_retrieval(request):
     return spotify_handler.spotify_get_id(request)
 
+
+# Rating logic for songs, albums, and artists
+
+def album_rating(album):
+    return
+
+def average_rating_for_album(album):
+    songs = Song.objects.filter(album=album)
+    if not songs:
+        return 0
+    total_rating = sum(song.rating for song in songs if song.rating is not None)
+    songs_with_ratings = [song for song in songs if song.rating is not None]
+    return total_rating / len(songs_with_ratings) if len(songs_with_ratings) > 0 else 0
+
+def average_rating_for_artist(artist):
+    albums = Album.objects.filter(artist=artist)
+    if not albums:
+        return 0
+    total_rating = sum(average_rating_for_album(album) for album in albums)
+    albums_with_ratings = [album for album in albums if average_rating_for_album(album) > 0]
+    return total_rating / len(albums_with_ratings) if len(albums_with_ratings) > 0 else 0
+
+def album_rating_for_rate_system_2(album):
+    return album.average_rating_for_album()
+
+def artist_rating_for_rate_system_2(artist):
+    return artist.average_rating_for_artist()

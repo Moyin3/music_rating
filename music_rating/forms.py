@@ -4,10 +4,11 @@ from .models import Song, Album, Single, EP, Artist
 class AlbumRatingForm(forms.ModelForm):
     class Meta:
         model = Album
-        fields = ['album_rating', 'optional_writing']
+        fields = ['album_rating', 'optional_writing', 'rate_system']
         widgets = {
             'album_rating': forms.NumberInput(attrs={'placeholder': 'Rating'}),
             'optional_writing': forms.Textarea(attrs={'placeholder': 'Optional writing'}),
+            'rate_system': forms.Select(attrs={'class': 'form-control'}),
         }
 
 class SingleRatingForm(forms.ModelForm):

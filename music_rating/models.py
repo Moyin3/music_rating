@@ -20,6 +20,7 @@ class Album(models.Model):
     spotify_id = models.CharField(max_length=50, unique=True, db_index=True, default="")
     album_rating = models.ForeignKey(Rating, on_delete=models.SET_NULL, blank=True, null=True)
     optional_writing = models.TextField(blank = True, null = True)
+    rate_system = models.ForeignKey(RateSystem, on_delete=models.CASCADE, default=1)
 
 class Single(models.Model):
     spotify_id = models.CharField(max_length=50, unique=True, db_index=True, default="")
