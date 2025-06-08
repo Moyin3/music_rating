@@ -6,7 +6,7 @@ import json
 import requests
 
 from .models import Song, Album, Artist
-from .forms import AlbumRatingForm
+from .forms import AlbumRatingForm, ArtistRatingForm, SongRatingForm
 
 spotify_handler = SpotifyUtils()
 
@@ -39,15 +39,35 @@ def compage(request):
     template = loader.get_template("music_rating/compage.html")
     return HttpResponse(template.render({}, request))
 
+def rate_song(request, spotify_id):
+    if request.method == 'POST':
+        form = SongRatingForm(request.POST)
+        if form.is_valid():
+            rating = form.cleaned_data['rating']
+            song = get_object_or_404(Song, spotify_id=spotify_id)
+            song.rating = rating
+            song.save()
+        return redirect('song_detail', spotify_id=spotify_id)
+
 def rate_album(request, spotify_id):
     if request.method == 'POST':
         form = AlbumRatingForm(request.POST)
         if form.is_valid():
             rating = form.cleaned_data['rating']
             album = get_object_or_404(Album, spotify_id=spotify_id)
-            album.rating = rating
+            album.album_rating = rating
             album.save()
         return redirect('album_detail', spotify_id=spotify_id)
+
+def rate_artist(request, spotify_id):
+    if request.method == 'POST':
+        form = ArtistRatingForm(request.POST)
+        if form.is_valid():
+            rating = form.cleaned_data['rating']
+            artist = get_object_or_404(Artist, spotify_id=spotify_id)
+            artist.artist_rating = rating
+            artist.save()
+        return redirect('artist_detail', spotify_id=spotify_id)
 
 def song_detail(request, spotify_id):
     request.GET = request.GET.copy()
@@ -56,7 +76,13 @@ def song_detail(request, spotify_id):
     response = spotify_handler.spotify_get_id(request)# Get from cache or API
     if isinstance(response, JsonResponse) and response.status_code == 200:
         data = json.loads(response.content)
-        return render(request, 'music_rating/song_detail.html', {'song': data})
+        song_object = Song.objects.filter(spotify_id=spotify_id).first()
+        form = SongRatingForm()
+        return render(request, 'music_rating/song_detail.html', {
+            'song': data, 
+            'song_obj': song_object, 
+            'form': form,
+            })
    # Handle error cases explicitly
     print("ERROR: Failed to retrieve album details")
     if isinstance(response, JsonResponse):
@@ -123,6 +149,8 @@ def artist_detail(request, spotify_id):
 
     if isinstance(response, JsonResponse) and response.status_code == 200:
         artist_data = json.loads(response.content)  # Artist details
+        artist_object = Artist.objects.filter(spotify_id=spotify_id).first()  # Get the Artist object if it exists
+        form = ArtistRatingForm()  # Initialize the form for artist rating
 
         # Fetch albums for the artist using Spotify API
         albums = []
@@ -158,6 +186,8 @@ def artist_detail(request, spotify_id):
         return render(request, 'music_rating/artist_detail.html', {
             'artist': artist_data,
             'albums': albums,
+            'artist_obj': artist_object,  # Pass the Artist object if it exists
+            'form': form,  # Pass the form for artist rating
         })
 
     # Handle error cases explicitly
