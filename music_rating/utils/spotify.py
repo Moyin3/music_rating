@@ -101,7 +101,7 @@ class SpotifyUtils:
         response = requests.get(search_url, headers=headers)
 
         if response.status_code == 200:
-            cache_object = self._parse_spotify_item(response.json())
+            cache_object = self._parse_spotify_item(response.json(), request)
             if cache_object:
                 cache.set(cache_key, cache_object, timeout=300) # 1 hour
                 return JsonResponse(cache_object)
@@ -109,9 +109,28 @@ class SpotifyUtils:
                 return JsonResponse({'error': 'Incorrect response format'})
         else:
             return JsonResponse({'error': 'Failed to fetch id from Spotify'}, status=400)
-        
     
-    def _parse_spotify_item(self, data):
+
+    def get_artist_albums(self, id, type, request):
+        token = self._get_access_token(request)
+        if not token:
+            return JsonResponse({'error': 'Failed to retrieve access token'}, status=400)
+        
+        encoded_id = quote(id)
+        encoded_type = quote(type)
+        search_url = f"https://api.spotify.com/v1/artists/{encoded_id}/albums?include_groups={encoded_type}"
+
+        headers = {
+            'Authorization': f'Bearer {token}'
+        }
+        response = requests.get(search_url, headers=headers)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return JsonResponse({'error': 'Failed to fetch id from Spotify'}, status=400)
+
+
+    def _parse_spotify_item(self, data, request):
         if not data:
             return None
         parsed = {
@@ -119,12 +138,29 @@ class SpotifyUtils:
             'type': f"{data.get('type')}s",
         }
         if data.get('type') == 'artist':
+    
+            artist_albums = self.get_artist_albums(parsed['id'], 'album', request)
+            artist_other = self.get_artist_albums(parsed['id'], 'single', request)
+
             parsed['artist_name'] = data.get('name')
+            parsed['artist_albums'] = [
+                (album['id'], album['name']) for album in artist_albums.get('items', [])
+            ]
+            parsed['artist_singles'] = [
+                (album['id'], album['name']) for album in artist_other.get('items', [])
+                if album.get('total_tracks') == 1
+            ]
+            parsed['artist_eps'] = [
+                (album['id'], album['name']) for album in artist_other.get('items', [])
+                if album.get('total_tracks') > 1
+            ]
+
         
         elif data.get('type') == 'album':
             parsed['album_name'] = data.get('name')
             parsed['artist_name'] = [artist['name'] for artist in data.get('artists', [])]
             parsed['artist_id'] = [artist['id'] for artist in data.get('artists', [])]
+            parsed['track_list'] = [(track['id'], track['name']) for track in data.get('tracks', []).get('items', [])]
 
         elif data.get('type') == 'track':
             parsed['track_name'] = data.get('name')

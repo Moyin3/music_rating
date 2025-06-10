@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_tags %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -32,12 +33,23 @@
     
         <h2>Songs</h2>
         <ul>
-            {% for track in tracks %}
-                <a href = "{% url 'song_detail' track.id%}"><li>{{ track.name }}</li></a>
+            {% for track in album.track_list %}
+            <a href="{% url 'song_detail' track.0 %}"><b>{{ track.1 }}</b></a><br>
             {% empty %}
                 <li>No tracks available</li>
             {% endfor %}
         </ul>
+
+        <div class="section">
+            <p class="label"> Artist{{ album.artist_name|length|pluralize }}:</p>
+            <ul>
+                {% for name, id in album.artist_name|zip_lists:album.artist_id %}
+                    <li><a href="{% url 'artist_detail' id %}">{{ name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+
         <div class = "rating_section">
         <h2>Rating</h2>
         <p>

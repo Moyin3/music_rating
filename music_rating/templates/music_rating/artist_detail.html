@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_tags %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -34,10 +35,8 @@
 
     <h2>Albums</h2>
     <ul>
-        {% for album in albums %}
-            <a href = "{% url 'album_detail' album.id%}">
-                <li>{{ album.name }}</li>
-            </a>
+        {% for album in artist.artist_albums %}
+        <a href="{% url 'album_detail' album.0 %}"><b>{{ album.1 }}</b></a><br>
         {% empty %}
             <li>No albums available</li>
         {% endfor %}
@@ -45,8 +44,8 @@
 
     <h2>Singles</h2>
     <ul>
-        {% for single in artist.singles.all %}
-            <li>{{ single.single_name }}</li>
+        {% for single in artist.artist_singles %}
+            <a href="{% url 'album_detail' single.0 %}"><b>{{ single.1 }}</b></a><br>
         {% empty %}
             <li>No singles available</li>
         {% endfor %}
@@ -54,8 +53,8 @@
 
     <h2>EPs</h2>
     <ul>
-        {% for ep in artist.eps.all %}
-            <li>{{ ep.ep_name }}</li>
+        {% for ep in artist.artist_eps%}
+        <a href="{% url 'album_detail' ep.0 %}"><b>{{ ep.1 }}</b></a><br>
         {% empty %}
             <li>No EPs available</li>
         {% endfor %}

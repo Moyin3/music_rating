@@ -77,7 +77,6 @@ document.addEventListener('click', function(event) {
 function selectSuggestion(suggestion) {
 
     // Determine the type of the suggestion and redirect to the appropriate view
-    console.log("Here");
     if (suggestion.type === 'track') {
         window.location.href = `/song/${suggestion.id}/`; // Redirect to track view
     } else if (suggestion.type === 'artist') {
