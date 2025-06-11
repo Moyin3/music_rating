@@ -23,11 +23,31 @@ searchBox.addEventListener("input", async () => {
             
             const maxResults = 5;
             let combinedResults = [];
+            var pop_success = true;
 
             combinedResults = combinedResults.concat(data.tracks.items);
             combinedResults = combinedResults.concat(data.artists.items);
+            // print('test');
+            // // Get Album popularity
+            // if (data.albums.total != 0) {
+            //     var is_string = '';
+            //     for (const album of data.albums.items) {
+            //         is_string = id_string + album.id + ',';
+            //     }
+            //     try {
+            //         const response = await fetch(`/album-pop/?query=${encodeURIComponent(is_string.slice(0, -1))}`);
+            //         const album_pops = await response.json();
+            //         for (const album of data.albums.items) {
+            //             album.popularity = album_pops[album.id];
+            //         }
+            //     } catch {
+            //         pop_success = false;
+            //     }
+            // }
+
             combinedResults = combinedResults.concat(data.albums.items);
-            const sortedCombinedResults = sortByCloseness(combinedResults, query)
+            const sortedCombinedResults = sortByCloseness(combinedResults, query);
+            //const sortedCombinedResults = sortByCloseness(combinedResults, query, pop_success);
             const results = sortedCombinedResults.slice(0, maxResults);
         
             // Display the limited results
@@ -110,17 +130,24 @@ function levenshtein(a, b) {
 }
 
 // Function to sort items by how close they are to a given string
-function sortByCloseness(list, targetString) {
-    const sorted = list.sort((a, b) => {
-        const distA = levenshtein(a.name, targetString);
-        const distB = levenshtein(b.name, targetString);
-        if (distA !== distB) {
-            return distA - distB;
-        }
-        return a.name.localeCompare(b.name);
-    });
+function sortByCloseness(list, targetString, pop_success) {
+    if (pop_success) {
+
+    } else {
+        const sorted = list.sort((a, b) => {
+                const distA = levenshtein(a.name, targetString);
+                const distB = levenshtein(b.name, targetString);
+                if (distA !== distB) {
+                    return distA - distB;
+                }
+                return a.name.localeCompare(b.name);
+            });
+    }
+    
     return sorted;
 }
+
+
 
 //Exporting functions so they can be tested
 if (typeof module !== 'undefined' && module.exports) {

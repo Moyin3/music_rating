@@ -159,3 +159,6 @@ def spotify_search(request):
 def spotify_id_retrieval(request):
     return spotify_handler.spotify_get_id(request)
 
+def spotify_album_pops(request):
+    return spotify_handler.get_album_pop(request)
+
