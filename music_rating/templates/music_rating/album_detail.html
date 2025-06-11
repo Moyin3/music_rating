@@ -58,8 +58,8 @@
         </button>
         </p>
         <p>
-            {% if album_obj.user_rating %}
-                {{ album_obj.user_rating.score}}
+            {% if user_rating %}
+                {{ user_rating.score}}
             {% else %}
                 You have not rated this album yet.
             {% endif %}
