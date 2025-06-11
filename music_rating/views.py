@@ -5,8 +5,10 @@ from .utils.spotify import SpotifyUtils
 import json
 import requests
 
-from .models import Song, Album, Artist
+from .models import Song, Album, Artist, Rating
 from .forms import AlbumRatingForm, ArtistRatingForm, SongRatingForm
+from django.contrib.contenttypes.models import ContentType
+
 
 spotify_handler = SpotifyUtils()
 
@@ -99,10 +101,18 @@ def album_detail(request, spotify_id):
         album_data = json.loads(response.content)
         album_object = Album.objects.filter(spotify_id=spotify_id).first()
         form = AlbumRatingForm()  # Initialize the form for album rating
+        if album_object:
+            content_type = ContentType.objects.get_for_model(Album)
+            user_rating = None
+            if request.user.is_authenticated:
+                user_rating = Rating.objects.filter(user=request.user, content_type=content_type, object_id = album_object.spotify_id).first()
+                if user_rating:
+                    form = AlbumRatingForm(initial={'rating': user_rating.score})
         return render(request, 'music_rating/album_detail.html', {
             'album': album_data,
             'album_obj': album_object,  # Pass the Album object if it exists
             'form': form,  # Pass the form for album rating
+            'user_rating': user_rating,  # Pass the user's rating if it exists
         })
 
 
