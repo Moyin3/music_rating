@@ -19,10 +19,12 @@ class UserProfile(models.Model):
 
 class Rating(models.Model):
     score = models.FloatField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    object_id = models.CharField(max_length=50)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)  # Nulls for a temporary fix, to enable migrations without breaking existing data
+    object_id = models.CharField(max_length=50, null = True) # Nulls for a temporary fix, to enable migrations without breaking existing data
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True) # Nulls for a temporary fix, to enable migrations without breaking existing data
     content_object = GenericForeignKey('content_type', 'object_id')
+    rate_system = models.ForeignKey(RateSystem, on_delete=models.CASCADE, default=1)
+    optional_writing = models.TextField(blank = True, null=True)
 
     class Meta:
         unique_together = ('user', 'content_type', 'object_id')
@@ -30,22 +32,16 @@ class Rating(models.Model):
 
 class Song(models.Model):
     spotify_id = models.CharField(max_length=50, unique=True, db_index=True, default="", primary_key=True)
-    optional_writing = models.TextField(blank = True, null=True)
+    
     
 class Album(models.Model):
     spotify_id = models.CharField(max_length=50, unique=True, db_index=True, default="", primary_key=True)
-    optional_writing = models.TextField(blank = True, null = True)
-    rate_system = models.ForeignKey(RateSystem, on_delete=models.CASCADE, default=1)
 
 class Single(models.Model):
     spotify_id = models.CharField(max_length=50, unique=True, db_index=True, default="", primary_key=True)
-    optional_writing = models.TextField(blank = True, null = True)
 
 class EP(models.Model):
     spotify_id = models.CharField(max_length=50, unique=True, db_index=True, default="", primary_key=True)
-    optional_writing = models.TextField(blank = True, null = True)
 
 class Artist(models.Model):
     spotify_id = models.CharField(max_length=50, unique=True, db_index=True, default="", primary_key=True)
-    rate_system = models.ForeignKey(RateSystem, on_delete=models.CASCADE, default=1)
-    optional_writing = models.TextField(blank = True, null = True)
