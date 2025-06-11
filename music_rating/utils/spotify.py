@@ -141,9 +141,9 @@ class SpotifyUtils:
         token = self._get_access_token(request)
         if not token:
             return JsonResponse({'error': 'Failed to retrieve access token'}, status=400)
-        spotify_id = request.GET.get('spotify_id', '')
-        encoded_id = quote(spotify_id)
-        search_url = f"https://api.spotify.com/v1/albums?{encoded_id}"
+        query = request.GET.get('query', '')
+        encoded_id = quote(query)
+        search_url = f"https://api.spotify.com/v1/albums?ids={encoded_id}"
         headers = {
             'Authorization': f'Bearer {token}'
         }
@@ -151,10 +151,10 @@ class SpotifyUtils:
         response = requests.get(search_url, headers=headers)
 
         if response.status_code == 200:
+            data = response.json()
             pop_data = {}
-            for album in response.get('albums', []):
+            for album in data.get('albums', []):
                 pop_data[album['id']] = album['popularity']
-
             return JsonResponse(pop_data)
         else:
             return JsonResponse({'error': 'Failed to fetch id from Spotify'}, status=400)
