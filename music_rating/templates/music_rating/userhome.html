@@ -17,6 +17,7 @@
                 <input type="text" id="nav_search_bar" class="nav_search_bar" placeholder="Search for a song, artist...">
                 <div id="suggestions" class = "suggestions"></div>
             </div>
+            <button id="mapToggleBtn">Select Location on Map</button>
             <div class="navbar-links">
                 <a href="{% url 'albums' %}">Albums</a>
                 <a href="{% url 'artists' %}">Artists</a>
@@ -25,8 +26,16 @@
                 <a href="{% url 'songs' %}">Songs</a>
             </div>
         </nav>
+        
 
+
+        <div id="mapContainer" style="height: 500px; display: none;"></div>
+        <div id="coordsDisplay"></div>
+
+        
         <script src="{% static 'java_script/search.js' %}?v={{ timestamp }}"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
         
 
 

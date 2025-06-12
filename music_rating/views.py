@@ -2,8 +2,10 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from .utils.spotify import SpotifyUtils
+from .utils.artist_info import get_local_artist_ids
 import json
 import requests
+
 
 from .models import Song, Album, Artist
 
@@ -147,7 +149,8 @@ def artist_detail(request, spotify_id):
         return HttpResponse("Error retrieving artist details", status=500)
     return HttpResponse("Artist not found", status=404)
 
-
+def map_search(request):
+    return get_local_artist_ids(request)
 
 
 

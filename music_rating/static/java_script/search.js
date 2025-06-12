@@ -97,7 +97,70 @@ document.addEventListener("DOMContentLoaded", () => {
             suggestionsDiv.style.display = 'none';
         }
     });
+
+    const mapToggleBtn = document.getElementById("mapToggleBtn");
+    const mapContainer = document.getElementById("mapContainer");
+
+    let mapInitialized = false;
+    let map;
+
+    mapToggleBtn.addEventListener("click", () => {
+        if (mapContainer.style.display === "none") {
+            mapContainer.style.display = "block";
+            mapToggleBtn.textContent = "Hide Map";
+            if (!mapInitialized) {
+                map = L.map('mapContainer').setView([20, 0], 2);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                    attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
+                }).addTo(map);
+
+                map.on('click', async function (e) {
+                    const lat = e.latlng.lat.toFixed(5);
+                    const lon = e.latlng.lng.toFixed(5);
+                    const currentZoom = map.getZoom();
+                    map.setView(e.latlng, Math.max(currentZoom + 3, 10));
+                    const params = new URLSearchParams({
+                        zoom: currentZoom,
+                        lat: lat,
+                        lon: lon
+                    });
+                    try {
+                        const response = await fetch(`/map-search/?${params.toString()}`);
+                        const data = await response.json();
+                        if (data.location) {
+                            const locationName = data.location;
+                            const artists = data.artists || [];
+
+                            const resultDiv = document.getElementById("coordsDisplay");
+                            resultDiv.innerHTML = `<h3>Artists from ${locationName}:</h3>`;
+
+                            if (artists.length > 0) {
+                                const ul = document.createElement('ul');
+                                artists.forEach(name => {
+                                    const li = document.createElement('li');
+                                    li.textContent = name;
+                                    ul.appendChild(li);
+                                });
+                                resultDiv.appendChild(ul);
+                            } else {
+                                resultDiv.innerHTML += `<p>No artists found.</p>`;
+                            }
+                        }
+                    } catch (err) {
+                        console.error("Error fetching artist data:", err);
+                    }
+                });
+
+                mapInitialized = true;
+            }
+        } else {
+            mapContainer.style.display = "none";
+            mapToggleBtn.textContent = "Select Location on Map";
+        }
+    });
 });
+
+
 
 
 

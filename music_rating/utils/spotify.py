@@ -120,6 +120,8 @@ class SpotifyUtils:
         }
         if data.get('type') == 'artist':
             parsed['artist_name'] = data.get('name')
+            print('here')
+            print(data.get('href'))
         
         elif data.get('type') == 'album':
             parsed['album_name'] = data.get('name')

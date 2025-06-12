@@ -34,4 +34,6 @@ urlpatterns = [
     path('artist/<str:spotify_id>/', views.artist_detail, name='artist_detail'),  # Detail page for a single artist
     path('id-retrieval/', views.spotify_id_retrieval, name='id_retrieval'), # Return id
     path('album-pop/', views.spotify_album_pops, name='album-pop'), # Return album pop
+    path('map-search/', views.map_search, name='map-search'), # map search
+
 ] + debug_toolbar_urls()
