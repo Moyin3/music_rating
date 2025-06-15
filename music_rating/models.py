@@ -18,7 +18,7 @@ class UserProfile(models.Model):
         return self.user.username
 
 class Rating(models.Model):
-    score = models.FloatField()
+    score = models.IntegerField(null=True, blank=True)  # This is to allow for null values, for the second rating system
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)  # Nulls for a temporary fix, to enable migrations without breaking existing data
     object_id = models.CharField(max_length=50, null = True) # Nulls for a temporary fix, to enable migrations without breaking existing data
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True) # Nulls for a temporary fix, to enable migrations without breaking existing data

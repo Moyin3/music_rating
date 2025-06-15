@@ -57,10 +57,23 @@
         </button>
         </p>
         <p>
-            {% if song_obj.rating %}
-                {{ song_obj.rating.score }}
+            {% if user_rating %}
+                {{ user_rating.score }}
             {% else %}
                 You have not rated this song yet.
+            {% endif %}
+        </p>
+        <p>
+            {% if optional_writing %}
+                {{ optional_writing }}
+            {% endif %}
+        </p>
+
+        <p> 
+            {% if community_rating %}
+                {{ community_rating }}
+            {% else %}
+                Looks like the community haven't found this gem
             {% endif %}
         </p>
     </div>
@@ -69,7 +82,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 {% if song.id %}
-                <form method="post" action="{% url 'rate_song' song.id %}">
+                <form method="post" action="{% url 'song_detail' song_obj.spotify_id %}">
                     {% csrf_token %}
                     <div class="modal-body">
                         {{ form.as_p }}
@@ -85,5 +98,14 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const rateSystemSelect = document.getElementById('id_rate_system');
+            const rateSystemLabel = document.querySelector('label[for="id_rate_system"]');
+
+            rateSystemSelect.style.display = 'none';
+            rateSystemLabel.style.display = 'none';
+        })
+    </script>
 </body>
 </html>

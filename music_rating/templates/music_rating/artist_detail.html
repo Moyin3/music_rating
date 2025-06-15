@@ -67,10 +67,17 @@
         </button>
         </p>
         <p>
-            {% if artist_obj.artist_rating %}
-                {{ artist_obj.artist_rating.score}}
+            {% if final_rating is not None %}
+                {{ final_rating}}
             {% else %}
                 You have not rated this artist yet.
+            {% endif %}
+        </p>
+        <p> 
+            {% if community_rating is not None %}
+                {{ community_rating}}
+            {% else %}
+                Looks like the community haven't found this gem.
             {% endif %}
         </p>
 
@@ -79,7 +86,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     {% if artist.id %}
-                    <form method="POST" action="{% url 'rate_artist' artist.id %}">
+                    <form method="POST" action="{% url 'artist_detail' artist_obj.spotify_id %}">
                         {% csrf_token %}
                         {{ form.as_p }}
                         <div class="modal-footer">
@@ -89,5 +96,36 @@
                     </form>
                     {% endif %}
                 </div>
-            </div>
+            </div> 
+
+            <!-- CSS to hide the score field and its label initially -->
+    <style>
+  #id_score, label[for="id_score"] {
+    display: none;
+  }
+</style>
+
+
+             <!-- JavaScript to handle the visibility of the score field based on the rate system selection -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const modal = document.getElementById('rateModal{{ artist.id }}');  
+                    modal.addEventListener('shown.bs.modal', function (event) {
+                        const rateSystemSelect = modal.querySelector('#id_rate_system');
+                        const scoreFieldLabel = modal.querySelector('label[for="id_score"]');
+                        const scoreFieldWrapper = modal.querySelector('#id_score');
+                        const updateScoreFieldVisibility = () => {
+                            if (rateSystemSelect.value != '1') { // Assuming '0' is the value for 'Custom'
+                                scoreFieldWrapper.style.display = 'none';
+                                scoreFieldLabel.style.display = 'none';
+                            } else {
+                                scoreFieldWrapper.style.display = 'block';
+                                scoreFieldLabel.style.display = 'block';
+                            }
+                        };
+                        rateSystemSelect.addEventListener('change', updateScoreFieldVisibility);
+                    });
+                });
+            </script>
+        </body>
 </html>
