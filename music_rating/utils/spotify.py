@@ -110,6 +110,8 @@ class SpotifyUtils:
         else:
             return JsonResponse({'error': 'Failed to fetch id from Spotify'}, status=400)
     
+    def get_album_dict_from_id(self, id, request):
+        return
 
     def get_artist_albums(self, id, type, request):
         token = self._get_access_token(request)

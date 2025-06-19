@@ -27,7 +27,7 @@ class Rating(models.Model):
     optional_writing = models.TextField(blank = True, null=True)
 
     class Meta:
-        unique_together = ('user', 'content_type', 'object_id')
+        unique_together = ('user', 'content_type', 'object_id', 'rate_system')
 
 
 class Song(models.Model):
