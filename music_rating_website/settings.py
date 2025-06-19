@@ -29,8 +29,8 @@ DATABASES = {
     }
 }
 
-SPOTIFY_CLIENT_ID = env('SPOTIFY_CLIENT_ID')
-SPOTIFY_CLIENT_SECRET = env('YOUR_SPOTIFY_CLIENT_SECRET')
+SPOTIFY_CLIENT_ID = env("SPOTIFY_CLIENT_ID")
+SPOTIFY_CLIENT_SECRET = env("YOUR_SPOTIFY_CLIENT_SECRET")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,13 +39,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ALLOWED_HOSTS = ["*"]
 
 CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/0',  # Use Redis database 1
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/0",  # Use Redis database 1
         "VERSION": "",
         "KEY_PREFIX": "",
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
     }
 }
@@ -92,13 +92,12 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-
             ],
         },
     },
 ]
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 WSGI_APPLICATION = "music_rating_website.wsgi.application"
 
