@@ -21,14 +21,16 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 DEBUG = env.bool("DEBUG", default=False)
 
 DATABASES = {
-    "default": env.db("DATABASE_URL"),
-    "TEST": {
-        "NAME": "test_postgres",
-    },
+    "default": {
+        **env.db("DATABASE_URL"),
+        "TEST": {
+            "NAME": "test_postgres",
+        },
+    }
 }
 
-SPOTIFY_CLIENT_ID = env('SPOTIFY_CLIENT_ID')
-SPOTIFY_CLIENT_SECRET = env('YOUR_SPOTIFY_CLIENT_SECRET')
+SPOTIFY_CLIENT_ID = env("SPOTIFY_CLIENT_ID")
+SPOTIFY_CLIENT_SECRET = env("YOUR_SPOTIFY_CLIENT_SECRET")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,13 +39,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ALLOWED_HOSTS = ["*"]
 
 CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/0',  # Use Redis database 1
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/0",  # Use Redis database 1
         "VERSION": "",
         "KEY_PREFIX": "",
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
     }
 }
@@ -82,7 +84,7 @@ ROOT_URLCONF = "music_rating_website.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "music_rating/templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -90,13 +92,12 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-
             ],
         },
     },
 ]
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 WSGI_APPLICATION = "music_rating_website.wsgi.application"
 
@@ -135,6 +136,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "/static/"
+
+STATICFILES_DIRS = [BASE_DIR / "music_rating/static"]
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

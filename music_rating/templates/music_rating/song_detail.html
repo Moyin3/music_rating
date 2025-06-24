@@ -7,7 +7,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ track.track_name }}</title>
-    <link rel="stylesheet" href="{% static 'music_rating/general.css' %}">
+    <link rel="stylesheet" href="{% static 'music_rating_css/general.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'java_script/search.js' %}"></script>
 </head>
 <body>
@@ -27,6 +29,7 @@
             <a href="{% url 'songs' %}">Songs</a>
         </div>
     </nav>
+    <script src="{% static 'java_script/search.js' %}?v={{ timestamp }}"></script>
     <div class="container">
         <h1>{{ song.track_name }}</h1>
     
@@ -46,11 +49,63 @@
             </ul>
         </div>
     </div>
-    <!--
-    <h2>Rating</h2>
-    <p>Rating: {{ track.rating }}</p>
-    <h2>Optional Notes</h2>
-    <p>{{ track.optional_writing|default:"No additional information available." }}</p>
-    -->
+    <div class = "rating_section">
+        <h2>Rating</h2>
+        <p>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#rateModal{{ song.id }}">
+        Add Rating
+        </button>
+        </p>
+        <p>
+            {% if user_rating %}
+                {{ user_rating.score }}
+            {% else %}
+                You have not rated this song yet.
+            {% endif %}
+        </p>
+        <p>
+            {% if optional_writing %}
+                {{ optional_writing }}
+            {% endif %}
+        </p>
+
+        <p> 
+            {% if community_rating %}
+                {{ community_rating }}
+            {% else %}
+                Looks like the community haven't found this gem
+            {% endif %}
+        </p>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="rateModal{{ song.id }}" tabindex="-1" aria-labelledby="rateModalLabel{{ song.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                {% if song.id %}
+                <form method="post" action="{% url 'song_detail' song_obj.spotify_id %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        {{ form.as_p }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Save Rating</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
+                {% else %}
+                <p>Error: Missing Spotify ID</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const rateSystemSelect = document.getElementById('id_rate_system');
+            const rateSystemLabel = document.querySelector('label[for="id_rate_system"]');
+
+            rateSystemSelect.style.display = 'none';
+            rateSystemLabel.style.display = 'none';
+        })
+    </script>
 </body>
 </html>
