@@ -62,7 +62,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "music_rating",
     "debug_toolbar",
-    "corsheaders",
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
