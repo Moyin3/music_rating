@@ -363,7 +363,7 @@ def get_album_dict_from_id(request, spotify_id):
     response = spotify_handler.spotify_get_id(request)
     return json.loads(response.content)
 
-
+# Average rating for track for all users across platform
 def community_rating_for_track(track) -> int:
     track_ratings = Rating.objects.filter(
         content_type=ContentType.objects.get_for_model(Song), object_id=track.spotify_id
@@ -373,7 +373,7 @@ def community_rating_for_track(track) -> int:
     ]
     return int(sum(valid_ratings) / len(valid_ratings)) if valid_ratings else 0
 
-
+# Average rating for album for all users across platform
 def community_rating_for_album(album, active_rate_system=None) -> int:
     album_content_type = ContentType.objects.get_for_model(Album)
     album_id = album.get("id")
@@ -383,7 +383,7 @@ def community_rating_for_album(album, active_rate_system=None) -> int:
     valid_ratings = [rating.score for rating in ratings if rating.score is not None]
     return int(sum(valid_ratings) / len(valid_ratings)) if valid_ratings else None
 
-
+# Average rating for artist for all users across platform
 def community_rating_for_artist(artist_dict, active_rate_system=None) -> int:
     artist_content_type = ContentType.objects.get_for_model(Artist)
     artist_id = artist_dict.get("id")
@@ -395,7 +395,7 @@ def community_rating_for_artist(artist_dict, active_rate_system=None) -> int:
     valid_ratings = [rating.score for rating in ratings if rating.score is not None]
     return int(sum(valid_ratings) / len(valid_ratings)) if valid_ratings else None
 
-
+# Takes an average of rated songs in the album
 def album_rating_for_rate_system_2(user, album) -> int:
     track_ids = [track_id for track_id, _ in album.get("track_list", [])]
     if not track_ids:
@@ -426,7 +426,7 @@ def album_rating_for_rate_system_2(user, album) -> int:
         return avg_score
     return None
 
-
+# Takes an average of rated albums an artist has
 def artist_rating_for_rate_system_2(user, artist, request) -> int:
     albums = artist.get("artist_albums", [])
 
