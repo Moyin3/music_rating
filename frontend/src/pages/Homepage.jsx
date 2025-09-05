@@ -1,11 +1,14 @@
 import React from "react";
 import Navbar from "../components/Navbar";
-import "./styles/Homepage.css";
+import "../components/Timeline";
+import Timeline from "../components/Timeline";
+
 
 export default function Homepage() {
     return (
-        <div className = "navbar_container">
+        <div>
             <Navbar />
+            <Timeline />
         </div>
     );
 }
