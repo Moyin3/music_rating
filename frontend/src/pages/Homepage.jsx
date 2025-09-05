@@ -1,13 +1,11 @@
 import React from "react";
 import Navbar from "../components/Navbar";
-import Searchbar from "../components/Searchbar";
+import "./styles/Homepage.css";
 
 export default function Homepage() {
     return (
-        <div>
+        <div className = "navbar_container">
             <Navbar />
-            <Searchbar />
-            <h1> Homepage </h1>
         </div>
     );
 }
