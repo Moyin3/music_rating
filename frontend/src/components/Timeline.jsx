@@ -1,13 +1,21 @@
 import React from "react";
+import Review from "./Review.jsx";
+import "./styles/Timeline.css";
 
 
 export default function Timeline(){
     return (
-        <div>
+        <>
             <h2>Timeline</h2>
             <div className = "review_container">
-                <p>This is where reviews will be displayed</p>
+            <Review />
             </div>
+            <div className = "review_container">
+                <Review />
         </div>
+        <div className = "review_container">
+            <Review />
+        </div>
+        </>
     )
 }
