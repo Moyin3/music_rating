@@ -43,12 +43,13 @@ def album_rating_for_rate_system_1_upsert(user, album_id: str, score: int) -> Tu
 
 def album_rating_for_rate_system_2_compute(user, album_dict: dict) -> Optional[int]:
     """Compute average of the user's rated songs in an album (no DB write)."""
-    track_ids: Iterable[str] = [track_id for track_id, _ in album_dict.get("track_list", [])]
+    track_ids: Iterable[str] = [tid for tid, _ in album_dict.get("track_list", [])]
     if not track_ids:
         return None
-    songs = Song.objects.filter(spotify_id__in=track_ids)
     ct_song = ContentType.objects.get_for_model(Song)
-    qs = Rating.objects.filter(user=user, content_type=ct_song, object_id__in=songs.values_list("spotify_id", flat=True)).exclude(score=None)
+    qs = Rating.objects.filter(
+        user=user, content_type=ct_song, object_id__in=track_ids
+    ).exclude(score=None)
     scores = list(qs.values_list("score", flat=True))
     return int(sum(scores) / len(scores)) if scores else None
 
@@ -70,7 +71,7 @@ def album_rating_for_rate_system_2_upsert(user, album_dict: dict) -> Tuple[Optio
     """Compute and persist the user's album rating for rate system 2."""
     avg = album_rating_for_rate_system_2_compute(user, album_dict)
     if avg is None:
-        return None
+        return (None, None)
     ct_album = ContentType.objects.get_for_model(Album)
     rs2 = RateSystem.objects.get(id=2)
     rating_obj, _ = Rating.objects.update_or_create(
@@ -167,18 +168,37 @@ def artist_rating_for_rate_system_2_upsert(
 
     return avg_score, artist_rating_obj
 
-def final_album_rating(user, album_dict: dict, rate_system: RateSystem) -> Optional[int]:
+def get_final_album_rating(user, album_dict: dict, rate_system: RateSystem) -> Optional[int]:
     if rate_system.id == 1:
-        return album_rating_for_rate_system_1_upsert(user, album_dict)
+        ct = ContentType.objects.get_for_model(Album)
+        rs1 = RateSystem.objects.get(id=1)
+        r = Rating.objects.filter(
+            user=user, content_type=ct, object_id=album_dict.get("id"), rate_system=rs1
+        ).first()
+        return r.score if r else None
+
     if rate_system.id == 2:
-        score, _ = album_rating_for_rate_system_2_upsert(user, album_dict)
-        return score
+        # read-only: compute on the fly (no DB writes here)
+        return album_rating_for_rate_system_2_compute(user, album_dict)
+
     raise ValueError(f"Unknown rate system: {rate_system.name}")
 
-def final_artist_rating(user, artist_dict: dict, rate_system: RateSystem, fetch_album_dict_by_id) -> Optional[int]:
+
+def get_final_artist_rating(user, artist_dict: dict, rate_system: RateSystem, fetch_album_dict_by_id) -> Optional[int]:
     if rate_system.id == 1:
-        return artist_rating_for_rate_system_1_upsert(user, artist_dict)
+        ct = ContentType.objects.get_for_model(Artist)
+        rs1 = RateSystem.objects.get(id=1)
+        r = Rating.objects.filter(
+            user=user, content_type=ct, object_id=artist_dict.get("id"), rate_system=rs1
+        ).first()
+        return r.score if r else None
+
     if rate_system.id == 2:
-        score, _ = artist_rating_for_rate_system_2_upsert(user, artist_dict, fetch_album_dict_by_id)
+        # for read-only: you can either compute (slow but fresh) 
+        # using upsert is quick and caches album RS2s but it is a DB write
+        score, _ = artist_rating_for_rate_system_2_upsert(
+            user, artist_dict, fetch_album_dict_by_id, force_recompute=False
+        )
         return score
+
     raise ValueError(f"Unknown rate system: {rate_system.name}")

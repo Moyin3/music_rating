@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from urllib.parse import quote
 from django.core.cache import cache
 from django_redis import get_redis_connection
+import json
 
 
 class SpotifyUtils:
@@ -111,9 +112,6 @@ class SpotifyUtils:
                 {"error": "Failed to fetch id from Spotify"}, status=400
             )
 
-    def get_album_dict_from_id(self, id, request):
-        return
-
     def get_artist_albums(self, id, type, request):
         token = self._get_access_token(request)
         if not token:
@@ -199,3 +197,13 @@ class SpotifyUtils:
             key_str = key.decode("utf-8")
             value = cache.get(key_str[2:])  # Decode key from bytes to string
             print(f"{key_str}: {value}")
+    
+
+_spotify = SpotifyUtils()
+def get_album_dict_from_id(spotify_id: str) -> dict:
+    """
+    Fetch an album dict directly from Spotify by ID.
+    Avoids mutating request objects.
+    """
+    response = _spotify.spotify_get_id(spotify_id=spotify_id, type="albums")
+    return json.loads(response.content)
