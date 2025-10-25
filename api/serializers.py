@@ -40,3 +40,17 @@ class ArtistSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Artist
         fields = ['spotify_id']
+
+class RatingWriteSerializer(serializers.Serializer):
+    score = serializers.IntegerField(min_value=0, max_value=100, required=True)
+    rate_system = serializers.IntegerField(required=False)
+    optional_writing = serializers.CharField(required=False, allow_blank=True, max_length=1400)
+
+    def __init__(self, *args, **kwargs):
+        self.content_object = kwargs.pop("content_object", None)
+        self.user = kwargs.pop("user", None)
+        self.rate_system = kwargs.pop("rate_system", None)
+        super().__init__(*args, **kwargs)
+        if self.rate_system and self.rate_system.id == 2:
+            self.fields["score"].required = False
+    
