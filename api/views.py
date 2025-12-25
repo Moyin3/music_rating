@@ -13,12 +13,31 @@ import json
 spotify_handler = SpotifyUtils()
 
 class AlbumDetailAPIView(APIView):
-    def get(self, request, spotify_id):
+    def get(self, request, spotify_id) -> Response:
         request.GET = request.GET.copy()
         request.GET["type"] = "albums"
         request.GET["spotify_id"] = spotify_id
         response = spotify_handler.spotify_get_id(request)
+        
+        if isinstance(response, JsonResponse) and response.status_code == 200:
+            album_data = response.json()
+            #TODO: Apparently spotify_get_id doesn't return a dict so I need to check if this is true, and if so update the above line
+            rating_system_id = request.session.get("rating_system_id")
+            active_rating_system = RateSystem.objects.get(id=rating_system_id) if rating_system_id else RateSystem.objects.first()
+            community_rating = community_rating_for_album(album_data, active_rating_system)
+            final_rating = final_album_rating(request.user, album_data, active_rating_system)
 
+            return Response({
+                "album_data": album_data,
+                "community_rating": community_rating,
+                "final_rating": final_rating,
+            })
+        elif isinstance(response, JsonResponse) and response.status_code == 404:
+            return Response({"error": "Album not found"}, status=404)
+        return Response({"detail": "Error fetching album details"}, status=500)
+        #TODO: Need to update error handling once I understand how SpotifyUtils works
+
+    def post(self, request, spotify_id) -> Response:
         if isinstance(response, JsonResponse) and response.status_code == 200:
             album_data = response.json()
             album_object, _ = Album.objects.get_or_create(spotify_id=spotify_id)
