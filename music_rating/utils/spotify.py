@@ -11,7 +11,7 @@ import json
 
 class SpotifyUtils:
     def __init__(self):
-        # Initializing spotipy with client credentials for non-user specific access
+        # Initializing spotify with client credentials for non-user specific access
         self.CLIENT_ID = settings.SPOTIFY_CLIENT_ID
         self.CLIENT_SECRET = settings.SPOTIFY_CLIENT_SECRET
         self.TOKEN_URL = "https://accounts.spotify.com/api/token"
@@ -68,6 +68,7 @@ class SpotifyUtils:
         if response.status_code == 200:
             return JsonResponse(response.json())
         else:
+            #TODO: improve error handling, can pass down Spotify's exact error response as done in the get_access_token method
             return JsonResponse(
                 {"error": "Failed to fetch data from Spotify"}, status=400
             )
@@ -75,11 +76,9 @@ class SpotifyUtils:
     def spotify_get_id(self, request):
 
         spotify_id = request.GET.get("spotify_id", "")
-        encoded_id = quote(spotify_id)
-        type = request.GET.get("type", "")
-        encoded_type = quote(type)
+        item_type = request.GET.get("type", "")
 
-        cache_key = f"spotify_{type}_{spotify_id}"
+        cache_key = f"spotify_{item_type}_{spotify_id}"
         cached_item = cache.get(cache_key)
 
         if cached_item:
@@ -87,13 +86,13 @@ class SpotifyUtils:
 
         token = self._get_access_token(request)
         if not token:
+            #TODO: improve error handling, can pass down Spotify's exact error response as done in the get_access_token method
             return JsonResponse(
                 {"error": "Failed to retrieve access token"}, status=400
             )
-        spotify_id = request.GET.get("spotify_id", "")
+
         encoded_id = quote(spotify_id)
-        type = request.GET.get("type", "")
-        encoded_type = quote(type)
+        encoded_type = quote(item_type)
         search_url = f"https://api.spotify.com/v1/{encoded_type}/{encoded_id}"
 
         headers = {"Authorization": f"Bearer {token}"}

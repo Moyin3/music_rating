@@ -37,7 +37,7 @@ class AlbumDetailAPIView(APIView):
         return Response({"detail": "Error fetching album details"}, status=500)
         #TODO: Need to update error handling once I understand how SpotifyUtils works
 
-    #TODO: Need to make sure this post method works as intended
+    
     def post(self, request, spotify_id) -> Response:
         request.GET = request.GET.copy()
         request.GET["type"] = "albums"
@@ -50,6 +50,9 @@ class AlbumDetailAPIView(APIView):
             for track_id, _ in album_data.get("track_list", []):
                 Song.objects.get_or_create(spotify_id=track_id)
             
+            """"I'm unsure of whether is creating a new rating or if it is only retrieving an existing one.
+            Realistically, it should be creating a new rating as the get request is for fetching album details, 
+            and the post request is for submitting a rating."""
             user_rating = None
             if request.user.is_authenticated:
                 content_type = ContentType.objects.get_for_model(Album)
