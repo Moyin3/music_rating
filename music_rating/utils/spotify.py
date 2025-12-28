@@ -34,7 +34,8 @@ class SpotifyUtils:
 
         data = {"grant_type": "client_credentials"}
 
-        response = requests.post(self.TOKEN_URL, headers=headers, data=data)
+        
+        response = requests.post(self.TOKEN_URL, headers=headers, data=data, timeout=3)
         # success
         if response.status_code == 200:
             tokens = response.json()
@@ -57,7 +58,7 @@ class SpotifyUtils:
                 {"error": "Failed to retrieve access token"}, status=400
             )
 
-        query = request.GET.get("query", "")
+        query = request.GET.get("query", "", timeout=3)
         encoded_query = quote(query)
         search_url = f"https://api.spotify.com/v1/search?q={encoded_query}&type=track,album,artist&limit=5"
 
@@ -97,7 +98,7 @@ class SpotifyUtils:
 
         headers = {"Authorization": f"Bearer {token}"}
 
-        response = requests.get(search_url, headers=headers)
+        response = requests.get(search_url, headers=headers, timeout=3)
 
         if response.status_code == 200:
             cache_object = self._parse_spotify_item(response.json(), request)
@@ -111,19 +112,20 @@ class SpotifyUtils:
                 {"error": "Failed to fetch id from Spotify"}, status=400
             )
 
-    def get_artist_albums(self, id, type, request):
+    # Assuming this function gets the discography not just albums. Change name if true.
+    def get_artist_albums(self, spotify_id, type, request):
         token = self._get_access_token(request)
         if not token:
             return JsonResponse(
                 {"error": "Failed to retrieve access token"}, status=400
             )
 
-        encoded_id = quote(id)
+        encoded_id = quote(spotify_id)
         encoded_type = quote(type)
         search_url = f"https://api.spotify.com/v1/artists/{encoded_id}/albums?include_groups={encoded_type}"
 
         headers = {"Authorization": f"Bearer {token}"}
-        response = requests.get(search_url, headers=headers)
+        response = requests.get(search_url, headers=headers, timeout=3)
         if response.status_code == 200:
             return response.json()
         else:
@@ -135,13 +137,13 @@ class SpotifyUtils:
         if not data:
             return None
         parsed = {
-            "id": data.get("id"),
+            "spotify_id": data.get("id"),
             "type": f"{data.get('type')}s",
         }
         if data.get("type") == "artist":
 
-            artist_albums = self.get_artist_albums(parsed["id"], "album", request)
-            artist_other = self.get_artist_albums(parsed["id"], "single", request)
+            artist_albums = self.get_artist_albums(parsed["spotify_id"], "album", request)
+            artist_other = self.get_artist_albums(parsed["spotify_id"], "single", request)
 
             parsed["artist_name"] = data.get("name")
             parsed["artist_albums"] = [
@@ -196,13 +198,4 @@ class SpotifyUtils:
             key_str = key.decode("utf-8")
             value = cache.get(key_str[2:])  # Decode key from bytes to string
             print(f"{key_str}: {value}")
-    
 
-_spotify = SpotifyUtils()
-def get_album_dict_from_id(spotify_id: str) -> dict:
-    """
-    Fetch an album dict directly from Spotify by ID.
-    Avoids mutating request objects.
-    """
-    response = _spotify.spotify_get_id(spotify_id=spotify_id, type="albums")
-    return json.loads(response.content)
