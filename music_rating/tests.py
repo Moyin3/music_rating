@@ -411,7 +411,7 @@ class ParseSpotifyItemTests(TestCase):
         parsed = self.spotify_utils._parse_spotify_item(artist_data, request)
 
         # Assertions
-        self.assertEqual(parsed["id"], "artist123")
+        self.assertEqual(parsed["spotify_id"], "artist123")
         self.assertEqual(parsed["type"], "artists")
         self.assertEqual(parsed["artist_name"], "Test Artist")
 
@@ -439,7 +439,7 @@ class ParseSpotifyItemTests(TestCase):
         parsed = self.spotify_utils._parse_spotify_item(album_data, request)
 
         # Assertions
-        self.assertEqual(parsed["id"], "album123")
+        self.assertEqual(parsed["spotify_id"], "album123")
         self.assertEqual(parsed["type"], "albums")
         self.assertEqual(parsed["album_name"], "Test Album")
         self.assertEqual(parsed["artist_name"], ["Artist One", "Artist Two"])
@@ -467,7 +467,7 @@ class ParseSpotifyItemTests(TestCase):
         parsed = self.spotify_utils._parse_spotify_item(track_data, request)
 
         # Assertions
-        self.assertEqual(parsed["id"], "track123")
+        self.assertEqual(parsed["spotify_id"], "track123")
         self.assertEqual(parsed["type"], "tracks")
         self.assertEqual(parsed["track_name"], "Test Track")
         self.assertEqual(parsed["album_name"], "Test Album")

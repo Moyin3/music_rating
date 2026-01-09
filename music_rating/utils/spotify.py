@@ -168,7 +168,7 @@ class SpotifyUtils:
             parsed["artist_id"] = [artist["id"] for artist in data.get("artists", [])]
             parsed["track_list"] = [
                 (track["id"], track["name"])
-                for track in data.get("tracks", []).get("items", [])
+                for track in data.get("tracks", {}).get("items", [])
             ]
 
         elif data.get("type") == "track":

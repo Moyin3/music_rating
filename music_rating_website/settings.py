@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import environ
+import sys
+import os
+from .settings import *  # noqa
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
@@ -21,14 +24,24 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 DEBUG = env.bool("DEBUG", default=False)
 
+
+# Never use Supabase in tests
 DATABASES = {
     "default": {
-        **env.db("DATABASE_URL"),
-        "TEST": {
-            "NAME": "test_postgres",
-        },
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "rate_system_test",
+        "USER": "moyin",          # or postgres
+        "PASSWORD": "",           # if local doesn’t need one
+        "HOST": "localhost",
+        "PORT": "5432",
     }
 }
+
+# Speed and safety
+PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+
+
 SPOTIFY_CLIENT_ID = env("SPOTIFY_CLIENT_ID")
 SPOTIFY_CLIENT_SECRET = env("YOUR_SPOTIFY_CLIENT_SECRET")
 
