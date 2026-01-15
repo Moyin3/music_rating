@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     "debug_toolbar",
     'rest_framework',
     "corsheaders",
+    "api",
 ]
 
 MIDDLEWARE = [
@@ -94,6 +95,10 @@ INTERNAL_IPS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
+
+CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
 ]
 

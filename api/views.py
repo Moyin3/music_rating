@@ -21,7 +21,6 @@ class AlbumDetailAPIView(APIView):
         
         if isinstance(response, JsonResponse) and response.status_code == 200:
             album_data = response.json()
-            #TODO: Apparently spotify_get_id doesn't return a dict so I need to check if this is true, and if so update the above line
             rating_system_id = request.session.get("rating_system_id")
             active_rating_system = RateSystem.objects.get(id=rating_system_id) if rating_system_id else RateSystem.objects.first()
             community_rating = community_rating_for_album(album_data, active_rating_system)
@@ -70,11 +69,53 @@ class AlbumDetailAPIView(APIView):
             return Response({"error": "Album not found"}, status=404)
 
         return Response({"detail": "Error fetching album details"}, status=500)
+    
+    def put(self, request, spotify_id) -> Response:
+        request.GET = request.GET.copy()
+        request.GET["type"] = "albums"
+        request.GET["spotify_id"] = spotify_id
+        response = spotify_handler.spotify_get_id(request)
+
+        if isinstance(response, JsonResponse) and response.status_code == 200:
+            album_data = response.json()
+            album_object, _ = Album.objects.get_or_create(spotify_id=spotify_id)
+            for track_id, _ in album_data.get("track_list", []):
+                Song.objects.get_or_create(spotify_id=track_id)
+            
+
+            if request.user.is_authenticated:
+                content_type = ContentType.objects.get_for_model(Album)
+                user_rating = Rating.objects.filter(
+                    user=request.user,
+                    content_type=content_type,
+                    object_id=spotify_id,
+                ).first()
+            
+            return Response({
+                "album_data": album_data,
+                "user_rating": RatingSerializer(user_rating).data if user_rating else None,
+            }, status = 200)
+    
+    def delete(self, request, spotify_id) -> Response:
+        if request.user.is_authenticated:
+            content_type = ContentType.objects.get_for_model(Album)
+            user_rating = Rating.objects.filter(
+                user=request.user,
+                content_type=content_type,
+                object_id=spotify_id,
+            ).first()
+            if user_rating:
+                user_rating.delete()
+                return Response({"detail": "Rating deleted"}, status=204)
+            else:
+                return Response({"error": "Rating not found"}, status=404)
+        else:
+            return Response({"error": "Authentication required"}, status=401)
 
 class SongDetailAPIView(APIView):
-    def get(self, request, spotify_id):
+    def get(self, request, spotify_id) -> Response:
         request.GET = request.GET.copy()
-        request.GET["type"] = "songs"
+        request.GET["type"] = "tracks"
         request.GET["spotify_id"] = spotify_id
         response = spotify_handler.spotify_get_id(request)
 
@@ -106,8 +147,11 @@ class SongDetailAPIView(APIView):
 
         return Response({"detail": "Error fetching song details"}, status=500)
 
+    """def post(self, request, spotify_id) -> Response:
+        return
+        """
 class ArtistDetailAPIView(APIView):
-    def get(self, request, spotify_id):
+    def get(self, request, spotify_id) -> Response:
         request.GET = request.GET.copy()
         request.GET["type"] = "artists"
         request.GET["spotify_id"] = spotify_id
