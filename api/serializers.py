@@ -14,7 +14,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
-        fields = ['score', 'user', 'object_id', 'content_type', 'content_object', 'rate_system', 'optional_writing']
+        fields = ['score', 'user', 'content_type','rate_system', 'optional_writing', "spotify_id"]
 
 class SongSerializer(serializers.ModelSerializer):
     class Meta:

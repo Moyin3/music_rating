@@ -2,7 +2,7 @@ from django.contrib import admin
 from debug_toolbar.toolbar import debug_toolbar_urls
 from django.urls import path
 from music_rating import views
-from api.views import AlbumDetailAPIView, SongDetailAPIView, ArtistDetailAPIView
+from api.views import AlbumDetailAPIView, SongDetailAPIView, ArtistDetailAPIView, RatingDetailView, RatingCreateView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -28,5 +28,8 @@ urlpatterns = [
     path("api/album/<str:spotify_id>", AlbumDetailAPIView.as_view(), name="api_album_detail"),
     path("api/song/<str:spotify_id>", SongDetailAPIView.as_view(), name="api_song_detail"),
     path("api/artist/<str:spotify_id>", ArtistDetailAPIView.as_view(), name="api_artist_detail"),
+    path("api/ratings/<int:pk>", RatingDetailView.as_view(), name = "ratings-RUD"),
+    path("api/ratings", RatingCreateView.as_view(), name = "ratings-create")
+
 
 ] + debug_toolbar_urls()

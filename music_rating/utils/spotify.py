@@ -58,7 +58,7 @@ class SpotifyUtils:
                 {"error": "Failed to retrieve access token"}, status=400
             )
 
-        query = request.GET.get("query", "", timeout=3)
+        query = request.GET.get("query", "")
         encoded_query = quote(query)
         search_url = f"https://api.spotify.com/v1/search?q={encoded_query}&type=track,album,artist&limit=5"
 
