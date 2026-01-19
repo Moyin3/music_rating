@@ -4,8 +4,7 @@ from django.urls import path
 from music_rating import views
 from api.views import AlbumDetailAPIView, SongDetailAPIView, ArtistDetailAPIView, RatingDetailView, RatingCreateView
 
-urlpatterns = [
-    path("admin/", admin.site.urls),
+"""
     path("entries/", views.entrypage, name="entries"),
     path("", views.userhome, name="homepage"),
     path("artists/", views.artistpage, name="artists"),
@@ -24,12 +23,13 @@ urlpatterns = [
     path(
         "artist/<str:spotify_id>/", views.artist_detail, name="artist_detail"
     ),  # Detail page for a single artist
+    """
+urlpatterns = [
     path("id-retrieval/", views.spotify_id_retrieval, name="id_retrieval"),  # Return id
     path("api/album/<str:spotify_id>", AlbumDetailAPIView.as_view(), name="api_album_detail"),
     path("api/song/<str:spotify_id>", SongDetailAPIView.as_view(), name="api_song_detail"),
     path("api/artist/<str:spotify_id>", ArtistDetailAPIView.as_view(), name="api_artist_detail"),
     path("api/ratings/<int:pk>", RatingDetailView.as_view(), name = "ratings-RUD"),
     path("api/ratings", RatingCreateView.as_view(), name = "ratings-create")
-
-
-] + debug_toolbar_urls()
+    
+    ] + debug_toolbar_urls()
