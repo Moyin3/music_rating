@@ -75,12 +75,9 @@ class SpotifyUtils:
             )
     #Remember to change the None to raises once I've done exception handling
     def spotify_get_id(self, request) -> dict | None:
-        print("spotify_get_id Called")
         spotify_id = request.GET.get("spotify_id", "")
         item_type = request.GET.get("type", "")
 
-        print("spotify_id:", spotify_id)
-        print("item_type:", item_type)
 
         cache_key = f"spotify_{item_type}_{spotify_id}"
         cached_item = cache.get(cache_key)
@@ -101,11 +98,9 @@ class SpotifyUtils:
         headers = {"Authorization": f"Bearer {token}"}
 
         response = requests.get(search_url, headers=headers, timeout=3)
-        print("Spotify status:", response.status_code)
 
         if response is not None and response.status_code == 200:
             cache_object = self._parse_spotify_item(response.json(), request)
-            print("parsed cache_object:", cache_object)
             if cache_object:
                 cache.set(cache_key, cache_object, timeout=300)  # 1 hour
                 return cache_object
