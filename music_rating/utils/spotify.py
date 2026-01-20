@@ -51,7 +51,7 @@ class SpotifyUtils:
             print(f"Error: {response.status_code}, {response.text}")
             return None
 
-    def spotify_search(self, request):
+    def spotify_search(self, request) -> JsonResponse:
         token = self._get_access_token(request)
         if not token:
             return JsonResponse(
@@ -73,24 +73,26 @@ class SpotifyUtils:
             return JsonResponse(
                 {"error": "Failed to fetch data from Spotify"}, status=400
             )
-
-    def spotify_get_id(self, request):
-
+    #Remember to change the None to raises once I've done exception handling
+    def spotify_get_id(self, request) -> dict | None:
+        print("spotify_get_id Called")
         spotify_id = request.GET.get("spotify_id", "")
         item_type = request.GET.get("type", "")
+
+        print("spotify_id:", spotify_id)
+        print("item_type:", item_type)
 
         cache_key = f"spotify_{item_type}_{spotify_id}"
         cached_item = cache.get(cache_key)
 
         if cached_item:
-            return JsonResponse(cached_item)
+            return cached_item
 
         token = self._get_access_token(request)
+        print("token exists:", bool(token))
         if not token:
             #TODO: improve error handling, can pass down Spotify's exact error response as done in the get_access_token method
-            return JsonResponse(
-                {"error": "Failed to retrieve access token"}, status=400
-            )
+            return None
 
         encoded_id = quote(spotify_id)
         encoded_type = quote(item_type)
@@ -99,18 +101,19 @@ class SpotifyUtils:
         headers = {"Authorization": f"Bearer {token}"}
 
         response = requests.get(search_url, headers=headers, timeout=3)
+        print("Spotify status:", response.status_code)
 
-        if response.status_code == 200:
+        if response is not None and response.status_code == 200:
             cache_object = self._parse_spotify_item(response.json(), request)
+            print("parsed cache_object:", cache_object)
             if cache_object:
                 cache.set(cache_key, cache_object, timeout=300)  # 1 hour
-                return JsonResponse(cache_object)
+                return cache_object
+            #Need to fix error handling
             else:
-                return JsonResponse({"error": "Incorrect response format"})
+                return None
         else:
-            return JsonResponse(
-                {"error": "Failed to fetch id from Spotify"}, status=400
-            )
+            return None
 
     # Assuming this function gets the discography not just albums. Change name if true.
     def get_artist_albums(self, spotify_id, type, request):
@@ -133,7 +136,7 @@ class SpotifyUtils:
                 {"error": "Failed to fetch id from Spotify"}, status=400
             )
 
-    def _parse_spotify_item(self, data, request):
+    def _parse_spotify_item(self, data, request) -> dict:
         if not data:
             return None
         parsed = {

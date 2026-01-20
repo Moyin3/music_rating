@@ -29,7 +29,7 @@ DEBUG = env.bool("DEBUG", default=False)
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "rate_system_test",
+        "NAME": "rate_system",
         "USER": "moyin",          # or postgres
         "PASSWORD": "",           # if local doesn’t need one
         "HOST": "localhost",
