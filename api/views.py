@@ -76,85 +76,95 @@ class SongDetailAPIView(APIView):
     def get(self, request, spotify_id) -> Response:
         request.GET = request.GET.copy()
         request.GET["type"] = "tracks"
-        request.GET["id"] = spotify_id
-        response = spotify_handler.spotify_get_id(request)
+        request.GET["spotify_id"] = spotify_id
 
-        if isinstance(response, JsonResponse) and response.status_code == 200:
-            song_data = response.json()
+
+        song_data = spotify_handler.spotify_get_id(request)
+
+        if not song_data:
+            return Response(
+                {
+                    "detail": "Error fetching song details"
+                },
+            )
             
             #This line ensures that when the response is returned if the user is not authenticated user_rating is still simply None.
-            user_rating = None
+        user_rating = None
 
-            if request.user.is_authenticated:
-                content_type = ContentType.objects.get_for_model(Song)
-                user_rating = (Rating.objects.filter(
-                    user=request.user,
-                    content_type=content_type,
-                    spotify_id=spotify_id,
-                ).select_related("rate_system")
-                .first()
-                )
-            
-            if user_rating:
-                active_rating_system = user_rating.rate_system
-            else:
-                active_rating_system = RateSystem.objects.get(key = "explicit")
-            
-            community_rating = community_rating_for_album(song_data, active_rating_system)
+        if request.user.is_authenticated:
+            content_type = ContentType.objects.get_for_model(Song)
+            user_rating = (Rating.objects.filter(
+                user=request.user,
+                content_type=content_type,
+                spotify_id=spotify_id,
+            ).select_related("rate_system")
+            .first()
+            )
+        
+        if user_rating:
+            active_rating_system = user_rating.rate_system
+        else:
+            active_rating_system = RateSystem.objects.get(key = "explicit")
+        
+        community_rating = community_rating_for_album(song_data, active_rating_system)
+
+        final_rating = None
+        if request.user.is_authenticated:
             final_rating = final_album_rating(request.user, song_data, active_rating_system)
 
-            return Response({
-                "song_data": song_data,
-                "community_rating": community_rating,
-                "final_rating": final_rating,
-                "user_rating": user_rating,
-            })
-        elif isinstance(response, JsonResponse) and response.status_code == 404:
-            return Response({"error": "Song not found"}, status=404)
-
-        return Response({"detail": "Error fetching song details"}, status=500)
+        return Response({
+            "song_data": song_data,
+            "community_rating": community_rating,
+            "final_rating": final_rating,
+            "user_rating": user_rating,
+        }, status=200)
 
     
 class ArtistDetailAPIView(APIView):
     def get(self, request, spotify_id) -> Response:
         request.GET = request.GET.copy()
         request.GET["type"] = "artists"
-        request.GET["id"] = spotify_id
-        response = spotify_handler.spotify_get_id(request)
+        request.GET["spotify_id"] = spotify_id
+        
+        
+        artist_data = spotify_handler.spotify_get_id(request)
+        
+        if not artist_data:
+            Response({
+                "detail": "Error finding Artist details"
+            },)
 
-        if isinstance(response, JsonResponse) and response.status_code == 200:
-            artist_data = response.json()
+        
 
             #This line ensures that when the response is returned if the user is not authenticated user_rating is still simply None.
-            user_rating = None
+        user_rating = None
 
 
-            if request.user.is_authenticated:
-                content_type = ContentType.objects.get_for_model(Artist)
-                user_rating = (Rating.objects.filter(
-                    user=request.user,
-                    content_type=content_type,
-                    spotify_id=spotify_id,
-                ).select_related("rate_system")
-                .first()
-                )
-            
-            if user_rating:
-                active_rating_system = user_rating.rate_system
-            else:
-                active_rating_system = RateSystem.objects.get(key = "explicit")
+        if request.user.is_authenticated:
+            content_type = ContentType.objects.get_for_model(Artist)
+            user_rating = (Rating.objects.filter(
+                user=request.user,
+                content_type=content_type,
+                spotify_id=spotify_id,
+            ).select_related("rate_system")
+            .first()
+            )
+        
+        if user_rating:
+            active_rating_system = user_rating.rate_system
+        else:
+            active_rating_system = RateSystem.objects.get(key = "explicit")
 
-            community_rating = community_rating_for_album(artist_data, active_rating_system)
+        community_rating = community_rating_for_album(artist_data, active_rating_system)
+        
+        final_rating = None
+        if request.user.is_authenticated:
             final_rating = final_album_rating(request.user, artist_data, active_rating_system)
 
 
-            return Response({
-                "artist_data": artist_data,
-                "community_rating": community_rating,
-                "final_rating": final_rating,
-                "user_rating": user_rating,
-            })
-        elif isinstance(response, JsonResponse) and response.status_code == 404:
-            return Response({"error": "Artist not found"}, status=404)
-
-        return Response({"detail": "Error fetching artist details"}, status=500)
+        return Response({
+            "artist_data": artist_data,
+            "community_rating": community_rating,
+            "final_rating": final_rating,
+            "user_rating": user_rating,
+        }, status=200)
