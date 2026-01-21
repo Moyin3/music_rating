@@ -86,7 +86,6 @@ class SpotifyUtils:
             return cached_item
 
         token = self._get_access_token(request)
-        print("token exists:", bool(token))
         if not token:
             #TODO: improve error handling, can pass down Spotify's exact error response as done in the get_access_token method
             return None
