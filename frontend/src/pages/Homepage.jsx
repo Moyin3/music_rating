@@ -1,13 +1,14 @@
 import React from "react";
 import Navbar from "../components/Navbar";
-import Searchbar from "../components/Searchbar";
+import "../components/Timeline";
+import Timeline from "../components/Timeline";
+
 
 export default function Homepage() {
     return (
-        <div>
+        <>
             <Navbar />
-            <Searchbar />
-            <h1> Homepage </h1>
-        </div>
+            <Timeline />
+        </>
     );
 }

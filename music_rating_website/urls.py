@@ -1,27 +1,10 @@
-"""
-URL configuration for myproject project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-
 from django.contrib import admin
 from debug_toolbar.toolbar import debug_toolbar_urls
-from django.urls import path
+from django.urls import path, include
 from music_rating import views
+from api.views import AlbumDetailAPIView, SongDetailAPIView, ArtistDetailAPIView, RatingDetailView, RatingCreateView
 
-urlpatterns = [
-    path("admin/", admin.site.urls),
+"""
     path("entries/", views.entrypage, name="entries"),
     path("", views.userhome, name="homepage"),
     path("artists/", views.artistpage, name="artists"),
@@ -40,5 +23,16 @@ urlpatterns = [
     path(
         "artist/<str:spotify_id>/", views.artist_detail, name="artist_detail"
     ),  # Detail page for a single artist
+    """
+urlpatterns = [
+    path("admin/", admin.site.urls),
     path("id-retrieval/", views.spotify_id_retrieval, name="id_retrieval"),  # Return id
-] + debug_toolbar_urls()
+    path("api/album/<str:spotify_id>", AlbumDetailAPIView.as_view(), name="api_album_detail"),
+    path("api/song/<str:spotify_id>", SongDetailAPIView.as_view(), name="api_song_detail"),
+    path("api/artist/<str:spotify_id>", ArtistDetailAPIView.as_view(), name="api_artist_detail"),
+    path("api/ratings/<int:pk>", RatingDetailView.as_view(), name = "ratings-RUD"),
+    path("api/ratings", RatingCreateView.as_view(), name = "ratings-create"),
+    path("api/dj-rest-auth/", include("dj_rest_auth.urls")),
+    path("api/dj-rest-auth/registration/", include("dj_rest_auth.registration.urls"))
+    
+    ] + debug_toolbar_urls()

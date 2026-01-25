@@ -12,28 +12,39 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import environ
+import sys
+import os
+from .settings import *  # noqa
 
+BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
-environ.Env.read_env()
+environ.Env.read_env(BASE_DIR / ".env")
 
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 DEBUG = env.bool("DEBUG", default=False)
 
+
+# Never use Supabase in tests
 DATABASES = {
     "default": {
-        **env.db("DATABASE_URL"),
-        "TEST": {
-            "NAME": "test_postgres",
-        },
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "rate_system",
+        "USER": "moyin",          # or postgres
+        "PASSWORD": "",           # if local doesn’t need one
+        "HOST": "localhost",
+        "PORT": "5432",
     }
 }
+
+# Speed and safety
+PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+
 
 SPOTIFY_CLIENT_ID = env("SPOTIFY_CLIENT_ID")
 SPOTIFY_CLIENT_SECRET = env("YOUR_SPOTIFY_CLIENT_SECRET")
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 ALLOWED_HOSTS = ["*"]
@@ -60,9 +71,19 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
     "music_rating",
     "debug_toolbar",
+    'rest_framework',
     "corsheaders",
+    "api",
+    "rest_framework.authtoken",
+    "dj_rest_auth",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "dj_rest_auth.registration",
 ]
 
 MIDDLEWARE = [
@@ -75,6 +96,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    "allauth.account.middleware.AccountMiddleware"
+
 ]
 
 INTERNAL_IPS = [
@@ -82,6 +105,10 @@ INTERNAL_IPS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
+
+CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
 ]
 
@@ -98,10 +125,15 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "django.template.context_processors.request",
             ],
         },
     },
 ]
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+SITE_ID = 1
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
@@ -109,6 +141,16 @@ WSGI_APPLICATION = "music_rating_website.wsgi.application"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {

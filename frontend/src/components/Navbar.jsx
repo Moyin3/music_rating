@@ -1,5 +1,6 @@
 import React from "react";
-
+import Searchbar from "./Searchbar";
+import "./styles/Navbar.css";
 export default function Navbar(){ 
     return (
         <nav>
@@ -9,6 +10,7 @@ export default function Navbar(){
             <a href="/community">Community Page</a>
             <a href="/entries">Rating Entries</a>
             <a href="/songs">Songs</a>
+            <Searchbar />
         </nav>
     );
 }

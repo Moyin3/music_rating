@@ -6,11 +6,12 @@ from django.http import JsonResponse
 from urllib.parse import quote
 from django.core.cache import cache
 from django_redis import get_redis_connection
+import json
 
 
 class SpotifyUtils:
     def __init__(self):
-        # Initializing spotipy with client credentials for non-user specific access
+        # Initializing spotify with client credentials for non-user specific access
         self.CLIENT_ID = settings.SPOTIFY_CLIENT_ID
         self.CLIENT_SECRET = settings.SPOTIFY_CLIENT_SECRET
         self.TOKEN_URL = "https://accounts.spotify.com/api/token"
@@ -33,7 +34,8 @@ class SpotifyUtils:
 
         data = {"grant_type": "client_credentials"}
 
-        response = requests.post(self.TOKEN_URL, headers=headers, data=data)
+        
+        response = requests.post(self.TOKEN_URL, headers=headers, data=data, timeout=3)
         # success
         if response.status_code == 200:
             tokens = response.json()
@@ -49,7 +51,7 @@ class SpotifyUtils:
             print(f"Error: {response.status_code}, {response.text}")
             return None
 
-    def spotify_search(self, request):
+    def spotify_search(self, request) -> JsonResponse:
         token = self._get_access_token(request)
         if not token:
             return JsonResponse(
@@ -67,66 +69,60 @@ class SpotifyUtils:
         if response.status_code == 200:
             return JsonResponse(response.json())
         else:
+            #TODO: improve error handling, can pass down Spotify's exact error response as done in the get_access_token method
             return JsonResponse(
                 {"error": "Failed to fetch data from Spotify"}, status=400
             )
-
-    def spotify_get_id(self, request):
-
+    #Remember to change the None to raises once I've done exception handling
+    def spotify_get_id(self, request) -> dict | None:
         spotify_id = request.GET.get("spotify_id", "")
-        encoded_id = quote(spotify_id)
-        type = request.GET.get("type", "")
-        encoded_type = quote(type)
+        item_type = request.GET.get("type", "")
 
-        cache_key = f"spotify_{type}_{spotify_id}"
+
+        cache_key = f"spotify_{item_type}_{spotify_id}"
         cached_item = cache.get(cache_key)
 
         if cached_item:
-            return JsonResponse(cached_item)
+            return cached_item
 
         token = self._get_access_token(request)
         if not token:
-            return JsonResponse(
-                {"error": "Failed to retrieve access token"}, status=400
-            )
-        spotify_id = request.GET.get("spotify_id", "")
+            #TODO: improve error handling, can pass down Spotify's exact error response as done in the get_access_token method
+            return None
+
         encoded_id = quote(spotify_id)
-        type = request.GET.get("type", "")
-        encoded_type = quote(type)
+        encoded_type = quote(item_type)
         search_url = f"https://api.spotify.com/v1/{encoded_type}/{encoded_id}"
 
         headers = {"Authorization": f"Bearer {token}"}
 
-        response = requests.get(search_url, headers=headers)
+        response = requests.get(search_url, headers=headers, timeout=3)
 
-        if response.status_code == 200:
+        if response is not None and response.status_code == 200:
             cache_object = self._parse_spotify_item(response.json(), request)
             if cache_object:
                 cache.set(cache_key, cache_object, timeout=300)  # 1 hour
-                return JsonResponse(cache_object)
+                return cache_object
+            #Need to fix error handling
             else:
-                return JsonResponse({"error": "Incorrect response format"})
+                return None
         else:
-            return JsonResponse(
-                {"error": "Failed to fetch id from Spotify"}, status=400
-            )
+            return None
 
-    def get_album_dict_from_id(self, id, request):
-        return
-
-    def get_artist_albums(self, id, type, request):
+    # Assuming this function gets the discography not just albums. Change name if true.
+    def get_artist_albums(self, spotify_id, type, request):
         token = self._get_access_token(request)
         if not token:
             return JsonResponse(
                 {"error": "Failed to retrieve access token"}, status=400
             )
 
-        encoded_id = quote(id)
+        encoded_id = quote(spotify_id)
         encoded_type = quote(type)
         search_url = f"https://api.spotify.com/v1/artists/{encoded_id}/albums?include_groups={encoded_type}"
 
         headers = {"Authorization": f"Bearer {token}"}
-        response = requests.get(search_url, headers=headers)
+        response = requests.get(search_url, headers=headers, timeout=3)
         if response.status_code == 200:
             return response.json()
         else:
@@ -134,17 +130,17 @@ class SpotifyUtils:
                 {"error": "Failed to fetch id from Spotify"}, status=400
             )
 
-    def _parse_spotify_item(self, data, request):
+    def _parse_spotify_item(self, data, request) -> dict:
         if not data:
             return None
         parsed = {
-            "id": data.get("id"),
+            "spotify_id": data.get("id"),
             "type": f"{data.get('type')}s",
         }
         if data.get("type") == "artist":
 
-            artist_albums = self.get_artist_albums(parsed["id"], "album", request)
-            artist_other = self.get_artist_albums(parsed["id"], "single", request)
+            artist_albums = self.get_artist_albums(parsed["spotify_id"], "album", request)
+            artist_other = self.get_artist_albums(parsed["spotify_id"], "single", request)
 
             parsed["artist_name"] = data.get("name")
             parsed["artist_albums"] = [
@@ -169,7 +165,7 @@ class SpotifyUtils:
             parsed["artist_id"] = [artist["id"] for artist in data.get("artists", [])]
             parsed["track_list"] = [
                 (track["id"], track["name"])
-                for track in data.get("tracks", []).get("items", [])
+                for track in data.get("tracks", {}).get("items", [])
             ]
 
         elif data.get("type") == "track":
@@ -199,3 +195,4 @@ class SpotifyUtils:
             key_str = key.decode("utf-8")
             value = cache.get(key_str[2:])  # Decode key from bytes to string
             print(f"{key_str}: {value}")
+
