@@ -11,7 +11,7 @@ from django.http import JsonResponse
 from django.contrib.contenttypes.models import ContentType
 import json
 from music_rating.forms import RatingForm
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 spotify_handler = SpotifyUtils()
 
@@ -25,6 +25,7 @@ class RatingDetailView(RetrieveUpdateDestroyAPIView):
     serializer_class = RatingSerializer
 
 class AlbumDetailAPIView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     def get(self, request, spotify_id) -> Response:
         request.GET = request.GET.copy()
         request.GET["type"] = "albums"
@@ -73,6 +74,7 @@ class AlbumDetailAPIView(APIView):
     #TODO: Need to update error handling once I understand how SpotifyUtils works
 
 class SongDetailAPIView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     def get(self, request, spotify_id) -> Response:
         request.GET = request.GET.copy()
         request.GET["type"] = "tracks"
@@ -85,7 +87,7 @@ class SongDetailAPIView(APIView):
             return Response(
                 {
                     "detail": "Error fetching song details"
-                },
+                }, status=500
             )
             
             #This line ensures that when the response is returned if the user is not authenticated user_rating is still simply None.
@@ -121,6 +123,7 @@ class SongDetailAPIView(APIView):
 
     
 class ArtistDetailAPIView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     def get(self, request, spotify_id) -> Response:
         request.GET = request.GET.copy()
         request.GET["type"] = "artists"
@@ -132,7 +135,7 @@ class ArtistDetailAPIView(APIView):
         if not artist_data:
             Response({
                 "detail": "Error finding Artist details"
-            },)
+            }, status=500)
 
         
 
