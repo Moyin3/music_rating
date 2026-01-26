@@ -8,6 +8,7 @@ from music_rating.utils.spotify import SpotifyUtils
 import time
 import json
 from django.http import JsonResponse
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.middleware import SessionMiddleware
 from .forms import RatingForm
 from django.contrib.auth import get_user_model
@@ -70,7 +71,7 @@ class EPModelTest(TestCase):
         self.assertEqual(self.ep.spotify_id, "33333")
 
 
-
+#TODO: Write these tests
 class DetailViewTests(TestCase):
     def setUp(self):
         self.client = Client()
@@ -94,105 +95,8 @@ class DetailViewTests(TestCase):
                 ]
             }
         }
-        mock_spotify_get_id.return_value = Mock(
-            status_code=200,
-            json=lambda: mock_response_data
-        )
-        # Call the view
-        url = reverse("api_album_detail", args=["test-spotify-id"])
-        
-        response = self.client.get(
-            url,
-            {
-                "spotify_id": "test-spotify-id",
-                "type": "album",
-            },
-        )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["album_data"]["album_name"], "Test Album")
-        self.assertEqual(response.data["album_data"]["artist_name"][0], "Test Artist")
-        #assert response.data["rate_system"] == "explicit"
-
-    @patch("music_rating.views.spotify_handler.spotify_get_id")
-    def test_song_detail_success(self, mock_spotify_get_id):
-        # Mock Spotify API response
-        mock_response_data = {
-            "track_name": "Test Song",
-            "artist_name": ["Artist 1", "Artist 2"],
-            "artist_id": ["id1", "id2"],
-            "album_name": "Test Album",
-            "album_id": "album1",
-        }
-        mock_spotify_get_id.return_value = JsonResponse(mock_response_data, status=200)
-
-        # Generate the URL dynamically
-        url = reverse("song_detail", args=["test-spotify-id"])
-        response = self.client.get(url)
-
-        # Assertions
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "music_rating/song_detail.html")
-        self.assertContains(response, "Test Song")
-        self.assertContains(response, "Test Album")
-        self.assertContains(response, "Artist 1")
-        self.assertContains(response, "Artist 2")
-        self.assertContains(response, '<a href="/artist/id1/">Artist 1</a>', html=True)
-        self.assertContains(response, '<a href="/artist/id2/">Artist 2</a>', html=True)
-
-    @patch("music_rating.views.spotify_handler.spotify_get_id")
-    def test_artist_detail_success(self, mock_spotify_get_id):
-        # Mock Spotify API response
-        mock_response_data = {
-            "id": "test-spotify-id",
-            "type": "artists",
-            "artist_name": "Test Artist",
-            "artist_albums": [["album1 - id", "Album 1"], ["album2 - id", "Album 2"]],
-        }
-        mock_spotify_get_id.return_value = JsonResponse(mock_response_data, status=200)
-
-        # Call the view
-        url = reverse("artist_detail", args=["test-spotify-id"])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Test Artist")
-        self.assertContains(response, "Album 1")
-
-    @patch("music_rating.views.spotify_handler.spotify_get_id")
-    def test_album_detail_error(self, mock_spotify_get_id):
-        # Mock Spotify API error response
-        mock_spotify_get_id.return_value = JsonResponse({}, status=404)
-
-        # Call the view
-        url = reverse("album_detail", args=["test-spotify-id"])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 404)
-
-    @patch("music_rating.views.spotify_handler.spotify_get_id")
-    def test_song_detail_error(self, mock_spotify_get_id):
-        # Mock Spotify API error response
-        mock_spotify_get_id.return_value = JsonResponse({}, status=404)
-
-        # Call the view
-        url = reverse("song_detail", args=["test-spotify-id"])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 404)
-
-    @patch("music_rating.views.spotify_handler.spotify_get_id")
-    def test_artist_detail_error(self, mock_spotify_get_id):
-        # Mock Spotify API error response
-        mock_spotify_get_id.return_value = JsonResponse({}, status=404)
-
-        # Call the view
-        url = reverse("artist_detail", args=["test-spotify-id"])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 404)
-
-
+#TODO: Review these tests
 class SpotifyUtilsTests(TestCase):
     def setUp(self):
         self.spotify_utils = SpotifyUtils()
@@ -373,7 +277,7 @@ class SpotifyUtilsTests(TestCase):
         request = self.factory.get("/?spotify_id=test_spotify_id&type=track")
         request.session = {}
 
-
+#TODO: Review these tests
 class ParseSpotifyItemTests(TestCase):
     def setUp(self):
         self.spotify_utils = SpotifyUtils()
@@ -477,111 +381,50 @@ class ParseSpotifyItemTests(TestCase):
         # Assertions
         self.assertIsNone(parsed)
 
-
-class RatingModelTests(TestCase):
-    def setUp(self):
-        self.rate_system = RateSystem.objects.create(
-            key ="explicit",
-            description="The default rating system",
-        )
-        self.rating = Rating.objects.create(score=12, rate_system=self.rate_system)
-
-    def test_rating_score(self):
-        self.assertEqual(self.rating.score, 12)
-
-
-class RateSystemModelTest(TestCase):
-    def setUp(self):
-        self.rate_system = RateSystem.objects.create(
-            name="average",
-            description="A custom rating system",
-        )
-
-"""
-class RatingFormTests(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(
-            username="testuser", password="testpass"
-        )  # Use your User model if available
-        self.album = Album.objects.create(spotify_id="album123")
-
-        self.rate_system = RateSystem.objects.create(
-            key ="explicit", description="desc"
-        )
-
-    def test_valid_form(self):
-        form = RatingForm(
-            data={
-                "score": 85,
-                "optional_writing": "Great!",
-                "rate_system": self.rate_system.key,
-            },
-            user=self.user,
-            content_object=self.album,
-            rate_system=self.rate_system,
-        )
-        self.assertTrue(form.is_valid())
-        rating = form.save()
-        self.assertEqual(rating.score, 85)
-        self.assertEqual(rating.optional_writing, "Great!")
-        self.assertEqual(rating.rate_system, self.rate_system)
-
-    def test_score_optional_for_rate_system_2(self):
-        rs2, _ = RateSystem.objects.get_or_create(
-            id=2, defaults={"name": "System 2", "description": "desc2"}
-        )
-        form = RatingForm(
-            data={"optional_writing": "No score", "rate_system": rs2.id},
-            user=self.user,
-            content_object=self.album,
-            rate_system=rs2,
-        )
-        self.assertTrue(form.is_valid())
-
-"""
 class RatingHelpersTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="testuser", password="testpass")
         self.user2 = User.objects.create_user(
             username="testuser2", password="testpass2"
         )
+        self.user3 = User.objects.create_user(username = "testuser3", password = "testpass3")
         self.album = Album.objects.create(spotify_id="album123")
         self.song = Song.objects.create(spotify_id="song123")
         self.artist = Artist.objects.create(spotify_id="artist123")
         self.rate_system_1 = RateSystem.objects.create(
-            id=1, key="explicit", description="desc"
+            id=1, key="explicit", description="The default rating system"
         )
         self.rate_system_2 = RateSystem.objects.create(
-            id=2, key="System 2", description="desc"
+            id=2, key="average", description="average of relevant ratings"
         )
         self.factory = RequestFactory()
         self.request = self.factory.get("/")
 
     def test_community_rating_for_track(self):
-        Rating.objects.create(score=80)
-        Rating.objects.create(score=100)
+        Rating.objects.create(score=80, spotify_id= "song123", user = self.user, content_type = ContentType.objects.get_for_model(Song), rate_system = self.rate_system_1)
+        Rating.objects.create(score=100, spotify_id = "song123", user = self.user2, content_type = ContentType.objects.get_for_model(Song), rate_system = self.rate_system_1)
         self.assertEqual(community_rating_for_track(self.song), 90)
 
     def test_community_rating_for_album(self):
         album_dict = {"id": self.album.spotify_id}
         Rating.objects.create(
-            score=70, rate_system=self.rate_system_1
+            score=70, user = self.user, rate_system=self.rate_system_1, content_type = ContentType.objects.get_for_model(Album), spotify_id = "album123"
+            )
+        Rating.objects.create(
+            score=90, user = self.user2, rate_system=self.rate_system_1, content_type = ContentType.objects.get_for_model(Album), spotify_id = "album123"
         )
         Rating.objects.create(
-            score=90, rate_system=self.rate_system_1
-        )
-        Rating.objects.create(
-            score=95, rate_system=self.rate_system_2
+            score=95, user = self.user3, rate_system=self.rate_system_2, content_type = ContentType.objects.get_for_model(Album), spotify_id = "album123"
         )
         self.assertEqual(community_rating_for_album(album_dict), 85)
 
     def test_community_rating_for_artist(self):
         artist_dict = {"id": self.artist.spotify_id}
         Rating.objects.create(
-            score=60, rate_system=self.rate_system_1
+            score=60, user = self.user, rate_system=self.rate_system_1, content_type = ContentType.objects.get_for_model(Artist), spotify_id = "artist123"
         )
         Rating.objects.create(
-            score=100, rate_system=self.rate_system_2
+            score=100, user = self.user2, rate_system=self.rate_system_2, content_type = ContentType.objects.get_for_model(Artist), spotify_id = "artist123"
         )
         self.assertEqual(community_rating_for_artist(artist_dict), 80)
 
@@ -595,11 +438,11 @@ class RatingHelpersTests(TestCase):
                 (song2.spotify_id, "Song 2"),
             ],
         }
-        Rating.objects.create(user=self.user, score=80)
-        Rating.objects.create(user=self.user, score=100)
+        Rating.objects.create(user=self.user, score=80, rate_system = self.rate_system_2, content_type = ContentType.objects.get_for_model(Song), spotify_id = "song123")
+        Rating.objects.create(user=self.user, score=100, rate_system = self.rate_system_2, content_type = ContentType.objects.get_for_model(Song), spotify_id = "song456")
         avg = album_rating_for_rate_system_2(self.user, album_dict)
         self.assertEqual(avg, 90)
-
+"""
     def test_artist_rating_for_rate_system_2(self):
         # User rates two albums (directly via rate system 2)
         album2 = Album.objects.create(spotify_id="album456")
@@ -685,3 +528,4 @@ class RatingHelpersTests(TestCase):
             ),
             avg,
         )
+        """

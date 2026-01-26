@@ -29,6 +29,8 @@ class Rating(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     rate_system = models.ForeignKey(RateSystem, on_delete=models.PROTECT, default=default_rate_system)
     optional_writing = models.TextField(blank = True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True) #Created this incase I want to do something with ratings, in terms of when they were made
+    updated_at = models.DateTimeField(auto_now=True) #This allows me to choose the most recent rating for rating helper functions
 
 
     class Meta:

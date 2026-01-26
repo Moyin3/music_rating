@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from .utils.spotify import SpotifyUtils
 import json
+from django.db.models import Avg
 
 # import requests
 
@@ -373,28 +374,39 @@ def community_rating_for_track(track) -> int:
     ]
     return int(sum(valid_ratings) / len(valid_ratings)) if valid_ratings else 0
 
+#TODO: Refactor the community ratings into one big function, everyone similar right now, want DRY code
 # Average rating for album for all users across platform
-def community_rating_for_album(album, active_rate_system=None) -> int:
+def community_rating_for_album(album) -> int:
     album_content_type = ContentType.objects.get_for_model(Album)
     album_id = album.get("id")
-    ratings = Rating.objects.filter(content_type=album_content_type, spotify_id=album_id)
-    if active_rate_system:
-        ratings = ratings.filter(rate_system=active_rate_system)
-    valid_ratings = [rating.score for rating in ratings if rating.score is not None]
-    return int(sum(valid_ratings) / len(valid_ratings)) if valid_ratings else None
+    latest_rating_per_user = (
+        Rating.objects.filter(
+            content_type = album_content_type, 
+            spotify_id = album_id,
+            score__isnull = False
+        )
+        .order_by("user_id", "-updated_at")
+        .distinct("user_id")
+    )
+    scores = [r.score for r in latest_rating_per_user]
+    return sum(scores) / len(scores) if scores else None
 
 # Average rating for artist for all users across platform
 def community_rating_for_artist(artist_dict, active_rate_system=None) -> int:
     artist_content_type = ContentType.objects.get_for_model(Artist)
     artist_id = artist_dict.get("id")
-    ratings = Rating.objects.filter(
-        content_type=artist_content_type, spotify_id=artist_id
+    latest_rating_per_user = (
+        Rating.objects.filter(
+            content_type = artist_content_type, 
+            spotify_id = artist_id,
+            score__isnull = False
+        )
+        .order_by("user_id", "-updated_at")
+        .distinct("user_id")
     )
-    if active_rate_system:
-        ratings = ratings.filter(rate_system=active_rate_system)
-    valid_ratings = [rating.score for rating in ratings if rating.score is not None]
-    return int(sum(valid_ratings) / len(valid_ratings)) if valid_ratings else None
-
+    scores = [r.score for r in latest_rating_per_user]
+    return sum(scores) / len(scores) if scores else None
+    
 # Takes an average of rated songs in the album
 def album_rating_for_rate_system_2(user, album) -> int:
     track_ids = [track_id for track_id, _ in album.get("track_list", [])]
@@ -415,7 +427,7 @@ def album_rating_for_rate_system_2(user, album) -> int:
 
     if avg_score is not None:
         album_content_type = ContentType.objects.get_for_model(Album)
-        rate_system_2 = RateSystem.objects.get(id=2)
+        rate_system_2 = RateSystem.objects.get(key="average")
         rating_obj, created = Rating.objects.update_or_create(
             user=user,
             content_type=album_content_type,
