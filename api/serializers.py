@@ -33,6 +33,17 @@ class RatingSerializer(serializers.ModelSerializer):
                 "optional_writing": validated_data.get("optional_writing"),
             },
         )
+    
+    def validate_score(self, value):
+        try:
+            value = int(value)
+        except (TypeError, ValueError):
+            raise serializers.ValidationError("Score must be an integer.")
+
+        if not 0 <= value <= 100:
+            raise serializers.ValidationError("Score must be between 0 and 100.")
+
+        return value
 
 class SongSerializer(serializers.ModelSerializer):
     class Meta:

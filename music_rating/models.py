@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -39,7 +40,11 @@ class Rating(models.Model):
         models.UniqueConstraint(
             fields=["user", "spotify_id", "content_type", "rate_system"],
             name="unique_user_spotify_item_rating"
-        )
+        ),
+        models.CheckConstraint(
+                condition=Q(score__gte=0) & Q(score__lte=100),
+                name="rating_score_between_0_and_100",
+            ),
     ]
 
 

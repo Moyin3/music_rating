@@ -7,6 +7,8 @@ from django.urls import reverse
 from music_rating.utils.spotify import SpotifyUtils
 import time
 import json
+from datetime import timedelta
+from django.utils import timezone
 from django.http import JsonResponse
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.middleware import SessionMiddleware
@@ -17,8 +19,6 @@ from music_rating.views import (
     artist_rating_for_rate_system_2,
     album_rating_for_rate_system_1,
     artist_rating_for_rate_system_1,
-    final_album_rating,
-    final_artist_rating,
     community_rating_for_artist,
     community_rating_for_track,
     community_rating_for_album,
@@ -277,7 +277,6 @@ class SpotifyUtilsTests(TestCase):
         request = self.factory.get("/?spotify_id=test_spotify_id&type=track")
         request.session = {}
 
-#TODO: Review these tests
 class ParseSpotifyItemTests(TestCase):
     def setUp(self):
         self.spotify_utils = SpotifyUtils()
@@ -400,34 +399,6 @@ class RatingHelpersTests(TestCase):
         self.factory = RequestFactory()
         self.request = self.factory.get("/")
 
-    def test_community_rating_for_track(self):
-        Rating.objects.create(score=80, spotify_id= "song123", user = self.user, content_type = ContentType.objects.get_for_model(Song), rate_system = self.rate_system_1)
-        Rating.objects.create(score=100, spotify_id = "song123", user = self.user2, content_type = ContentType.objects.get_for_model(Song), rate_system = self.rate_system_1)
-        self.assertEqual(community_rating_for_track(self.song), 90)
-
-    def test_community_rating_for_album(self):
-        album_dict = {"id": self.album.spotify_id}
-        Rating.objects.create(
-            score=70, user = self.user, rate_system=self.rate_system_1, content_type = ContentType.objects.get_for_model(Album), spotify_id = "album123"
-            )
-        Rating.objects.create(
-            score=90, user = self.user2, rate_system=self.rate_system_1, content_type = ContentType.objects.get_for_model(Album), spotify_id = "album123"
-        )
-        Rating.objects.create(
-            score=95, user = self.user3, rate_system=self.rate_system_2, content_type = ContentType.objects.get_for_model(Album), spotify_id = "album123"
-        )
-        self.assertEqual(community_rating_for_album(album_dict), 85)
-
-    def test_community_rating_for_artist(self):
-        artist_dict = {"id": self.artist.spotify_id}
-        Rating.objects.create(
-            score=60, user = self.user, rate_system=self.rate_system_1, content_type = ContentType.objects.get_for_model(Artist), spotify_id = "artist123"
-        )
-        Rating.objects.create(
-            score=100, user = self.user2, rate_system=self.rate_system_2, content_type = ContentType.objects.get_for_model(Artist), spotify_id = "artist123"
-        )
-        self.assertEqual(community_rating_for_artist(artist_dict), 80)
-
     def test_album_rating_for_rate_system_2(self):
         # User rates two songs in the album
         song2 = Song.objects.create(spotify_id="song456")
@@ -481,55 +452,195 @@ class RatingHelpersTests(TestCase):
         Rating.objects.create(user=self.user, score=88, spotify_id = "artist123", rate_system = self.rate_system_1, content_type = ContentType.objects.get_for_model(Artist))
         self.assertEqual(artist_rating_for_rate_system_1(self.user, artist_dict), 88)
 
-    def test_final_album_rating(self):
-        album_dict = {
-            "id": self.album.spotify_id,
-            "track_list": [(self.song.spotify_id, "Song 1")],
-        }
+    #These tests are simplified versions of community rating to see if the underlying average, (the basic maths) is going wrong.
+    def test_community_rating_for_track_simple(self):
+        song_dict = {"id": self.song.spotify_id}
+        Rating.objects.create(score=80, spotify_id= "song123", user = self.user, content_type = ContentType.objects.get_for_model(Song), rate_system = self.rate_system_1)
+        Rating.objects.create(score=100, spotify_id = "song123", user = self.user2, content_type = ContentType.objects.get_for_model(Song), rate_system = self.rate_system_1)
+        self.assertEqual(community_rating_for_track(song_dict), 90)
+
+    def test_community_rating_for_album_simple(self):
+        album_dict = {"id": self.album.spotify_id}
         Rating.objects.create(
+            score=70, user = self.user, rate_system=self.rate_system_1, content_type = ContentType.objects.get_for_model(Album), spotify_id = "album123"
+            )
+        Rating.objects.create(
+            score=90, user = self.user2, rate_system=self.rate_system_1, content_type = ContentType.objects.get_for_model(Album), spotify_id = "album123"
+        )
+        Rating.objects.create(
+            score=95, user = self.user3, rate_system=self.rate_system_2, content_type = ContentType.objects.get_for_model(Album), spotify_id = "album123"
+        )
+        self.assertEqual(community_rating_for_album(album_dict), 85)
+
+    def test_community_rating_for_artist_simple(self):
+        artist_dict = {"id": self.artist.spotify_id}
+        Rating.objects.create(
+            score=60, user = self.user, rate_system=self.rate_system_1, content_type = ContentType.objects.get_for_model(Artist), spotify_id = "artist123"
+        )
+        Rating.objects.create(
+            score=100, user = self.user2, rate_system=self.rate_system_2, content_type = ContentType.objects.get_for_model(Artist), spotify_id = "artist123"
+        )
+        self.assertEqual(community_rating_for_artist(artist_dict), 80)
+    
+
+    #Writing these tests to see if the communitry rating functions are choosing the most recent ratings from a user.
+    def test_community_rating_for_track(self):
+        ct = ContentType.objects.get_for_model(Song)
+        track_dict = {"id": self.song.spotify_id}
+        
+        old_rating, _ = Rating.objects.update_or_create(
+        user=self.user,
+        spotify_id="song123",
+        rate_system=self.rate_system_1,
+        content_type=ct,
+        defaults={"score": 30}
+    )
+
+        # Manually force it to be older
+        old_rating.updated_at = timezone.now() - timedelta(days=2)
+        old_rating.save(update_fields=["updated_at"])
+
+        # User 1: newer rating, different rate system
+        new_rating, _ = Rating.objects.update_or_create(
             user=self.user,
-            score=55,
-            rate_system=self.rate_system_1,
-            spotify_id = "album123",
-            content_type = ContentType.objects.get_for_model(Album)
-        )
-        self.assertEqual(
-            final_album_rating(self.user, album_dict, self.rate_system_1), 55
-        )
-        Rating.objects.create(user=self.user, score=99, spotify_id = "song123", rate_system = self.rate_system_2, content_type = ContentType.objects.get_for_model(Song))
-        self.assertEqual(
-            final_album_rating(self.user, album_dict, self.rate_system_2), 99
+            spotify_id="song123",
+            rate_system=self.rate_system_2,
+            content_type=ct,
+            defaults={"score": 70}
         )
 
-    def test_final_artist_rating(self):
-        artist_dict = {
-            "id": self.artist.spotify_id,
-            "artist_albums": [[self.album.spotify_id, "Album 1"]],
-        }
-        Rating.objects.create(
-            user=self.user,
-            score=66,
+        new_rating.updated_at = timezone.now() - timedelta(days=1)
+        new_rating.save(update_fields=["updated_at"])
+
+        # User 1: even newer rating
+        Rating.objects.update_or_create(
+            user = self.user,
+            spotify_id = "song123",
+            rate_system = self.rate_system_2,
+            content_type = ct,
+            defaults={"score": 100}
+        )
+        Rating.objects.update_or_create(
+            user=self.user2,
+            spotify_id="song123",
             rate_system=self.rate_system_1,
-            spotify_id = "artist123",
-            content_type = ContentType.objects.get_for_model(Artist)
+            content_type=ct,
+            defaults={"score": 90}
         )
-        self.assertEqual(
-            final_artist_rating(
-                self.user, artist_dict, self.rate_system_1, self.request
-            ),
-            66,
+
+        Rating.objects.update_or_create(
+            user = self.user3,
+            spotify_id = "song123",
+            rate_system=self.rate_system_1,
+            content_type=ct,
+            defaults={"score": 5}
         )
-        # For rate system 2
-        Rating.objects.create(
-            user=self.user,
-            score=80,
+
+        self.assertEqual(community_rating_for_track(track_dict), 65)
+        
+    
+    def test_community_rating_for_album(self):
+        ct = ContentType.objects.get_for_model(Album)
+        album_dict = {"id": self.album.spotify_id}
+        
+        old_rating, _ = Rating.objects.update_or_create(
+        user=self.user,
+        spotify_id="album123",
+        rate_system=self.rate_system_1,
+        content_type=ct,
+        defaults={"score": 30}
+    )
+
+        # Manually force it to be older
+        old_rating.updated_at = timezone.now() - timedelta(days=2)
+        old_rating.save(update_fields=["updated_at"])
+
+        old_rating_user_2, _ = Rating.objects.update_or_create(
+            user=self.user2,
+            spotify_id="album123",
             rate_system=self.rate_system_2,
+            content_type=ct,
+            defaults={"score": 50}
+        )
+
+        old_rating_user_2.updated_at = timezone.now() - timedelta(days=1)
+        old_rating_user_2.save(update_fields=["updated_at"])
+
+       
+        Rating.objects.update_or_create(
+            user = self.user,
             spotify_id = "album123",
-            content_type = ContentType.objects.get_for_model(Album)
+            rate_system = self.rate_system_2,
+            content_type = ct,
+            defaults={"score": 0}
         )
-        self.assertEqual(
-            final_artist_rating(
-                self.user, artist_dict, self.rate_system_2, self.request
-            ),
-            80,
+        Rating.objects.update_or_create(
+            user=self.user2,
+            spotify_id="album123",
+            rate_system=self.rate_system_1,
+            content_type=ct,
+            defaults={"score": 25}
         )
+
+        Rating.objects.update_or_create(
+            user = self.user3,
+            spotify_id = "album123",
+            rate_system=self.rate_system_1,
+            content_type=ct,
+            defaults={"score": 5}
+        )
+
+        self.assertEqual(community_rating_for_album(album_dict), 10)
+    
+    def test_community_rating_for_artist(self):
+        ct = ContentType.objects.get_for_model(Artist)
+        artist_dict = {"id": self.artist.spotify_id}
+        
+        old_rating, _ = Rating.objects.update_or_create(
+        user=self.user,
+        spotify_id="artist123",
+        rate_system=self.rate_system_1,
+        content_type=ct,
+        defaults={"score": 30}
+    )
+
+        # Manually force it to be older
+        old_rating.updated_at = timezone.now() - timedelta(days=2)
+        old_rating.save(update_fields=["updated_at"])
+
+        old_rating_user_2, _ = Rating.objects.update_or_create(
+            user=self.user2,
+            spotify_id="artist123",
+            rate_system=self.rate_system_2,
+            content_type=ct,
+            defaults={"score": 50}
+        )
+
+        old_rating_user_2.updated_at = timezone.now() - timedelta(days=1)
+        old_rating_user_2.save(update_fields=["updated_at"])
+
+       
+        Rating.objects.update_or_create(
+            user = self.user,
+            spotify_id = "artist123",
+            rate_system = self.rate_system_2,
+            content_type = ct,
+            defaults={"score": 22}
+        )
+        Rating.objects.update_or_create(
+            user=self.user2,
+            spotify_id="artist123",
+            rate_system=self.rate_system_1,
+            content_type=ct,
+            defaults={"score": 57}
+        )
+
+        Rating.objects.update_or_create(
+            user = self.user3,
+            spotify_id = "artist123",
+            rate_system=self.rate_system_1,
+            content_type=ct,
+            defaults={"score": 8}
+        )
+
+        self.assertEqual(community_rating_for_artist(artist_dict), 29)

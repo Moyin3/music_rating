@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from music_rating.models import Song, Album, Artist, Rating, RateSystem
-from music_rating.views import community_rating_for_album, final_album_rating
+from music_rating.views import community_rating_for_album
 from .serializers import RateSystemSerializer, SongSerializer, AlbumSerializer, ArtistSerializer, RatingSerializer
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView
@@ -52,23 +52,15 @@ class AlbumDetailAPIView(APIView):
                 spotify_id=spotify_id,
             )
             .select_related("rate_system")
-            .first()
+            .order_by("-updated_at").first()
             )
-        if user_rating:
-            active_rating_system = user_rating.rate_system
-        else:
-            active_rating_system = RateSystem.objects.get(key = "explicit")
         
-        community_rating = community_rating_for_album(album_data, active_rating_system)
+        community_rating = community_rating_for_album(album_data)
 
-        final_rating = None
-        if request.user.is_authenticated:
-            final_rating = final_album_rating(request.user, album_data, active_rating_system)
 
         return Response({
             "album_data": album_data,
             "community_rating": community_rating,
-            "final_rating": final_rating,
             "user_rating" : user_rating
         }, status=200)
     #TODO: Need to update error handling once I understand how SpotifyUtils works
@@ -103,21 +95,11 @@ class SongDetailAPIView(APIView):
             .first()
             )
         
-        if user_rating:
-            active_rating_system = user_rating.rate_system
-        else:
-            active_rating_system = RateSystem.objects.get(key = "explicit")
-        
-        community_rating = community_rating_for_album(song_data, active_rating_system)
-
-        final_rating = None
-        if request.user.is_authenticated:
-            final_rating = final_album_rating(request.user, song_data, active_rating_system)
+        community_rating = community_rating_for_album(song_data)
 
         return Response({
             "song_data": song_data,
             "community_rating": community_rating,
-            "final_rating": final_rating,
             "user_rating": user_rating,
         }, status=200)
 
@@ -152,22 +134,11 @@ class ArtistDetailAPIView(APIView):
             ).select_related("rate_system")
             .first()
             )
-        
-        if user_rating:
-            active_rating_system = user_rating.rate_system
-        else:
-            active_rating_system = RateSystem.objects.get(key = "explicit")
 
-        community_rating = community_rating_for_album(artist_data, active_rating_system)
-        
-        final_rating = None
-        if request.user.is_authenticated:
-            final_rating = final_album_rating(request.user, artist_data, active_rating_system)
-
+        community_rating = community_rating_for_album(artist_data)
 
         return Response({
             "artist_data": artist_data,
             "community_rating": community_rating,
-            "final_rating": final_rating,
             "user_rating": user_rating,
         }, status=200)

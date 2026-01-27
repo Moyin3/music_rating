@@ -224,12 +224,6 @@ def album_detail(request, spotify_id):
                 existing_rating  # Include user's previous rating if it exists
             )
 
-        # Added this check to make sure that active_rate_system is not None before passing it to final_album_rating
-        if active_rate_system:
-            context["final_rating"] = final_album_rating(
-                request.user, album_data, active_rate_system
-            )  # Pass the final album rating based on the active rate system
-
         return render(request, "music_rating/album_detail.html", context)
 
     # Handle error cases explicitly
@@ -329,12 +323,6 @@ def artist_detail(request, spotify_id):
         if user_rating:
             context["user_rating"] = existing_rating
 
-        # Added this check to make sure that active_rate_system is not None before passing it to final_artist_rating
-        if active_rate_system:
-            context["final_rating"] = final_artist_rating(
-                request.user, artist_data, active_rate_system, request
-            )
-
         return render(request, "music_rating/artist_detail.html", context)
 
     # Handle error cases explicitly
@@ -366,13 +354,20 @@ def get_album_dict_from_id(request, spotify_id):
 
 # Average rating for track for all users across platform
 def community_rating_for_track(track) -> int:
-    track_ratings = Rating.objects.filter(
-        content_type=ContentType.objects.get_for_model(Song), spotify_id=track.spotify_id
+    song_content_type = ContentType.objects.get_for_model(Song)
+    song_id = track.get("id")
+    latest_rating_per_user = (
+        Rating.objects.filter(
+        content_type=song_content_type, 
+        spotify_id=song_id,
+        score__isnull = False
     )
-    valid_ratings = [
-        rating.score for rating in track_ratings if rating.score is not None
-    ]
-    return int(sum(valid_ratings) / len(valid_ratings)) if valid_ratings else 0
+    .order_by("user_id", "-updated_at")
+    .distinct("user_id")
+    )
+    #TODO: fix this and other divisions to avoid rounding and floating point errors
+    scores = [r.score for r in latest_rating_per_user]
+    return sum(scores) / len(scores) if scores else None
 
 #TODO: Refactor the community ratings into one big function, everyone similar right now, want DRY code
 # Average rating for album for all users across platform
@@ -501,22 +496,3 @@ def artist_rating_for_rate_system_1(user, artist) -> int:
         user=user, content_type=artist_content_type, spotify_id=spotify_id
     ).first()
     return rating.score if rating else None
-
-
-def final_album_rating(user, album, rate_system) -> int:
-    if rate_system.key == "explicit":
-        return album_rating_for_rate_system_1(user, album)
-    elif rate_system.key == "average":
-        return album_rating_for_rate_system_2(user, album)
-    else:
-        raise ValueError(f"Unknown rate system: {rate_system.key}")
-
-
-def final_artist_rating(user, artist, rate_system, request) -> int:
-    if rate_system.key == "explicit":
-        return artist_rating_for_rate_system_1(user, artist)
-    elif rate_system.key == "average":
-        score = artist_rating_for_rate_system_2(user, artist, request)
-        return score
-    else:
-        raise ValueError(f"Unknown rate system: {rate_system.key}")
