@@ -442,7 +442,7 @@ class RatingHelpersTests(TestCase):
         Rating.objects.create(user=self.user, score=100, rate_system = self.rate_system_2, content_type = ContentType.objects.get_for_model(Song), spotify_id = "song456")
         avg = album_rating_for_rate_system_2(self.user, album_dict)
         self.assertEqual(avg, 90)
-"""
+
     def test_artist_rating_for_rate_system_2(self):
         # User rates two albums (directly via rate system 2)
         album2 = Album.objects.create(spotify_id="album456")
@@ -457,27 +457,28 @@ class RatingHelpersTests(TestCase):
             user=self.user,
             score=80,
             rate_system=self.rate_system_2,
+            content_type = ContentType.objects.get_for_model(Album),
+            spotify_id = "album123"
         )
         Rating.objects.create(
             user=self.user,
             score=100,
             rate_system=self.rate_system_2,
+            content_type = ContentType.objects.get_for_model(Album),
+            spotify_id = "album456"
         )
-        avg, rating_obj = artist_rating_for_rate_system_2(
-            self.user, artist_dict, self.request
-        )
+        avg = artist_rating_for_rate_system_2(self.user, artist_dict, self.request)
         self.assertEqual(avg, 90)
-        self.assertEqual(rating_obj.user, self.user)
-        self.assertEqual(rating_obj.spotify_id, self.artist.spotify_id)
+
 
     def test_album_rating_for_rate_system_1(self):
         album_dict = {"id": self.album.spotify_id}
-        Rating.objects.create(user=self.user, score=77)
+        Rating.objects.create(user=self.user, score=77, spotify_id = "album123", rate_system = self.rate_system_1, content_type = ContentType.objects.get_for_model(Album))
         self.assertEqual(album_rating_for_rate_system_1(self.user, album_dict), 77)
 
     def test_artist_rating_for_rate_system_1(self):
         artist_dict = {"id": self.artist.spotify_id}
-        Rating.objects.create(user=self.user, score=88)
+        Rating.objects.create(user=self.user, score=88, spotify_id = "artist123", rate_system = self.rate_system_1, content_type = ContentType.objects.get_for_model(Artist))
         self.assertEqual(artist_rating_for_rate_system_1(self.user, artist_dict), 88)
 
     def test_final_album_rating(self):
@@ -489,14 +490,15 @@ class RatingHelpersTests(TestCase):
             user=self.user,
             score=55,
             rate_system=self.rate_system_1,
+            spotify_id = "album123",
+            content_type = ContentType.objects.get_for_model(Album)
         )
         self.assertEqual(
             final_album_rating(self.user, album_dict, self.rate_system_1), 55
         )
-        Rating.objects.create(user=self.user, score=99)
-        avg = album_rating_for_rate_system_2(self.user, album_dict)
+        Rating.objects.create(user=self.user, score=99, spotify_id = "song123", rate_system = self.rate_system_2, content_type = ContentType.objects.get_for_model(Song))
         self.assertEqual(
-            final_album_rating(self.user, album_dict, self.rate_system_2), avg
+            final_album_rating(self.user, album_dict, self.rate_system_2), 99
         )
 
     def test_final_artist_rating(self):
@@ -508,6 +510,8 @@ class RatingHelpersTests(TestCase):
             user=self.user,
             score=66,
             rate_system=self.rate_system_1,
+            spotify_id = "artist123",
+            content_type = ContentType.objects.get_for_model(Artist)
         )
         self.assertEqual(
             final_artist_rating(
@@ -520,12 +524,12 @@ class RatingHelpersTests(TestCase):
             user=self.user,
             score=80,
             rate_system=self.rate_system_2,
+            spotify_id = "album123",
+            content_type = ContentType.objects.get_for_model(Album)
         )
-        avg, _ = artist_rating_for_rate_system_2(self.user, artist_dict, self.request)
         self.assertEqual(
             final_artist_rating(
                 self.user, artist_dict, self.rate_system_2, self.request
             ),
-            avg,
+            80,
         )
-        """

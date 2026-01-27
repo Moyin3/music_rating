@@ -428,7 +428,7 @@ def album_rating_for_rate_system_2(user, album) -> int:
     if avg_score is not None:
         album_content_type = ContentType.objects.get_for_model(Album)
         rate_system_2 = RateSystem.objects.get(key="average")
-        rating_obj, created = Rating.objects.update_or_create(
+        Rating.objects.update_or_create(
             user=user,
             content_type=album_content_type,
             spotify_id=album.get("id"),
@@ -446,7 +446,7 @@ def artist_rating_for_rate_system_2(user, artist, request) -> int:
         return None
     album_content_type = ContentType.objects.get_for_model(Album)
     artist_content_type = ContentType.objects.get_for_model(Artist)
-    rate_system_2 = RateSystem.objects.get(id=2)
+    rate_system_2 = RateSystem.objects.get(key="average")
     album_scores = []
 
     for album in albums:
@@ -463,6 +463,7 @@ def artist_rating_for_rate_system_2(user, artist, request) -> int:
             album_scores.append(rating.score)
         else:
             # If no direct rating, calculate average track rating for this album
+            # Thinking I shouldn't work out an average if there aren't album ratings.
             album_dict = get_album_dict_from_id(request, album_id)
             score = album_rating_for_rate_system_2(user, album_dict)
             if score is not None:
@@ -480,8 +481,8 @@ def artist_rating_for_rate_system_2(user, artist, request) -> int:
             defaults={"score": avg_score},
         )
         # Returning the rating object for now in case we decide to use it later
-        return avg_score, rating_obj
-    return None, None
+        return avg_score
+    return None
 
 
 def album_rating_for_rate_system_1(user, album) -> int:
@@ -503,19 +504,19 @@ def artist_rating_for_rate_system_1(user, artist) -> int:
 
 
 def final_album_rating(user, album, rate_system) -> int:
-    if rate_system.id == 1:
+    if rate_system.key == "explicit":
         return album_rating_for_rate_system_1(user, album)
-    elif rate_system.id == 2:
+    elif rate_system.key == "average":
         return album_rating_for_rate_system_2(user, album)
     else:
-        raise ValueError(f"Unknown rate system: {rate_system.name}")
+        raise ValueError(f"Unknown rate system: {rate_system.key}")
 
 
 def final_artist_rating(user, artist, rate_system, request) -> int:
-    if rate_system.id == 1:
+    if rate_system.key == "explicit":
         return artist_rating_for_rate_system_1(user, artist)
-    elif rate_system.id == 2:
-        score, _ = artist_rating_for_rate_system_2(user, artist, request)
+    elif rate_system.key == "average":
+        score = artist_rating_for_rate_system_2(user, artist, request)
         return score
     else:
-        raise ValueError(f"Unknown rate system: {rate_system.name}")
+        raise ValueError(f"Unknown rate system: {rate_system.key}")
