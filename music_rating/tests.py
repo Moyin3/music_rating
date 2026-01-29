@@ -627,12 +627,6 @@ class RatingHelpersTests(TestCase):
 
         self.assertEqual(community_rating_for_artist("artist123"), 29)
 
-
-# ============================================================================
-# TESTS WRITTEN BY COPILOT - Serializer Tests, API Integration Tests, 
-# and Database Constraint Tests
-# ============================================================================
-
 class RatingSerializerTests(TestCase):
     """Test suite for RatingSerializer with both rate systems and error handling."""
     
