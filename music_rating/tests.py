@@ -443,8 +443,8 @@ class RatingHelpersTests(TestCase):
     #These tests are simplified versions of community rating to see if the underlying average, (the basic maths) is going wrong.
     def test_community_rating_for_track_simple(self):
         Rating.objects.create(score=80, spotify_id= "song123", user = self.user, content_type = ContentType.objects.get_for_model(Song), rate_system = self.rate_system_1)
-        Rating.objects.create(score=100, spotify_id = "song123", user = self.user2, content_type = ContentType.objects.get_for_model(Song), rate_system = self.rate_system_1)
-        self.assertEqual(community_rating_for_song("song123"), 90)
+        Rating.objects.create(score=50, spotify_id = "song123", user = self.user2, content_type = ContentType.objects.get_for_model(Song), rate_system = self.rate_system_1)
+        self.assertEqual(community_rating_for_song("song123"), 65)
 
     def test_community_rating_for_album_simple(self):
         Rating.objects.create(
@@ -863,6 +863,51 @@ class RatingSerializerTests(TestCase):
         serializer = RatingSerializer(data=data, context={"request": request})
         self.assertFalse(serializer.is_valid())
         self.assertIn("score", serializer.errors)
+    
+    def test_serializer_creates_average_score_when_score_absent(self):
+
+        from api.serializers import RatingSerializer
+        
+        # Set up: create multiple song ratings
+        song1 = Song.objects.create(spotify_id="song_a", album_spotify_id="album123")
+        song2 = Song.objects.create(spotify_id="song_b", album_spotify_id="album123")
+        
+        Rating.objects.create(
+            user=self.user,
+            spotify_id="song_a",
+            content_type=ContentType.objects.get_for_model(Song),
+            rate_system=self.rate_system_explicit,
+            score=80
+        )
+        Rating.objects.create(
+            user=self.user,
+            spotify_id="song_b",
+            content_type=ContentType.objects.get_for_model(Song),
+            rate_system=self.rate_system_explicit,
+            score=90
+        )
+        
+        request = self._create_request_with_user(self.user)
+
+        data = {
+            "spotify_id": "album123",
+            "content_type": ContentType.objects.get_for_model(Album).id,
+            "rate_system": self.rate_system_average.id,
+            "optional_writing": "Good songs"
+        }
+
+        serializer = RatingSerializer(data=data, context={"request": request})
+        self.assertTrue(serializer.is_valid(), msg=serializer.errors)
+        serializer.save()
+        
+        # Verify the average was calculated and stored (not the provided 50)
+        rating = Rating.objects.filter(
+            user=self.user,
+            spotify_id="album123",
+            rate_system=self.rate_system_average
+        ).first()
+        self.assertIsNotNone(rating)
+        self.assertEqual(rating.score, 85)
 
 
 class APIRatingCreateIntegrationTest(TestCase):
@@ -1030,14 +1075,9 @@ class APIRatingDetailIntegrationTest(TestCase):
             content_type="application/json"
         )
         
-        # NOTE: Current implementation doesn't enforce object-level permissions
-        # This test documents current behavior - view allows updates without permission check
-        # TODO: Add IsOwnerOrReadOnly permission to RatingDetailView
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 403)
         self.rating.refresh_from_db()
-        # The rating should NOT have been modified (but currently it does due to missing permissions)
-        # For now, we document that it WAS modified
-        self.assertEqual(self.rating.score, 50)
+        self.assertEqual(self.rating.score, 80)
 
     def test_rating_delete_own_rating_success(self):
         """Test that user can delete their own rating."""
@@ -1058,12 +1098,8 @@ class APIRatingDetailIntegrationTest(TestCase):
             reverse("ratings-RUD", kwargs={"pk": self.rating.id})
         )
         
-        # NOTE: Current implementation doesn't enforce object-level permissions
-        # This test documents current behavior - view allows deletions without permission check
-        # TODO: Add IsOwnerOrReadOnly permission to RatingDetailView
-        self.assertEqual(response.status_code, 204)
-        # Rating should NOT exist (but due to missing permissions, it was deleted)
-        self.assertFalse(Rating.objects.filter(id=self.rating.id).exists())
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(Rating.objects.filter(id=self.rating.id).exists())
 
     def test_rating_update_invalid_score(self):
         """Test that updating with invalid score fails with correct error."""

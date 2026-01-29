@@ -11,7 +11,8 @@ from django.http import JsonResponse
 from django.contrib.contenttypes.models import ContentType
 import json
 from music_rating.forms import RatingForm
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from .permissions import IsOwnerOrReadOnly
 
 spotify_handler = SpotifyUtils()
 
@@ -21,11 +22,12 @@ class RatingCreateView(CreateAPIView):
     serializer_class = RatingSerializer
 
 class RatingDetailView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
 
 class AlbumDetailAPIView(APIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
     def get(self, request, spotify_id) -> Response:
         request.GET = request.GET.copy()
         request.GET["type"] = "albums"
@@ -66,7 +68,7 @@ class AlbumDetailAPIView(APIView):
     #TODO: Need to update error handling once I understand how SpotifyUtils works
 
 class SongDetailAPIView(APIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
     def get(self, request, spotify_id) -> Response:
         request.GET = request.GET.copy()
         request.GET["type"] = "tracks"
@@ -105,7 +107,7 @@ class SongDetailAPIView(APIView):
 
     
 class ArtistDetailAPIView(APIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
     def get(self, request, spotify_id) -> Response:
         request.GET = request.GET.copy()
         request.GET["type"] = "artists"

@@ -14,16 +14,21 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ['user', 'bio']
 
 class RatingSerializer(serializers.ModelSerializer):
+    score = serializers.IntegerField(required = False)
     class Meta:
         model = Rating
-        fields = [
-            "score",
-            "content_type",
-            "rate_system",
-            "optional_writing",
-            "spotify_id",
-        ]
+        fields = "__all__"
         read_only_fields = ["user"]
+    
+    def validate(self, attrs):
+        rate_system = attrs.get("rate_system")
+
+        if rate_system.key != "average" and "score" not in attrs:
+            raise serializers.ValidationError({
+                "score": "This field is required for this rating system."
+            })
+
+        return attrs
 
     def create(self, validated_data):
         user = self.context["request"].user
