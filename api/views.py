@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from music_rating.models import Song, Album, Artist, Rating, RateSystem
-from music_rating.views import community_rating_for_album, final_album_rating
+from music_rating.views import community_rating_for_album, community_rating_for_artist, community_rating_for_song
 from .serializers import RateSystemSerializer, SongSerializer, AlbumSerializer, ArtistSerializer, RatingSerializer
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView
@@ -11,7 +11,8 @@ from django.http import JsonResponse
 from django.contrib.contenttypes.models import ContentType
 import json
 from music_rating.forms import RatingForm
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from .permissions import IsOwnerOrReadOnly
 
 spotify_handler = SpotifyUtils()
 
@@ -21,11 +22,12 @@ class RatingCreateView(CreateAPIView):
     serializer_class = RatingSerializer
 
 class RatingDetailView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
 
 class AlbumDetailAPIView(APIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
     def get(self, request, spotify_id) -> Response:
         request.GET = request.GET.copy()
         request.GET["type"] = "albums"
@@ -52,29 +54,21 @@ class AlbumDetailAPIView(APIView):
                 spotify_id=spotify_id,
             )
             .select_related("rate_system")
-            .first()
+            .order_by("-updated_at").first()
             )
-        if user_rating:
-            active_rating_system = user_rating.rate_system
-        else:
-            active_rating_system = RateSystem.objects.get(key = "explicit")
         
-        community_rating = community_rating_for_album(album_data, active_rating_system)
+        community_rating = community_rating_for_album(spotify_id)
 
-        final_rating = None
-        if request.user.is_authenticated:
-            final_rating = final_album_rating(request.user, album_data, active_rating_system)
 
         return Response({
             "album_data": album_data,
             "community_rating": community_rating,
-            "final_rating": final_rating,
             "user_rating" : user_rating
         }, status=200)
     #TODO: Need to update error handling once I understand how SpotifyUtils works
 
 class SongDetailAPIView(APIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
     def get(self, request, spotify_id) -> Response:
         request.GET = request.GET.copy()
         request.GET["type"] = "tracks"
@@ -100,30 +94,20 @@ class SongDetailAPIView(APIView):
                 content_type=content_type,
                 spotify_id=spotify_id,
             ).select_related("rate_system")
-            .first()
+            .order_by("-updated_at").first()
             )
         
-        if user_rating:
-            active_rating_system = user_rating.rate_system
-        else:
-            active_rating_system = RateSystem.objects.get(key = "explicit")
-        
-        community_rating = community_rating_for_album(song_data, active_rating_system)
-
-        final_rating = None
-        if request.user.is_authenticated:
-            final_rating = final_album_rating(request.user, song_data, active_rating_system)
+        community_rating = community_rating_for_song(spotify_id)
 
         return Response({
             "song_data": song_data,
             "community_rating": community_rating,
-            "final_rating": final_rating,
             "user_rating": user_rating,
         }, status=200)
 
     
 class ArtistDetailAPIView(APIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
     def get(self, request, spotify_id) -> Response:
         request.GET = request.GET.copy()
         request.GET["type"] = "artists"
@@ -133,7 +117,7 @@ class ArtistDetailAPIView(APIView):
         artist_data = spotify_handler.spotify_get_id(request)
         
         if not artist_data:
-            Response({
+            return Response({
                 "detail": "Error finding Artist details"
             }, status=500)
 
@@ -150,24 +134,13 @@ class ArtistDetailAPIView(APIView):
                 content_type=content_type,
                 spotify_id=spotify_id,
             ).select_related("rate_system")
-            .first()
+            .order_by("-updated_at").first()
             )
-        
-        if user_rating:
-            active_rating_system = user_rating.rate_system
-        else:
-            active_rating_system = RateSystem.objects.get(key = "explicit")
 
-        community_rating = community_rating_for_album(artist_data, active_rating_system)
-        
-        final_rating = None
-        if request.user.is_authenticated:
-            final_rating = final_album_rating(request.user, artist_data, active_rating_system)
-
+        community_rating = community_rating_for_artist(spotify_id)
 
         return Response({
             "artist_data": artist_data,
             "community_rating": community_rating,
-            "final_rating": final_rating,
             "user_rating": user_rating,
         }, status=200)

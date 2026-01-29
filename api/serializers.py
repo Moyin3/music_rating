@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from music_rating.models import RateSystem, Rating, Song, UserProfile, Song, Album, Single, EP, Artist
+from music_rating.views import album_rating_for_rate_system_2, artist_rating_for_rate_system_2
+from django.contrib.contenttypes.models import ContentType
 
 class RateSystemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,27 +14,69 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ['user', 'bio']
 
 class RatingSerializer(serializers.ModelSerializer):
+    score = serializers.IntegerField(required = False)
     class Meta:
         model = Rating
-        fields = ['score', 'user', 'content_type','rate_system', 'optional_writing', "spotify_id"]  
+        fields = "__all__"
+        read_only_fields = ["user"]
+    
+    def validate(self, attrs):
+        rate_system = attrs.get("rate_system")
+
+        if rate_system.key != "average" and "score" not in attrs:
+            raise serializers.ValidationError({
+                "score": "This field is required for this rating system."
+            })
+
+        return attrs
 
     def create(self, validated_data):
-        request = self.context["request"]
-        user = request.user
+        user = self.context["request"].user
+        rate_system = validated_data["rate_system"]
+        content_type = validated_data["content_type"]
+        spotify_id = validated_data["spotify_id"]
 
-        """Decided to include created, just in case I wanted to do something down 
-        the line checking if a new Rating has been created or if it's just an update"""
-        rating, created = Rating.objects.update_or_create(
-            user = user,
-            spotify_id = validated_data["spotify_id"],
-            content_type = validated_data["content_type"],
-            rate_system = validated_data["rate_system"],
+        if rate_system.key == "average":
+            model = content_type.model
+
+            if model == "album":
+                validated_data["score"] = album_rating_for_rate_system_2(
+                    user=user,
+                    album_spotify_id=spotify_id,
+                )
+            elif model == "artist":
+                validated_data["score"] = artist_rating_for_rate_system_2(
+                    user=user,
+                    artist_spotify_id=spotify_id,
+                )
+            else:
+                raise serializers.ValidationError(
+                    "Unsupported content type for average rating."
+                )
+
+        rating, _ = Rating.objects.update_or_create(
+            user=user,
+            spotify_id=spotify_id,
+            content_type=content_type,
+            rate_system=rate_system,
             defaults={
                 "score": validated_data["score"],
-                # .get function here, because if there isn't any writing, then it will just return None without crashing
                 "optional_writing": validated_data.get("optional_writing"),
             },
         )
+
+        return rating
+    
+    def validate_score(self, value):
+        try:
+            value = int(value)
+        except (TypeError, ValueError):
+            raise serializers.ValidationError("Score must be an integer.")
+
+        if not 0 <= value <= 100:
+            raise serializers.ValidationError("Score must be between 0 and 100.")
+
+        return value
 
 class SongSerializer(serializers.ModelSerializer):
     class Meta:

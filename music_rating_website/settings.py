@@ -130,6 +130,14 @@ TEMPLATES = [
         },
     },
 ]
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_EMAIL_REQUIRED = True
+
+ACCOUNT_SIGNUP_FIELDS = {
+    "username": {"required": True},
+    "email": {"required": True},
+}
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 

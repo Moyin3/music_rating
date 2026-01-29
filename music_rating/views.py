@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from .utils.spotify import SpotifyUtils
 import json
+from django.db.models import Avg
 
 # import requests
 
@@ -223,12 +224,6 @@ def album_detail(request, spotify_id):
                 existing_rating  # Include user's previous rating if it exists
             )
 
-        # Added this check to make sure that active_rate_system is not None before passing it to final_album_rating
-        if active_rate_system:
-            context["final_rating"] = final_album_rating(
-                request.user, album_data, active_rate_system
-            )  # Pass the final album rating based on the active rate system
-
         return render(request, "music_rating/album_detail.html", context)
 
     # Handle error cases explicitly
@@ -328,12 +323,6 @@ def artist_detail(request, spotify_id):
         if user_rating:
             context["user_rating"] = existing_rating
 
-        # Added this check to make sure that active_rate_system is not None before passing it to final_artist_rating
-        if active_rate_system:
-            context["final_rating"] = final_artist_rating(
-                request.user, artist_data, active_rate_system, request
-            )
-
         return render(request, "music_rating/artist_detail.html", context)
 
     # Handle error cases explicitly
@@ -365,145 +354,170 @@ def get_album_dict_from_id(request, spotify_id):
 
 # Average rating for track for all users across platform
 def community_rating_for_track(track) -> int:
-    track_ratings = Rating.objects.filter(
-        content_type=ContentType.objects.get_for_model(Song), spotify_id=track.spotify_id
+    song_content_type = ContentType.objects.get_for_model(Song)
+    song_id = track.get("id")
+    latest_rating_per_user = (
+        Rating.objects.filter(
+        content_type=song_content_type, 
+        spotify_id=song_id,
+        score__isnull = False
     )
-    valid_ratings = [
-        rating.score for rating in track_ratings if rating.score is not None
-    ]
-    return int(sum(valid_ratings) / len(valid_ratings)) if valid_ratings else 0
+    .order_by("user_id", "-updated_at")
+    .distinct("user_id")
+    )
+    #TODO: fix this and other divisions to avoid rounding and floating point errors
+    scores = [r.score for r in latest_rating_per_user]
+    return sum(scores) / len(scores) if scores else None
 
+#TODO: Refactor the community ratings into one big function, everyone similar right now, want DRY code
 # Average rating for album for all users across platform
-def community_rating_for_album(album, active_rate_system=None) -> int:
-    album_content_type = ContentType.objects.get_for_model(Album)
-    album_id = album.get("id")
-    ratings = Rating.objects.filter(content_type=album_content_type, spotify_id=album_id)
-    if active_rate_system:
-        ratings = ratings.filter(rate_system=active_rate_system)
-    valid_ratings = [rating.score for rating in ratings if rating.score is not None]
-    return int(sum(valid_ratings) / len(valid_ratings)) if valid_ratings else None
+def community_rating_for_album(album_spotify_id) -> int | None:
+    album_ct = ContentType.objects.get_for_model(Album)
+
+    latest_rating_per_user = (
+        Rating.objects
+        .filter(
+            content_type=album_ct,
+            spotify_id=album_spotify_id,
+            score__isnull=False,
+        )
+        .order_by("user_id", "-updated_at")
+        .distinct("user_id")
+    )
+
+    scores = [r.score for r in latest_rating_per_user]
+    return int(sum(scores) / len(scores)) if scores else None
 
 # Average rating for artist for all users across platform
-def community_rating_for_artist(artist_dict, active_rate_system=None) -> int:
-    artist_content_type = ContentType.objects.get_for_model(Artist)
-    artist_id = artist_dict.get("id")
-    ratings = Rating.objects.filter(
-        content_type=artist_content_type, spotify_id=artist_id
+def community_rating_for_artist(artist_spotify_id) -> int | None:
+    artist_ct = ContentType.objects.get_for_model(Artist)
+
+    latest_rating_per_user = (
+        Rating.objects
+        .filter(
+            content_type=artist_ct,
+            spotify_id=artist_spotify_id,
+            score__isnull=False,
+        )
+        .order_by("user_id", "-updated_at")
+        .distinct("user_id")
     )
-    if active_rate_system:
-        ratings = ratings.filter(rate_system=active_rate_system)
-    valid_ratings = [rating.score for rating in ratings if rating.score is not None]
-    return int(sum(valid_ratings) / len(valid_ratings)) if valid_ratings else None
+
+    scores = [r.score for r in latest_rating_per_user]
+    return int(sum(scores) / len(scores)) if scores else None
+
+def community_rating_for_song(track_spotify_id) -> int | None:
+    song_ct = ContentType.objects.get_for_model(Song)
+
+    latest_rating_per_user = (
+        Rating.objects
+        .filter(
+            content_type = song_ct,
+            spotify_id = track_spotify_id,
+            score__isnull = False,
+        )
+        .order_by("user_id", "-updated_at")
+        .distinct("user_id")
+    )
+    scores = [r.score for r in latest_rating_per_user]
+    return int(sum(scores) / len(scores)) if scores else None
 
 # Takes an average of rated songs in the album
-def album_rating_for_rate_system_2(user, album) -> int:
-    track_ids = [track_id for track_id, _ in album.get("track_list", [])]
-    if not track_ids:
-        return 0
-    song_content_type = ContentType.objects.get_for_model(Song)
-    total_rating = 0
-    number_of_ratings = 0
-    songs = Song.objects.filter(spotify_id__in=track_ids)
-    for song in songs:
-        ratings = Rating.objects.filter(
-            user=user, content_type=song_content_type, spotify_id=song.spotify_id
-        )
-        for rating in ratings:
-            total_rating += rating.score
-            number_of_ratings += 1
-    avg_score = int(total_rating / number_of_ratings) if number_of_ratings > 0 else None
+def album_rating_for_rate_system_2(user, album_spotify_id) -> int:
+    song_ct = ContentType.objects.get_for_model(Song)
+    album_ct = ContentType.objects.get_for_model(Album)
+    rate_system = RateSystem.objects.get(key="average")
 
-    if avg_score is not None:
-        album_content_type = ContentType.objects.get_for_model(Album)
-        rate_system_2 = RateSystem.objects.get(id=2)
-        rating_obj, created = Rating.objects.update_or_create(
-            user=user,
-            content_type=album_content_type,
-            spotify_id=album.get("id"),
-            rate_system=rate_system_2,
-            defaults={"score": avg_score},
-        )
-        return avg_score
-    return None
+    # All songs that belong to this album
+    songs = Song.objects.filter(album_spotify_id=album_spotify_id)
+    if not songs.exists():
+        return 0
+
+    # User's ratings for those songs
+    ratings = Rating.objects.filter(
+        user=user,
+        content_type=song_ct,
+        spotify_id__in=songs.values_list("spotify_id", flat=True),
+    )
+
+    if not ratings.exists():
+        return 0
+
+    avg_score = int(ratings.aggregate(avg=Avg("score"))["avg"])
+
+    Rating.objects.update_or_create(
+        user=user,
+        content_type=album_ct,
+        spotify_id=album_spotify_id,
+        rate_system=rate_system,
+        defaults={"score": avg_score},
+    )
+
+    return avg_score
 
 # Takes an average of rated albums an artist has
-def artist_rating_for_rate_system_2(user, artist, request) -> int:
-    albums = artist.get("artist_albums", [])
+def artist_rating_for_rate_system_2(user, artist_spotify_id) -> int:
+    album_ct = ContentType.objects.get_for_model(Album)
+    artist_ct = ContentType.objects.get_for_model(Artist)
+    rate_system = RateSystem.objects.get(key="average")
 
-    if not albums:
-        return None
-    album_content_type = ContentType.objects.get_for_model(Album)
-    artist_content_type = ContentType.objects.get_for_model(Artist)
-    rate_system_2 = RateSystem.objects.get(id=2)
-    album_scores = []
+    # Albums by this artist that exist in the DB
+    albums = Album.objects.filter(artist_spotify_id=artist_spotify_id)
+    if not albums.exists():
+        return 0
 
-    for album in albums:
-        album_id = album[0]
+    # User's album ratings for those albums
+    ratings = Rating.objects.filter(
+        user=user,
+        content_type=album_ct,
+        spotify_id__in=albums.values_list("spotify_id", flat=True),
+        rate_system=rate_system,
+    )
 
-        # Get user's direct album rating
-        rating = Rating.objects.filter(
+    if not ratings.exists():
+        return 0
+
+    avg_score = int(ratings.aggregate(avg=Avg("score"))["avg"])
+
+    Rating.objects.update_or_create(
+        user=user,
+        content_type=artist_ct,
+        spotify_id=artist_spotify_id,
+        rate_system=rate_system,
+        defaults={"score": avg_score},
+    )
+
+    return avg_score
+
+def album_rating_for_rate_system_1(user, album_spotify_id) -> int | None:
+    album_ct = ContentType.objects.get_for_model(Album)
+
+    rating = (
+        Rating.objects
+        .filter(
             user=user,
-            content_type=album_content_type,
-            spotify_id=album_id,
-            rate_system=rate_system_2,
-        ).first()
-        if rating and rating.score is not None:
-            album_scores.append(rating.score)
-        else:
-            # If no direct rating, calculate average track rating for this album
-            album_dict = get_album_dict_from_id(request, album_id)
-            score = album_rating_for_rate_system_2(user, album_dict)
-            if score is not None:
-                album_scores.append(score)
-
-    avg_score = int(sum(album_scores) / len(album_scores)) if album_scores else None
-
-    # Save or update the direct artist rating for rate system 2
-    if avg_score is not None:
-        rating_obj, created = Rating.objects.update_or_create(
-            user=user,
-            content_type=artist_content_type,
-            spotify_id=artist.get("id"),
-            rate_system=rate_system_2,
-            defaults={"score": avg_score},
+            content_type=album_ct,
+            spotify_id=album_spotify_id,
         )
-        # Returning the rating object for now in case we decide to use it later
-        return avg_score, rating_obj
-    return None, None
+        .order_by("-updated_at")
+        .first()
+    )
 
-
-def album_rating_for_rate_system_1(user, album) -> int:
-    album_content_type = ContentType.objects.get_for_model(Album)
-    spotify_id = album.get("id")
-    rating = Rating.objects.filter(
-        user=user, content_type=album_content_type, spotify_id=spotify_id
-    ).first()
     return rating.score if rating else None
 
 
-def artist_rating_for_rate_system_1(user, artist) -> int:
-    artist_content_type = ContentType.objects.get_for_model(Artist)
-    spotify_id = artist.get("id")
-    rating = Rating.objects.filter(
-        user=user, content_type=artist_content_type, spotify_id=spotify_id
-    ).first()
+def artist_rating_for_rate_system_1(user, artist_spotify_id) -> int | None:
+    artist_ct = ContentType.objects.get_for_model(Artist)
+
+    rating = (
+        Rating.objects
+        .filter(
+            user=user,
+            content_type=artist_ct,
+            spotify_id=artist_spotify_id,
+        )
+        .order_by("-updated_at")
+        .first()
+    )
+
     return rating.score if rating else None
-
-
-def final_album_rating(user, album, rate_system) -> int:
-    if rate_system.id == 1:
-        return album_rating_for_rate_system_1(user, album)
-    elif rate_system.id == 2:
-        return album_rating_for_rate_system_2(user, album)
-    else:
-        raise ValueError(f"Unknown rate system: {rate_system.name}")
-
-
-def final_artist_rating(user, artist, rate_system, request) -> int:
-    if rate_system.id == 1:
-        return artist_rating_for_rate_system_1(user, artist)
-    elif rate_system.id == 2:
-        score, _ = artist_rating_for_rate_system_2(user, artist, request)
-        return score
-    else:
-        raise ValueError(f"Unknown rate system: {rate_system.name}")
