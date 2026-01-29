@@ -24,7 +24,7 @@ class UserProfile(models.Model):
         return self.user.username
 
 class Rating(models.Model):
-    score = models.IntegerField(null=True, blank=True)  # This is to allow for null values, for the second rating system
+    score = models.IntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     spotify_id = models.CharField(max_length=50, db_index=True)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -50,10 +50,12 @@ class Rating(models.Model):
 
 class Song(models.Model):
     spotify_id = models.CharField(max_length=50, db_index = True)
+    album_spotify_id = models.CharField(max_length=255, db_index = True)
     
     
 class Album(models.Model):
     spotify_id = models.CharField(max_length=50, db_index=True)
+    artist_spotify_id = models.CharField(max_length=255, db_index=True)
 
 class Single(models.Model):
     spotify_id = models.CharField(max_length=50, db_index=True)

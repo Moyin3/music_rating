@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from music_rating.models import Song, Album, Artist, Rating, RateSystem
-from music_rating.views import community_rating_for_album
+from music_rating.views import community_rating_for_album, community_rating_for_artist, community_rating_for_song
 from .serializers import RateSystemSerializer, SongSerializer, AlbumSerializer, ArtistSerializer, RatingSerializer
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView
@@ -55,7 +55,7 @@ class AlbumDetailAPIView(APIView):
             .order_by("-updated_at").first()
             )
         
-        community_rating = community_rating_for_album(album_data)
+        community_rating = community_rating_for_album(spotify_id)
 
 
         return Response({
@@ -92,10 +92,10 @@ class SongDetailAPIView(APIView):
                 content_type=content_type,
                 spotify_id=spotify_id,
             ).select_related("rate_system")
-            .first()
+            .order_by("-updated_at").first()
             )
         
-        community_rating = community_rating_for_album(song_data)
+        community_rating = community_rating_for_song(spotify_id)
 
         return Response({
             "song_data": song_data,
@@ -115,7 +115,7 @@ class ArtistDetailAPIView(APIView):
         artist_data = spotify_handler.spotify_get_id(request)
         
         if not artist_data:
-            Response({
+            return Response({
                 "detail": "Error finding Artist details"
             }, status=500)
 
@@ -132,10 +132,10 @@ class ArtistDetailAPIView(APIView):
                 content_type=content_type,
                 spotify_id=spotify_id,
             ).select_related("rate_system")
-            .first()
+            .order_by("-updated_at").first()
             )
 
-        community_rating = community_rating_for_album(artist_data)
+        community_rating = community_rating_for_artist(spotify_id)
 
         return Response({
             "artist_data": artist_data,
