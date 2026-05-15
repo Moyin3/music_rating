@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from music_rating.models import Song, Album, Artist, Rating, RateSystem
-from music_rating.views import community_rating_for_album, community_rating_for_artist, community_rating_for_song
+from music_rating.utils.ratingHelpers import community_rating_for_album, community_rating_for_artist, community_rating_for_song
 from .serializers import RateSystemSerializer, SongSerializer, AlbumSerializer, ArtistSerializer, RatingSerializer
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView
