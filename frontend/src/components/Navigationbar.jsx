@@ -1,6 +1,5 @@
 import Searchbar from "./Searchbar";
-import LoginForm from "./loginpage";
-import SignUpForm from "./signuppage";
+import LoginButton from "./LoginButton";
 
 export default function Navigationbar(){
     return(
@@ -10,8 +9,7 @@ export default function Navigationbar(){
             <a className="Artists">Artists</a>
             <a className="Albums">Albums</a>
             <a className="Tracks">Tracks</a>
-            <LoginForm />
-            <SignUpForm />
+            <LoginButton />
         </div>
     )
 }

@@ -1,13 +1,10 @@
-import { useState } from 'react';
-
-const Loginform = () => {
+const LoginForm = () => {
     const [isVisible, setVisible] = useState(false);
     const [isSubmitted, setSubmitted] = useState(false);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
     
-
     function openLoginForm() {
         setVisible(true);
     }
@@ -20,6 +17,7 @@ const Loginform = () => {
     try {
         const response = await fetch("http://127.0.0.1:8000/api/dj-rest-auth/login/", {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json"
             },
@@ -27,7 +25,7 @@ const Loginform = () => {
         });
 
         if (!response.ok){
-            throw new Error('Something went wrong');
+            throw new Error('Login failed');
         }
         const result = await response.json();
         console.log(result);
@@ -37,25 +35,23 @@ const Loginform = () => {
     };
     return (
         <>
-        <button onClick = {openLoginForm}>Login</button>
-        {isVisible &&(
+        (isVisible &&
         <form>
-            <label>Username:</label>
-            <input type = "text" value = {username} onChange={(e) => setUsername(e.target.value)}/>
+        <label>Username:</label>
+        <input type = "text" value = {username} onChange={(e) => setUsername(e.target.value)}/>
 
-            <label>Email:</label>
-            <input type= "email" value = {email} onChange={(e) => setEmail(e.target.value)}/>
+        <label>Email:</label>
+        <input type= "email" value = {email} onChange={(e) => setEmail(e.target.value)}/>
 
-            <label>Password:</label>
-            <input type = "password" value = {password} onChange={(e) => setPassword(e.target.value)}/>
-            
-            <button onClick = {handleSubmit}>Login</button>
+        <label>Password:</label>
+        <input type = "password" value = {password} onChange={(e) => setPassword(e.target.value)}/>
+        
+        <button onClick = {handleSubmit}>Login</button>
         </form>
-
         )
-}
         </>
     );
     };
 
-export default Loginform;
+export default LoginForm;
+    
