@@ -87,6 +87,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -95,7 +96,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "allauth.account.middleware.AccountMiddleware"
 
 ]
@@ -130,14 +130,11 @@ TEMPLATES = [
         },
     },
 ]
-ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 
-ACCOUNT_SIGNUP_FIELDS = {
-    "username": {"required": True},
-    "email": {"required": True},
-}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*']
+
+ACCOUNT_LOGIN_METHODS = {'username'}
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 

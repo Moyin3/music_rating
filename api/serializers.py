@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from music_rating.models import RateSystem, Rating, Song, UserProfile, Song, Album, Single, EP, Artist
-from music_rating.views import album_rating_for_rate_system_2, artist_rating_for_rate_system_2
+from music_rating.utils.ratingHelpers import album_rating_for_rate_system_2, artist_rating_for_rate_system_2
 from django.contrib.contenttypes.models import ContentType
 
 class RateSystemSerializer(serializers.ModelSerializer):
