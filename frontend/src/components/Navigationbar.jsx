@@ -1,6 +1,7 @@
 import Searchbar from "./SearchBar";
 import LoginButton from "./LoginButton";
 import { BrowserRouter, Link } from "react-router";
+import SignUpButton from "./SignUpButton";
 
 const NavigationBar = () => {
     return(
@@ -12,6 +13,7 @@ const NavigationBar = () => {
             <button>Artists</button>
             <button>Albums</button>
             <button>Tracks</button>
+            <SignUpButton />
             <LoginButton />
         </div>
     )
