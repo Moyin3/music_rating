@@ -1,13 +1,11 @@
+import { useState } from 'react';
+
 const LoginForm = () => {
-    const [isVisible, setVisible] = useState(false);
     const [isSubmitted, setSubmitted] = useState(false);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
     
-    function openLoginForm() {
-        setVisible(true);
-    }
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -35,7 +33,6 @@ const LoginForm = () => {
     };
     return (
         <>
-        (isVisible &&
         <form>
         <label>Username:</label>
         <input type = "text" value = {username} onChange={(e) => setUsername(e.target.value)}/>
@@ -48,7 +45,6 @@ const LoginForm = () => {
         
         <button onClick = {handleSubmit}>Login</button>
         </form>
-        )
         </>
     );
     };

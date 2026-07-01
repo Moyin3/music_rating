@@ -1,9 +1,15 @@
-import Navigationbar from "./components/Navigationbar";
-
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import {Routes, Route } from "react-router";
 function App() {
   return (
-    <Navigationbar />
+    <>
+    <Routes>
+      <Route path = "/" element = {<HomePage />}></Route>
+      <Route path= "/login" element = {<LoginPage />}></Route>
+    </Routes>
+    </>
   );
 }
 
-export default App
+export default App;

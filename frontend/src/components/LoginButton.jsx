@@ -1,14 +1,15 @@
-import {useState} from 'react'
+import React from 'react';
+import { BrowserRouter, Link } from "react-router";
 
-const [isVisible, setVisible] = useState(false);
 
-function openLoginForm() {
-        setVisible(true);
-    }
 
-function LoginButton({OpenLoginForm}) {
+const LoginButton = () => {
     return(
-    <button onClick={OpenLoginForm}>Login</button>
+        <>
+        <Link to= "/login">
+    <button>Login</button>
+    </Link>
+    </>
     )
 }
 export default LoginButton;
