@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import LoginCheck from '../functions/LoginCheck';
 
 const LoginForm = () => {
     const [isSubmitted, setSubmitted] = useState(false);
@@ -30,6 +31,7 @@ const LoginForm = () => {
     } catch (error) {
         console.error("Error:", error)
     }
+    LoginCheck();
     };
     return (
         <>
