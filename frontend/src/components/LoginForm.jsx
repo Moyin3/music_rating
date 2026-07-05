@@ -26,12 +26,13 @@ const LoginForm = () => {
         if (!response.ok){
             throw new Error('Login failed');
         }
+        //printing out access token, remember to remove in prod
         const result = await response.json();
         console.log(result);
     } catch (error) {
         console.error("Error:", error)
     }
-    LoginCheck();
+    console.log(await LoginCheck());
     };
     return (
         <>
