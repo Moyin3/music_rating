@@ -13,6 +13,7 @@ import json
 from music_rating.forms import RatingForm
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .permissions import IsOwnerOrReadOnly
+from django.views import View
 
 spotify_handler = SpotifyUtils()
 
@@ -144,3 +145,14 @@ class ArtistDetailAPIView(APIView):
             "community_rating": community_rating,
             "user_rating": user_rating,
         }, status=200)
+
+
+"""Separate from the API View, just a small view that uses the SpotifyUtils class
+to handle search, and since it's just this small view, I've decided not to use a
+different file to hold this class based view in."""
+
+
+
+class SpotifySearchView(View):
+    def get(self, request):
+        return spotify_handler.spotify_search(request)

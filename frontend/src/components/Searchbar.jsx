@@ -74,7 +74,7 @@ const search = async(event) => {
         setBoxVisible(true);
     }
     try{
-        const response = await fetch(`/spotify-search/?query=${encodeURIComponent(searchval)}`)
+        const response = await fetch(`/api/search/?query=${encodeURIComponent(searchval)}`)
         const data = await response.json();
         if (data.tracks.total != 0 || data.artists.total != 0 || data.albums.total != 0) {
             //More css suggestion box stuff

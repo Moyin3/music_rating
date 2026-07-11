@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   server:{
     proxy: {
-      '/spotify-search': 'http://127.0.0.1:8000'
+      '/api/search/': 'http://127.0.0.1:8000'
     },
     host: "127.0.0.1"
   },
