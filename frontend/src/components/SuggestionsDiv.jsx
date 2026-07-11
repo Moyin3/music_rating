@@ -8,18 +8,18 @@ const SuggestionsDiv = ({results}) => {
 
     // Determine the type of the suggestion and redirect to the appropriate view
     if (suggestion.type === 'track') {
-        navigate(`/song/${suggestion.id}/`); // Redirect to track view
+        navigate(`/song/${suggestion.id}/`, {state: {"data": suggestion}}); // Redirect to track view
     } else if (suggestion.type === 'artist') {
-        navigate(`/artist/${suggestion.id}/`); // Redirect to artist view
+        navigate(`/artist/${suggestion.id}/`, {state: {"data": suggestion}}); // Redirect to artist view
     } else if (suggestion.type === 'album') {
-        navigate(`/album/${suggestion.id}/`); // Redirect to album view
+        navigate(`/album/${suggestion.id}/`, {state: {"data": suggestion}}); // Redirect to album view
     }
 }
     return(
         results.length === 0 ? "No results found" :
         <div className="suggestions">
     {results.map((item) => {
-                //I think this might be a debugging line, keeping it in because why not, and I'm unsure.
+                //I really like this for debugging, as it shows the jsonresponse I'm being returned in console.
                 console.log("Processing item:", item);
                     if (item.type === 'track'){
                         return(
