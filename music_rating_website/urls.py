@@ -10,7 +10,7 @@ urlpatterns = [
     path("api/song/<str:spotify_id>", SongDetailAPIView.as_view(), name="api_song_detail"),
     path("api/artist/<str:spotify_id>", ArtistDetailAPIView.as_view(), name="api_artist_detail"),
     path("api/ratings/<int:pk>", RatingDetailView.as_view(), name = "ratings-RUD"),
-    path("api/ratings", RatingCreateView.as_view(), name = "ratings-create"),
+    path("api/ratings/", RatingCreateView.as_view(), name = "ratings-create"),
     path("api/dj-rest-auth/", include("dj_rest_auth.urls")),
     path("api/dj-rest-auth/registration/", include("dj_rest_auth.registration.urls")),
     path("api/dj-rest-auth/registration/account-confirm-email/", VerifyEmailView.as_view(), name = "account_email_verification_sent"),

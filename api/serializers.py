@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 class RateSystemSerializer(serializers.ModelSerializer):
     class Meta:
         model = RateSystem
-        fields = ['name', 'description']
+        fields = ['key', 'description']
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,10 +15,16 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class RatingSerializer(serializers.ModelSerializer):
     score = serializers.IntegerField(required = False)
+    content_type = serializers.CharField()
     class Meta:
         model = Rating
         fields = "__all__"
         read_only_fields = ["user"]
+    
+    def typeToContentTypeLookUp(self, type) -> ContentType: 
+        if type == "track":
+            type = "song"
+        return ContentType.objects.get_by_natural_key(app_label="music_rating", model = type)
     
     def validate(self, attrs):
         rate_system = attrs.get("rate_system")
@@ -33,7 +39,7 @@ class RatingSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context["request"].user
         rate_system = validated_data["rate_system"]
-        content_type = validated_data["content_type"]
+        content_type = self.typeToContentTypeLookUp(validated_data["content_type"])
         spotify_id = validated_data["spotify_id"]
 
         if rate_system.key == "average":
