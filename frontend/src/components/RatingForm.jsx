@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import TokenRefresh from "../functions/TokenRefresh";
+import { redirect } from "react-router";
 
 
 const RatingForm = ( {name, type, spotify_id} ) => {
@@ -22,6 +24,12 @@ const RatingForm = ( {name, type, spotify_id} ) => {
                 },
                 body:JSON.stringify(data)
             });
+
+            if (response.status === 401){
+                if( await TokenRefresh() == null){
+                    throw redirect("/login");
+                };
+            }
         }
         catch(error) {
             console.error("Error during fetch:", error);
