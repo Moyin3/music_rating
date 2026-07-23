@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import TokenRefresh from "../functions/TokenRefresh";
-import { redirect } from "react-router";
+import { useNavigate } from "react-router";
+import post from "../functions/post";
 
 
 const RatingForm = ( {name, type, spotify_id} ) => {
@@ -9,31 +9,29 @@ const RatingForm = ( {name, type, spotify_id} ) => {
     const [review, setReview] = useState('');
     const [rateSystem, setRateSystem] = useState('');
     const [isVisible, setVisible] = useState(true);
+    let navigate = useNavigate();
     const handleSave = async (event) => {
+
         event.preventDefault();
 
         const data = {"score": rating, "optional_writing":review, "spotify_id": spotify_id, "content_type": type};
         console.log(data);
 
-        try{
-            const response = await fetch("/api/ratings/", {
-                method: "POST",
-                credentials: "include",
-                headers:{
-                    "Content-Type": "application/json"
-                },
-                body:JSON.stringify(data)
-            });
-
-            if (response.status === 401){
-                if( await TokenRefresh() == null){
-                    throw redirect("/login");
-                };
-            }
+        const response = await post({"url": "/api/ratings/", "data": data});
+        
+        if (response.status == "success"){
+            console.log(response)
+            //Do nothing I guess
+        }else if (response.status == "need login"){
+            navigate("/login")
         }
-        catch(error) {
-            console.error("Error during fetch:", error);
+        else if (response.status == "error: request failed"){
+            //Also need to handle this later, but should be easier to fix
         }
+        else{
+            //Need to handle this later
+        }
+            
     }
     useEffect(() => {
         if (type == 'track'){

@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import LoginCheck from '../functions/LoginCheck';
+import post from '../functions/post';
+import { useLocation } from "react-router";
 
-const LoginForm = () => {
+const LoginForm = ({user}) => {
     const [isSubmitted, setSubmitted] = useState(false);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -13,26 +15,18 @@ const LoginForm = () => {
 
     const data = { username, email, password };
 
-    try {
-        const response = await fetch("http://127.0.0.1:8000/api/dj-rest-auth/login/", {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        });
+    const response = await post({"url": "http://127.0.0.1:8000/api/dj-rest-auth/login/", "data": data})
 
-        if (!response.ok){
-            throw new Error('Login failed');
-        }
-        //printing out access token, remember to remove in prod
-        const result = await response.json();
-        console.log(result);
-    } catch (error) {
-        console.error("Error:", error)
+    if (response.status == "success"){
+        console.log(response)
+
+    }else if (response.status == "error: request failed"){
+        //TODO: Do this later
+    }else{
+        //Serious Headache
     }
     console.log(await LoginCheck());
+
     };
     return (
         <>

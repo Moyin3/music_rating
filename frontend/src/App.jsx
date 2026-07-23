@@ -5,10 +5,10 @@ import SignUpPage from "./pages/SignUpPage";
 import ContentPage from "./pages/ContentPage";
 import ContentRatingPage from "./pages/ContentRatingPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext } from "react";
 import LoginCheck from "./functions/LoginCheck";
 
-function App() {
+function App({user}) {
   const [checked, setChecked] = useState(false);
   const [user, setUser] = useState(null);
   
