@@ -16,7 +16,7 @@ This project is under active development, targeting a public launch in September
 - 401 handling / token refresh on the client
 
 **Not started:**
-- List of Reviews for User
+- List of Reviews for User (frontend)
 - Styling
 - Deployment
 
