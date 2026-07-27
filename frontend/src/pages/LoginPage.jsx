@@ -2,12 +2,11 @@ import { useState } from 'react';
 import LoginForm from '../components/LoginForm';
 import NavigationBar from '../components/Navigationbar';
 
-const LoginPage = ({user}) => {
-    console.log("sending the user", {user})
+const LoginPage = () => {
     return(
     <>
     <NavigationBar />
-    <LoginForm user = {user}/>
+    <LoginForm />
     </>
     )
 }

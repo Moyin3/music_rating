@@ -19,7 +19,10 @@ const post = async ({url, data}) => {
                 else{
                     result = {"status": "need login", "json": null}
                 }
+                //Need to handle status codes better
             }else if (response.status === 201){
+                result = {"status": "success", "json": await response.json()}
+            }else if (response.status ===200){
                 result = {"status": "success", "json": await response.json()}
             }else{
                 result = {"status": "error: request failed", "json": null}

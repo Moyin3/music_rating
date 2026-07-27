@@ -15,7 +15,7 @@ const RatingForm = ( {name, type, spotify_id} ) => {
         event.preventDefault();
 
         const data = {"score": rating, "optional_writing":review, "spotify_id": spotify_id, "content_type": type};
-        console.log(data);
+        console.log("This is the data being sent before validation", data);
 
         const response = await post({"url": "/api/ratings/", "data": data});
         

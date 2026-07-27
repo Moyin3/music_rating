@@ -1,24 +1,27 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import LoginCheck from '../functions/LoginCheck';
 import post from '../functions/post';
 import { useLocation } from "react-router";
+import AuthContext from '../functions/AuthContext';
 
-const LoginForm = ({user}) => {
+const LoginForm = () => {
     const [isSubmitted, setSubmitted] = useState(false);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
+    const { user, setUser } = useContext(AuthContext);
     
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-
+    
     const data = { username, email, password };
 
     const response = await post({"url": "http://127.0.0.1:8000/api/dj-rest-auth/login/", "data": data})
 
     if (response.status == "success"){
         console.log(response)
+        setUser(await LoginCheck());
 
     }else if (response.status == "error: request failed"){
         //TODO: Do this later
@@ -26,6 +29,7 @@ const LoginForm = ({user}) => {
         //Serious Headache
     }
     console.log(await LoginCheck());
+
 
     };
     return (
