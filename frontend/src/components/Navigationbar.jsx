@@ -1,17 +1,22 @@
-import Searchbar from "./Searchbar";
-import LoginForm from "./loginpage";
-import SignUpForm from "./signuppage";
+import Searchbar from "./SearchBar";
+import LoginButton from "./LoginButton";
+import { BrowserRouter, Link } from "react-router";
+import SignUpButton from "./SignUpButton";
 
-export default function Navigationbar(){
+const NavigationBar = () => {
     return(
         <div>
-            <a className="Home">Home</a>
+            <Link to= "/">
+            <button>Home</button>
+            </Link>
             <Searchbar />
-            <a className="Artists">Artists</a>
-            <a className="Albums">Albums</a>
-            <a className="Tracks">Tracks</a>
-            <LoginForm />
-            <SignUpForm />
+            <button>Artists</button>
+            <button>Albums</button>
+            <button>Tracks</button>
+            <SignUpButton />
+            <LoginButton />
         </div>
     )
 }
+
+export default NavigationBar;

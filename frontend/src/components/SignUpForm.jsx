@@ -1,44 +1,43 @@
 import { useState } from 'react';
 
-const Loginform = () => {
+const SignUpForm = () => {
     const [isVisible, setVisible] = useState(false);
     const [isSubmitted, setSubmitted] = useState(false);
     const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
-    
+    const [password1, setPassword1] = useState('');
+    const [password2, setPassword2] = useState('');
 
-    function openLoginForm() {
+    function openSignUpForm() {
         setVisible(true);
     }
-
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-    const data = { username, email, password };
+    const data = { username, password1, password2, email };
 
+    
     try {
-        const response = await fetch("http://127.0.0.1:8000/api/dj-rest-auth/login/", {
-            method: "POST",
+        const response = await fetch ("http://127.0.0.1:8000/api/dj-rest-auth/registration/", {
+            method: "POST", 
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(data)
-        });
 
-        if (!response.ok){
+        });
+        
+        if (!response.ok) {
             throw new Error('Something went wrong');
         }
+
         const result = await response.json();
         console.log(result);
     } catch (error) {
         console.error("Error:", error)
     }
-    };
-    return (
-        <>
-        <button onClick = {openLoginForm}>Login</button>
-        {isVisible &&(
+};
+     return (
         <form>
             <label>Username:</label>
             <input type = "text" value = {username} onChange={(e) => setUsername(e.target.value)}/>
@@ -46,16 +45,15 @@ const Loginform = () => {
             <label>Email:</label>
             <input type= "email" value = {email} onChange={(e) => setEmail(e.target.value)}/>
 
-            <label>Password:</label>
-            <input type = "password" value = {password} onChange={(e) => setPassword(e.target.value)}/>
+            <label>Set Password:</label>
+            <input type = "password" value = {password1} onChange={(e) => setPassword1(e.target.value)}/>
+
+            <label>Make Sure Password Matches:</label>
+            <input type = "password" value = {password2} onChange= {(e) => setPassword2(e.target.value)}/>
             
-            <button onClick = {handleSubmit}>Login</button>
+            <button onClick = {handleSubmit}>Sign Up</button>
         </form>
-
-        )
-}
-        </>
     );
-    };
+};
 
-export default Loginform;
+export default SignUpForm;
