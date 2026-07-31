@@ -8,10 +8,13 @@ const SuggestionsDiv = ({results}) => {
 
     // Determine the type of the suggestion and redirect to the appropriate view
     if (suggestion.type === 'track') {
+        console.log("Data being sent from search:", suggestion)
         navigate(`/song/${suggestion.id}/`, {state: {"data": suggestion}}); // Redirect to track view
     } else if (suggestion.type === 'artist') {
+        console.log("Data being sent from search:", suggestion)
         navigate(`/artist/${suggestion.id}/`, {state: {"data": suggestion}}); // Redirect to artist view
     } else if (suggestion.type === 'album') {
+        console.log("Data being sent from search:", suggestion)
         navigate(`/album/${suggestion.id}/`, {state: {"data": suggestion}}); // Redirect to album view
     }
 }

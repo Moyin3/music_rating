@@ -14,6 +14,9 @@ from music_rating.forms import RatingForm
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .permissions import IsOwnerOrReadOnly
 from django.views import View
+import logging
+
+logger = logging.getLogger(__name__)
 
 spotify_handler = SpotifyUtils()
 
@@ -156,3 +159,13 @@ different file to hold this class based view in."""
 class SpotifySearchView(View):
     def get(self, request):
         return spotify_handler.spotify_search(request)
+
+class DisplayTracksAndDiscographyView(View):
+    def get(self, request):
+        response = spotify_handler.spotify_get_id(request)
+        if response != None:
+            return JsonResponse(response, status = 200)
+        else:
+            #TODO: Need to Error handle properly
+            logger.error("Error: failed to get tracks/discography")
+            return JsonResponse({"Error": "failed to get tracks/discography"}, status = 400)
