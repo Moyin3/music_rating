@@ -60,13 +60,13 @@ class AlbumDetailAPIView(APIView):
             .select_related("rate_system")
             .order_by("-updated_at").first()
             )
-        
-        community_rating = community_rating_for_album(spotify_id)
+        # Need to get the community rating from the album
+        #community_rating = Album.objects.filter(spotify_id = spotify_id)
 
 
         return Response({
             "album_data": album_data,
-            "community_rating": community_rating,
+            #"community_rating": community_rating,
             "user_rating" : user_rating
         }, status=200)
     #TODO: Need to update error handling once I understand how SpotifyUtils works
@@ -100,12 +100,13 @@ class SongDetailAPIView(APIView):
             ).select_related("rate_system")
             .order_by("-updated_at").first()
             )
+
         
-        community_rating = community_rating_for_song(spotify_id)
+        #community_rating
 
         return Response({
             "song_data": song_data,
-            "community_rating": community_rating,
+            #"community_rating": community_rating,
             "user_rating": user_rating,
         }, status=200)
 
@@ -141,11 +142,11 @@ class ArtistDetailAPIView(APIView):
             .order_by("-updated_at").first()
             )
 
-        community_rating = community_rating_for_artist(spotify_id)
+        #community_rating
 
         return Response({
             "artist_data": artist_data,
-            "community_rating": community_rating,
+            #"community_rating": community_rating,
             "user_rating": user_rating,
         }, status=200)
 

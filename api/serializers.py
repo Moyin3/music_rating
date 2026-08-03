@@ -71,6 +71,8 @@ class RatingSerializer(serializers.ModelSerializer):
             },
         )
 
+
+
         return rating
     
     def validate_score(self, value):
