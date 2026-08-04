@@ -96,7 +96,7 @@ class SpotifyUtils:
 
         encoded_id = quote(spotify_id)
         encoded_type = quote(item_type)
-        search_url = f"https://api.spotify.com/v1/{encoded_type}s/{encoded_id}"
+        search_url = f"https://api.spotify.com/v1/{encoded_type}/{encoded_id}"
 
         headers = {"Authorization": f"Bearer {token}"}
 

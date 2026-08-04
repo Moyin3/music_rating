@@ -17,6 +17,7 @@ def get_album_dict_from_id(request, spotify_id):
 
 
 # Takes an average of rated songs in the album
+#TODO: needs a guard in case a song isn't populated with its album spotify id
 def album_rating_for_rate_system_2(user, album_spotify_id) -> int:
     song_ct = ContentType.objects.get_for_model(Song)
     album_ct = ContentType.objects.get_for_model(Album)
@@ -50,6 +51,7 @@ def album_rating_for_rate_system_2(user, album_spotify_id) -> int:
     return avg_score
 
 # Takes an average of rated albums an artist has
+#TODO: needs a guard just in case an album isn't populated with its artist id
 def artist_rating_for_rate_system_2(user, artist_spotify_id) -> int:
     album_ct = ContentType.objects.get_for_model(Album)
     artist_ct = ContentType.objects.get_for_model(Artist)

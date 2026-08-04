@@ -3,11 +3,12 @@ import RatingForm from "../components/RatingForm";
 import { useLocation } from "react-router";
 
 const ContentRatingPage = () => {
-    let {name, type, spotify_id} = useLocation().state.data;
+    console.log("info being sent to the rating", useLocation().state.data);
+    let {name, type, id} = useLocation().state.data;
 return(
     <>
     <NavigationBar />
-    <RatingForm  name = {name} type = {type} spotify_id={spotify_id}/>
+    <RatingForm  name = {name} type = {type} spotify_id={id}/>
     </>
 )
 }

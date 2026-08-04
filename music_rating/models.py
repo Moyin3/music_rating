@@ -47,53 +47,36 @@ class Rating(models.Model):
             ),
     ]
 
+    def save(self, *args, **kwargs):
+        super(Rating, self).save(*args, **kwargs)
+        latest_rating_per_user = (
+            Rating.objects.filter(
+                content_type = self.content_type,
+                spotify_id = self.spotify_id,
+                score__isnull = False,
+            )
+            .order_by("user_id", "-updated_at")
+            .distinct("user_id")
+        )
+        scores = [r.score for r in latest_rating_per_user]
+        community_rating = int(sum(scores) / len(scores)) if scores else None
+
+        rating_object, _ = self.content_type.model_class().objects.get_or_create(spotify_id = self.spotify_id)
+        rating_object.community_rating = community_rating
+        rating_object.save()
 
 class Song(models.Model):
     spotify_id = models.CharField(max_length=50, db_index = True)
-    album_spotify_id = models.CharField(max_length=255, db_index = True)
-    community_rating = models.IntegerField()
-
-    def recalculateSongCommunityScore(self):
-        song_ct = ContentType.objects.get_for_model(Song)
-        
-        latest_rating_per_user = (
-                Rating.objects
-                .filter(
-                    content_type = song_ct,
-                    spotify_id = self.spotify_id,
-                    score__isnull = False,
-                )
-                .order_by("user_id", "-updated_at")
-                .distinct("user_id")
-            )
-        scores = [r.score for r in latest_rating_per_user]
-        self.community_rating = int(sum(scores) / len(scores)) if scores else None
-        self.save()
+    album_spotify_id = models.CharField(max_length=255, db_index = True, null = True)
+    community_rating = models.IntegerField(null = True)
         
     
     
 class Album(models.Model):
     spotify_id = models.CharField(max_length=50, db_index=True)
-    artist_spotify_id = models.CharField(max_length=255, db_index=True)
-    community_rating = models.IntegerField()
+    artist_spotify_id = models.CharField(max_length=255, db_index=True, null = True)
+    community_rating = models.IntegerField(null = True)
 
-    def recalculateAlbumCommunityScore(self):
-        album_ct = ContentType.objects.get_for_model(Album)
-        
-        latest_rating_per_user = (
-                Rating.objects
-                .filter(
-                    content_type=album_ct,
-                    spotify_id=self.spotify_id,
-                    score__isnull=False,
-                )
-                .order_by("user_id", "-updated_at")
-                .distinct("user_id")
-            )
-        
-        scores = [r.score for r in latest_rating_per_user]
-        self.community_rating =  int(sum(scores) / len(scores)) if scores else None
-        self.save()
 
 class Single(models.Model):
     spotify_id = models.CharField(max_length=50, db_index=True)
@@ -103,22 +86,4 @@ class EP(models.Model):
 
 class Artist(models.Model):
     spotify_id = models.CharField(max_length=50, db_index=True)
-    community_rating = models.IntegerField()
-
-    def recalculateArtistCommunityScore(self):
-        artist_ct = ContentType.objects.get_for_model(Artist)
-        
-        latest_rating_per_user = (
-                Rating.objects
-                .filter(
-                    content_type=artist_ct,
-                    spotify_id=self.spotify_id,
-                    score__isnull=False,
-                )
-                .order_by("user_id", "-updated_at")
-                .distinct("user_id")
-            )
-        
-        scores = [r.score for r in latest_rating_per_user]
-        self.community_rating = int(sum(scores) / len(scores)) if scores else None
-        self.save()
+    community_rating = models.IntegerField(null = True)

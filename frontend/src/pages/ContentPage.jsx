@@ -5,70 +5,85 @@ import { useEffect, useState } from "react";
 
 const ContentPage = () => {
     let metadata = useLocation().state;
-    console.log("Data being received", metadata)
+    const [backendData, setBackendData] = useState(null);
     const [discography, setDiscography] = useState(null);
-
-    const getDiscography = async(event) => {
-    let data = null;
-    try{
-        console.log("Is it even trying the fetch")
-        const response = await fetch(`/api/discography/?type=${metadata.data.type}&spotify_id=${metadata.data.id}`, {
-            method: "GET",
-            credentials: "include"
+    console.log("Data being received", metadata)
+    const getData = async(event) => {
+        let data = null;
+        if (metadata.data.type == "track"){
+            metadata.data.type = "song"
+        }
+        try{
+            console.log("is fetch happening")
+            const response = await fetch(`/api/${metadata.data.type}/${metadata.data.id}`, {
+                method : "GET",
+                credentials: "include"
             }
         );
         if (response.ok) {
             data = await response.json();
         }
     } catch(error){
-        console.log("Error", error)
         data = null;
     }
     return data;
-}
-
+    }
         useEffect(()=>{
-            const loadDiscography = async () =>{
-                setDiscography(await getDiscography());
+            const loadData = async () =>{
+                setBackendData(await getData());
             }
             console.log("effect running", metadata)
-            if (metadata.data.type == "album" || metadata.data.type == "artist"){
-                loadDiscography();
-            }
+                loadData();
         }, [metadata])
 
-        console.log("Discography data", discography)
+        console.log("Has the frontend connected to the backend", backendData)
     return(
         <>
         <NavigationBar />
+        {/*Leaving the metadata stuff behind even though we also get backend data,
+        because 1. it works, 2. I don't want to go through the trouble of changing
+        the createrating button navigation, the type being returned by the backend doesn't
+        quite match, should be easy fix if need be */}
+
         <h1>{metadata.data.name}</h1>
         <CreateRatingButton type={metadata.data.type} name = {metadata.data.name} spotify_id={metadata.data.id} />
-        {metadata.data.type == "album" && discography?.type =="albums" &&
+        {metadata.data.type == "album" && backendData != null &&
         <ul>
-            {discography?.track_list.map((no) =>(
+            {backendData.album_data?.track_list.map((no) =>(
                 <Link to= {`/song/${no[0]}/`} state = {{"data": {"name": no[1], "type": "song", "id": no[0]}}}>
-                <li key = {no[0]}>{no[1]}</li>
+                    <li key = {no[0]}>{no[1]}</li>
                 </Link>
             ))}
         </ul>}
-        {metadata.data.type == "artist" && discography?.type =="artists" && 
+{metadata.data.type == "artist" && backendData != null && 
         <ul>
-            {discography?.artist_albums.map((no) =>(
+            {backendData.artist_data?.artist_albums.map((no) =>(
                 <Link to= {`/album/${no[0]}/`} state = {{"data": {"name": no[1], "type": "album", "id": no[0]}}}>
                     <li key = {no[0]}>{no[1]}</li>
                     {console.log("Album data being sent from artist page", {"data": {"name": no[1], "type": "album", "id": no[0]}})}
                 </Link>
             ))}
             <br />
-            {discography?.artist_singles.map((no) =>(
+            {backendData.artist_data?.artist_singles.map((no) =>(
                 <Link to= {`/song/${no[0]}/`} state = {{"data": {"name": no[1], "type": "song", "id": no[0]}}}>
                     <li key = {no[0]}>{no[1]}</li>
                 </Link>
             ))}
         </ul>
         }
+        {backendData != null &&(
+        <>
+        <h3>Community Rating</h3>
+        <p>{backendData.community_rating}</p>
         </>
-    )
-}
+        )}
+        {backendData &&(
+            <>
+            <h3>User Rating</h3>
+            <p>{backendData.user_rating}</p>
+            </>
+        )}
+        </>
+        )}
 
 export default ContentPage;
