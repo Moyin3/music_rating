@@ -15,77 +15,9 @@ def get_album_dict_from_id(request, spotify_id):
     response = spotify_handler.spotify_get_id(request)
     return json.loads(response.content)
 
-# Average rating for track for all users across platform
-def community_rating_for_track(track) -> int:
-    song_content_type = ContentType.objects.get_for_model(Song)
-    song_id = track.get("id")
-    latest_rating_per_user = (
-        Rating.objects.filter(
-        content_type=song_content_type, 
-        spotify_id=song_id,
-        score__isnull = False
-    )
-    .order_by("user_id", "-updated_at")
-    .distinct("user_id")
-    )
-    #TODO: fix this and other divisions to avoid rounding and floating point errors, can be done using the django Avg method I'm sure
-    scores = [r.score for r in latest_rating_per_user]
-    return sum(scores) / len(scores) if scores else None
-
-#TODO: Refactor the community ratings into one big function, everyone similar right now, want DRY code
-# Average rating for album for all users across platform
-def community_rating_for_album(album_spotify_id) -> int | None:
-    album_ct = ContentType.objects.get_for_model(Album)
-
-    latest_rating_per_user = (
-        Rating.objects
-        .filter(
-            content_type=album_ct,
-            spotify_id=album_spotify_id,
-            score__isnull=False,
-        )
-        .order_by("user_id", "-updated_at")
-        .distinct("user_id")
-    )
-
-    scores = [r.score for r in latest_rating_per_user]
-    return int(sum(scores) / len(scores)) if scores else None
-
-# Average rating for artist for all users across platform
-def community_rating_for_artist(artist_spotify_id) -> int | None:
-    artist_ct = ContentType.objects.get_for_model(Artist)
-
-    latest_rating_per_user = (
-        Rating.objects
-        .filter(
-            content_type=artist_ct,
-            spotify_id=artist_spotify_id,
-            score__isnull=False,
-        )
-        .order_by("user_id", "-updated_at")
-        .distinct("user_id")
-    )
-
-    scores = [r.score for r in latest_rating_per_user]
-    return int(sum(scores) / len(scores)) if scores else None
-
-def community_rating_for_song(track_spotify_id) -> int | None:
-    song_ct = ContentType.objects.get_for_model(Song)
-
-    latest_rating_per_user = (
-        Rating.objects
-        .filter(
-            content_type = song_ct,
-            spotify_id = track_spotify_id,
-            score__isnull = False,
-        )
-        .order_by("user_id", "-updated_at")
-        .distinct("user_id")
-    )
-    scores = [r.score for r in latest_rating_per_user]
-    return int(sum(scores) / len(scores)) if scores else None
 
 # Takes an average of rated songs in the album
+#TODO: needs a guard in case a song isn't populated with its album spotify id
 def album_rating_for_rate_system_2(user, album_spotify_id) -> int:
     song_ct = ContentType.objects.get_for_model(Song)
     album_ct = ContentType.objects.get_for_model(Album)
@@ -119,6 +51,7 @@ def album_rating_for_rate_system_2(user, album_spotify_id) -> int:
     return avg_score
 
 # Takes an average of rated albums an artist has
+#TODO: needs a guard just in case an album isn't populated with its artist id
 def artist_rating_for_rate_system_2(user, artist_spotify_id) -> int:
     album_ct = ContentType.objects.get_for_model(Album)
     artist_ct = ContentType.objects.get_for_model(Artist)
