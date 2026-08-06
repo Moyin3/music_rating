@@ -24,6 +24,7 @@ class UserProfile(models.Model):
         return self.user.username
 
 class Rating(models.Model):
+    name = models.CharField()
     score = models.IntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     spotify_id = models.CharField(max_length=50, db_index=True)

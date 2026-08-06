@@ -2,7 +2,7 @@ from django.shortcuts import render
 from music_rating.models import Song, Album, Artist, Rating, RateSystem
 from .serializers import RateSystemSerializer, SongSerializer, AlbumSerializer, ArtistSerializer, RatingSerializer
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from music_rating.utils.spotify import SpotifyUtils
@@ -28,6 +28,11 @@ class RatingDetailView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
+
+class RatingListView(ListAPIView):
+    serializer_class = RatingSerializer
+    def get_queryset(self):
+        return Rating.objects.filter(user=self.request.user)
 
 class AlbumDetailAPIView(APIView):
     permission_classes = [AllowAny]

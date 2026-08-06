@@ -22,8 +22,6 @@ const SuggestionsDiv = ({results}) => {
         results.length === 0 ? "No results found" :
         <div className="suggestions">
     {results.map((item) => {
-                //I really like this for debugging, as it shows the jsonresponse I'm being returned in console.
-                console.log("Processing item:", item);
                     if (item.type === 'track'){
                         return(
                         <div key = {item.id} onClick = {() => selectSuggestion(item)}>
