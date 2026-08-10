@@ -8,10 +8,11 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { useState, useEffect, createContext, useContext } from "react";
 import LoginCheck from "./functions/LoginCheck";
 import AuthContext from "./functions/AuthContext";
+import ReviewsPage from "./pages/ReviewsPage";
 
 function App() {
   const [checked, setChecked] = useState(false);
-  const {user, setUser } = useContext(AuthContext);
+  const {user, setUser} = useContext(AuthContext);
   
   
   useEffect(() => {
@@ -31,6 +32,7 @@ function App() {
       <Route element = {<ProtectedRoute isAuthenticated = {!!user}/>}>
       <Route path = "/rating" element = {<ContentRatingPage />}></Route>
       </Route>
+      <Route path = "/reviews/:username" element = {<ReviewsPage />}></Route>
     </Routes>
     </>
   );

@@ -41,6 +41,7 @@ class RatingSerializer(serializers.ModelSerializer):
         rate_system = validated_data["rate_system"]
         content_type = self.typeToContentTypeLookUp(validated_data["content_type"])
         spotify_id = validated_data["spotify_id"]
+        name = validated_data["name"]
 
         if rate_system.key == "average":
             model = content_type.model
@@ -62,6 +63,7 @@ class RatingSerializer(serializers.ModelSerializer):
 
         rating, _ = Rating.objects.update_or_create(
             user=user,
+            name = name,
             spotify_id=spotify_id,
             content_type=content_type,
             rate_system=rate_system,

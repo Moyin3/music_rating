@@ -64,6 +64,8 @@ const ContentPage = () => {
                 </Link>
             ))}
             <br />
+            {/*Currently this code below forces the type of the single to be a song, 
+            which isn't necessarily true, and can lead to errors and undesired behaviour change this */}
             {backendData.artist_data?.artist_singles.map((no) =>(
                 <Link to= {`/song/${no[0]}/`} state = {{"data": {"name": no[1], "type": "song", "id": no[0]}}}>
                     <li key = {no[0]}>{no[1]}</li>

@@ -2,7 +2,7 @@ from django.contrib import admin
 from debug_toolbar.toolbar import debug_toolbar_urls
 from django.urls import path, include
 from api.views import (AlbumDetailAPIView, SongDetailAPIView, ArtistDetailAPIView, 
-                       RatingDetailView, RatingCreateView, SpotifySearchView, DisplayTracksAndDiscographyView)
+                       RatingDetailView, RatingCreateView, SpotifySearchView, RatingListView)
 from dj_rest_auth.registration.views import VerifyEmailView
 
 urlpatterns = [
@@ -16,6 +16,6 @@ urlpatterns = [
     path("api/dj-rest-auth/registration/", include("dj_rest_auth.registration.urls")),
     path("api/dj-rest-auth/registration/account-confirm-email/", VerifyEmailView.as_view(), name = "account_email_verification_sent"),
     path("api/search/", SpotifySearchView.as_view(), name = "search"),
-    path("api/discography/", DisplayTracksAndDiscographyView.as_view(), name = "discography")
+    path("api/ratings/<str:username>", RatingListView.as_view(), name= "rating-list")
     
     ] + debug_toolbar_urls()
