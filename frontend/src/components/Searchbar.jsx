@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SuggestionsDiv from './SuggestionsDiv';
 
 export default function Searchbar(){
@@ -60,12 +60,33 @@ if (typeof module !== 'undefined' && module.exports) {
 //     return data
 // }
 
+const userSearch = async(event) => {
+    if (query) setBoxVisible(true);
+
+    try{
+        const response = await fetch(`/api/search/users/?username=${encodeURIComponent(query)}`)
+        const data = await response.json();
+        console.log("user search data", data[0]["username"])
+
+        if (data[0]["username"]){
+            const maxResults = 5;
+
+            let tempResults = [];
+
+            tempResults = tempResults.concat(data[0]["username"]);
+            let sortedTempResults = sortByCloseness(tempResults, query);
+
+            return sortedTempResults.slice(0, maxResults);
+
+        }
+    }catch(error){
+        console.error("Error during fetch:", error);
+    }
+}
 
 
-const search = async(event) => {
-    let searchval = event.target.value;
-    setQuery(searchval);
-    if(searchval.length < 2){
+const spotifySearch = async(event) => {
+    if(query.length < 2){
         setBoxVisible(false);
         return(
             null
@@ -74,12 +95,12 @@ const search = async(event) => {
         setBoxVisible(true);
     }
     try{
-        const response = await fetch(`/api/search/?query=${encodeURIComponent(searchval)}`)
+        const response = await fetch(`/api/search/?query=${encodeURIComponent(query)}`)
         const data = await response.json();
         if (data.tracks.total != 0 || data.artists.total != 0 || data.albums.total != 0) {
             //More css suggestion box stuff
 
-            const maxResults = 5;
+            const maxResults = 10;
 
             let tempResults = [];
 
@@ -87,8 +108,8 @@ const search = async(event) => {
             tempResults = tempResults.concat(data.artists.items);
             tempResults = tempResults.concat(data.albums.items);
             
-            let sortedTempResults = sortByCloseness(tempResults, searchval);
-            setResults(sortedTempResults.slice(0, maxResults));
+            let sortedTempResults = sortByCloseness(tempResults, query);
+            return sortedTempResults.slice(0, maxResults);
 
             }} 
                 catch (error) {
@@ -96,10 +117,19 @@ const search = async(event) => {
                     // Suggestions
                 }
             }
+        
+        useEffect(()=> {
+            async function fetchData(){
+                const [resA, resB] = await Promise.all([userSearch(), spotifySearch()]);
+                setResults([resA, resB]);
+            }
+            fetchData();
+            console.log("These are the results:", results)
+        }, [query]);
 
     return (
     <>
-        <input type = "text" placeholder = "Search..." value = {query} onChange={search} />
+        <input type = "text" placeholder = "Search..." value = {query} onChange={(e) => setQuery(e.target.value)} />
         {isBoxVisible&&
         <SuggestionsDiv results = {results} />}
         </>

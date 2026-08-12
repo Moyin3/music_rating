@@ -5,23 +5,25 @@ const SuggestionsDiv = ({results}) => {
 
 
     function selectSuggestion(suggestion) {
-
     // Determine the type of the suggestion and redirect to the appropriate view
-    if (suggestion.type === 'track') {
+    if (suggestion?.type === 'track') {
         console.log("Data being sent from search:", suggestion)
         navigate(`/song/${suggestion.id}/`, {state: {"data": suggestion}}); // Redirect to track view
-    } else if (suggestion.type === 'artist') {
+    } else if (suggestion?.type === 'artist') {
         console.log("Data being sent from search:", suggestion)
         navigate(`/artist/${suggestion.id}/`, {state: {"data": suggestion}}); // Redirect to artist view
-    } else if (suggestion.type === 'album') {
+    } else if (suggestion?.type === 'album') {
         console.log("Data being sent from search:", suggestion)
         navigate(`/album/${suggestion.id}/`, {state: {"data": suggestion}}); // Redirect to album view
+    } else{
+        console.log("Data being sent from search:",)
     }
-}
-    return(
+} return(
         results.length === 0 ? "No results found" :
+
         <div className="suggestions">
-    {results.map((item) => {
+    <>
+    {results[1] && results[1].map((item) => {
                     if (item.type === 'track'){
                         return(
                         <div key = {item.id} onClick = {() => selectSuggestion(item)}>
@@ -44,8 +46,14 @@ const SuggestionsDiv = ({results}) => {
                         )
                     }
                 
-            })
-         }</div>);
+})}{results[0] && results[0].map((item) => {
+    return(
+        <div key = {item} onClick = {() => selectSuggestion(item)}>
+        USER: <strong>{item}</strong>
+        </div>
+    )})
+}</>
+    </div>);
 }
 
 export default SuggestionsDiv;

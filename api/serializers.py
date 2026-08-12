@@ -9,9 +9,11 @@ class RateSystemSerializer(serializers.ModelSerializer):
         fields = ['key', 'description']
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source = "user.username", read_only = True)
+
     class Meta:
         model = UserProfile
-        fields = ['user', 'bio']
+        fields = ['user', 'bio', "username"]
 
 class RatingSerializer(serializers.ModelSerializer):
     score = serializers.IntegerField(required = False)
