@@ -28,6 +28,9 @@ class UserProfile(models.Model):
 
 @receiver(post_save, sender = User)
 def create_user_profile(sender, instance, created, **kwargs):
+    # using if created because I only want to create UserProfile 
+    # object when a new user is created, not when an existing user is saved or
+    # updated.
     if created:
         UserProfile.objects.create(user = instance)
 
