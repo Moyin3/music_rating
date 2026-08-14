@@ -15,8 +15,9 @@ const SuggestionsDiv = ({results}) => {
     } else if (suggestion?.type === 'album') {
         console.log("Data being sent from search:", suggestion)
         navigate(`/album/${suggestion.id}/`, {state: {"data": suggestion}}); // Redirect to album view
-    } else{
-        console.log("Data being sent from search:",)
+    } else {
+        console.log("Data being sent from search:", suggestion)
+        navigate(`/reviews/${suggestion}/`, {state: suggestion})
     }
 } return(
         results.length === 0 ? "No results found" :
@@ -48,8 +49,8 @@ const SuggestionsDiv = ({results}) => {
                 
 })}{results[0] && results[0].map((item) => {
     return(
-        <div key = {item} onClick = {() => selectSuggestion(item)}>
-        USER: <strong>{item}</strong>
+        <div key = {item.username} onClick = {() => selectSuggestion(item.username)}>
+        USER: <strong>{item.username}</strong>
         </div>
     )})
 }</>

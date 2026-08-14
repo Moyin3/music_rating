@@ -26,9 +26,10 @@ class RatingDetailView(RetrieveUpdateDestroyAPIView):
     serializer_class = RatingSerializer
 
 class RatingListView(ListAPIView):
+    permission_classes = [AllowAny]
     serializer_class = RatingSerializer
     def get_queryset(self):
-        return Rating.objects.filter(user=self.request.user)
+        return Rating.objects.filter(user__username=self.request.query_params.get("username"))
 
 class AlbumDetailAPIView(APIView):
     permission_classes = [AllowAny]
