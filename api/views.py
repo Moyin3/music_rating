@@ -1,15 +1,11 @@
 from django.shortcuts import render
-from music_rating.models import Song, Album, Artist, Rating, RateSystem
-from .serializers import RateSystemSerializer, SongSerializer, AlbumSerializer, ArtistSerializer, RatingSerializer
+from music_rating.models import Song, Album, Artist, Rating, UserProfile
+from .serializers import RatingSerializer, UserProfileSerializer
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView, ListAPIView
 from rest_framework.response import Response
-from rest_framework import status
 from music_rating.utils.spotify import SpotifyUtils
-from django.http import JsonResponse
 from django.contrib.contenttypes.models import ContentType
-import json
-from music_rating.forms import RatingForm
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .permissions import IsOwnerOrReadOnly
 from django.views import View
@@ -188,6 +184,17 @@ class ArtistDetailAPIView(APIView):
             "user_rating": user_rating,
         }, status=200)
 
+class UsernameSearchView(ListAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = UserProfileSerializer
+    def get_queryset(self):
+        username = self.request.query_params.get("username")
+        if username is not None:
+            return UserProfile.objects.filter(user__username__icontains = username)
+        else:
+            logger.warning("No username matches")
+            return UserProfile.objects.none()
+
 
 """Separate from the API View, just a small view that uses the SpotifyUtils class
 to handle search, and since it's just this small view, I've decided not to use a
@@ -198,3 +205,4 @@ different file to hold this class based view in."""
 class SpotifySearchView(View):
     def get(self, request):
         return spotify_handler.spotify_search(request)
+
