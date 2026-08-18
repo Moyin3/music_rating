@@ -31,8 +31,18 @@ function levenshtein(a, b) {
 // Function to sort items by how close they are to a given string
 function sortByCloseness(list, targetString) {
     const sorted = list.sort((a, b) => {
-        const distA = levenshtein(a.name, targetString);
-        const distB = levenshtein(b.name, targetString);
+        let distA = null;
+        let distB = null;
+        if (a.name){
+            distA = levenshtein(a.name, targetString);
+        }else if (a.username){
+            distA = levenshtein(a.username, targetString);
+        }
+        if (b.name){
+            distB = levenshtein(b.name, targetString);
+        }else if (b.username){
+            distB = levenshtein(b.username, targetString);
+        }
         if (distA !== distB) {
             return distA - distB;
         }
@@ -66,16 +76,14 @@ const userSearch = async(event) => {
     try{
         const response = await fetch(`/api/search/users/?username=${encodeURIComponent(query)}`)
         const data = await response.json();
-        console.log("user search data", data[0]["username"])
+        console.log("user search data", data)
 
-        if (data[0]["username"]){
+        if (data){
             const maxResults = 5;
-
             let tempResults = [];
-
-            tempResults = tempResults.concat(data[0]["username"]);
+            tempResults = tempResults.concat(data);
+            console.log("user temp", tempResults)
             let sortedTempResults = sortByCloseness(tempResults, query);
-
             return sortedTempResults.slice(0, maxResults);
 
         }
@@ -108,6 +116,7 @@ const spotifySearch = async(event) => {
             tempResults = tempResults.concat(data.artists.items);
             tempResults = tempResults.concat(data.albums.items);
             
+            console.log("temp", tempResults)
             let sortedTempResults = sortByCloseness(tempResults, query);
             return sortedTempResults.slice(0, maxResults);
 

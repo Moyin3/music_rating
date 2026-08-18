@@ -17,6 +17,6 @@ urlpatterns = [
     path("api/dj-rest-auth/registration/account-confirm-email/", VerifyEmailView.as_view(), name = "account_email_verification_sent"),
     path("api/search/", SpotifySearchView.as_view(), name = "search"),
     path("api/search/users/", UsernameSearchView.as_view(), name = "userSearch"),
-    path("api/ratings/<str:username>", RatingListView.as_view(), name= "rating-list")
+    path("api/reviews/", RatingListView.as_view(), name= "rating-list")
     
     ] + debug_toolbar_urls()
