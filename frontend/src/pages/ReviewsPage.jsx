@@ -25,7 +25,7 @@ return(
     )
     }
     <NavigationBar />
-    {reviews &&
+    {reviews && reviews.length != 0 &&
     <div className="reviews">
     {reviews.map((no)=>(
         <p key = {no.spotify_id}>{no.name}: {no.score}<br />{no.optional_writing}<br /> Created on: {no.created_at}</p>
@@ -34,7 +34,7 @@ return(
     </div>
     
 }
-{!reviews && 
+{(!reviews || reviews.length == 0) && 
 <p>No reviews to be found here</p>}
     </>
 )
