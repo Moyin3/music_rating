@@ -22,6 +22,7 @@ function App() {
     }
     doLoginCheck();
   },[])
+  console.log("What does user look like?", user)
   return (
     <>
     <Routes>

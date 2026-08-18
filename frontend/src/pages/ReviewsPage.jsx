@@ -1,12 +1,14 @@
 import NavigationBar from "../components/Navigationbar";
-import {useEffect, useState} from "react";
+import {useEffect, useState, useContext} from "react";
 import {useLocation} from "react-router";
 import getReviews from "../functions/getReviews";
+import AuthContext from "../functions/AuthContext";
 
 const ReviewsPage = () =>{
     let username = useLocation().state;
     console.log("Reviews page arrivals", username)
     const[reviews, setReviews] = useState(null);
+    const{user, setUser} = useContext(AuthContext);
 
     useEffect(()=>{
         const loadReviews = async () =>{
@@ -14,9 +16,14 @@ const ReviewsPage = () =>{
         }
         console.log("Do we get here?")
         loadReviews();
-    }, [])
+    }, [username])
 return(
-    <>
+    <>{(user == null || user.username != username) &&(
+        <>
+        <h1>{username}'s Ratings:</h1>
+        </>
+    )
+    }
     <NavigationBar />
     {reviews &&
     <div className="reviews">
@@ -28,7 +35,7 @@ return(
     
 }
 {!reviews && 
-<p>You haven't reviewed anything chief. Get on it!</p>}
+<p>No reviews to be found here</p>}
     </>
 )
 }
