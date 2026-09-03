@@ -3,6 +3,9 @@ import json
 from django.contrib.contenttypes.models import ContentType
 from music_rating.models import Song, Album, Artist, Rating, RateSystem
 from django.db.models import Avg
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 spotify_handler = SpotifyUtils()
@@ -26,6 +29,7 @@ def album_rating_for_rate_system_2(user, album_spotify_id) -> int:
     # All songs that belong to this album
     songs = Song.objects.filter(album_spotify_id=album_spotify_id)
     if not songs.exists():
+        logger.error("Can't find any songs in this album")
         return 0
 
     # User's ratings for those songs
@@ -36,6 +40,7 @@ def album_rating_for_rate_system_2(user, album_spotify_id) -> int:
     )
 
     if not ratings.exists():
+        logger.error("Ratings don't exist for this album to be averaged")
         return 0
 
     avg_score = int(ratings.aggregate(avg=Avg("score"))["avg"])
@@ -60,19 +65,21 @@ def artist_rating_for_rate_system_2(user, artist_spotify_id) -> int:
     # Albums by this artist that exist in the DB
     albums = Album.objects.filter(artist_spotify_id=artist_spotify_id)
     if not albums.exists():
+        logger.warning("There are no album ratings to be averaged")
         return 0
 
     # User's album ratings for those albums
     ratings = Rating.objects.filter(
         user=user,
         content_type=album_ct,
-        spotify_id__in=albums.values_list("spotify_id", flat=True),
-        rate_system=rate_system,
+        spotify_id__in=albums.values_list("spotify_id", flat=True)
     )
 
     if not ratings.exists():
+        logger.error("Ratings don't exist for this Artist to be averaged")
         return 0
 
+    #TODO: Maybe introduce an error here or somewhere else so that people can't make an average rating, if there's nothing to average.
     avg_score = int(ratings.aggregate(avg=Avg("score"))["avg"])
 
     Rating.objects.update_or_create(

@@ -2,6 +2,9 @@ from rest_framework import serializers
 from music_rating.models import RateSystem, Rating, Song, UserProfile, Song, Album, Single, EP, Artist
 from music_rating.utils.ratingHelpers import album_rating_for_rate_system_2, artist_rating_for_rate_system_2
 from django.contrib.contenttypes.models import ContentType
+import logging
+
+logger = logging.getLogger(__name__)
 
 class RateSystemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -45,6 +48,8 @@ class RatingSerializer(serializers.ModelSerializer):
         spotify_id = validated_data["spotify_id"]
         name = validated_data["name"]
 
+
+
         if rate_system.key == "average":
             model = content_type.model
 
@@ -72,6 +77,8 @@ class RatingSerializer(serializers.ModelSerializer):
             defaults={
                 "score": validated_data["score"],
                 "optional_writing": validated_data.get("optional_writing"),
+                "album_spotify_id": validated_data.get("album_spotify_id"),
+                "artist_spotify_id": validated_data.get("artist_spotify_id")
             },
         )
 
@@ -93,12 +100,12 @@ class RatingSerializer(serializers.ModelSerializer):
 class SongSerializer(serializers.ModelSerializer):
     class Meta:
         model = Song
-        fields = ['spotify_id']
+        fields = ['spotify_id', 'album_spotify_id']
 
 class AlbumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Album
-        fields = ['spotify_id']
+        fields = ['spotify_id', 'artist_spotify_id']
 
 class SingleSerializer(serializers.ModelSerializer):
     class Meta:
