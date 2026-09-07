@@ -13,7 +13,7 @@ const LoginForm = () => {
     const location = useLocation();
     const navigate = useNavigate();
     // This is data that has been given for the original route, but ended up in the redirect 
-    const priorData = location.state.priorData.Data; 
+    const priorData = location.state?.priorData?.Data; 
     const handleSubmit = async (event) => {
         event.preventDefault();
     

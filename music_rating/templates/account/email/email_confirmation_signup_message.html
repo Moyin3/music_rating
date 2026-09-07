@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Email Confirmation</title>
+</head>
+<body>
+    <p>Dear {{ user.username }},</p>
+    <p>Thank you for registering on our platform. Please confirm your email address by clicking the link below:</p>
+    <p><a href="{{ activate_url }}">Confirm Email Address</a></p>
+    <p>If you did not create an account, please ignore this email.</p>
+    <p>Best regards,<br>The Music Rating Team</p>
+</body>
+</html>
