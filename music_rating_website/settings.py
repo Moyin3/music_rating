@@ -137,12 +137,25 @@ TEMPLATES = [
 ]
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 
+ACCOUNT_CONFIRM_EMAIL_ON_GET = False
+
+ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
+
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*']
 
 ACCOUNT_LOGIN_METHODS = {'username'}
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
+MAILERS = {
+    "default": {
+        "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+        "OPTIONS": {
+            "host": "smtp.mailgun.org",
+            "use_tls": True,
+            "username": "yeeno@sandbox4878d83ffd6e42d199779738f51c097f.mailgun.org",
+            "password": env("SMTP_PASSWORD"),
+        },
+    },
+}
 SITE_ID = 1
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
