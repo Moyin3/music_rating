@@ -9,6 +9,7 @@ import { useState, useEffect, createContext, useContext } from "react";
 import LoginCheck from "./functions/LoginCheck";
 import AuthContext from "./functions/AuthContext";
 import ReviewsPage from "./pages/ReviewsPage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 
 function App() {
   const [checked, setChecked] = useState(false);
@@ -34,6 +35,7 @@ function App() {
       <Route path = "/rating" element = {<ContentRatingPage />}></Route>
       </Route>
       <Route path = "/reviews/:username" element = {<ReviewsPage />}></Route>
+      <Route path="/verify-email/:key" element={<VerifyEmailPage />} />
     </Routes>
     </>
   );

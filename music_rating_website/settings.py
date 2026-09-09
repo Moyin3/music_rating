@@ -159,6 +159,8 @@ EMAIL_HOST_PASSWORD = env("SMTP_PASSWORD")
 
 ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = False
 
+ACCOUNT_EMAIL_CONFIRMATION_URL = "http://127.0.0.1:5173/verify-email/{key}"
+
 SITE_ID = 1
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
