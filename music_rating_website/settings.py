@@ -161,6 +161,8 @@ ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = False
 
 ACCOUNT_EMAIL_CONFIRMATION_URL = "http://127.0.0.1:5173/verify-email/{key}"
 
+ACCOUNT_ADAPTER = "music_rating.adapters.MyAccountAdapter"
+
 SITE_ID = 1
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
