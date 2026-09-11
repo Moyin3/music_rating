@@ -36,6 +36,7 @@ function App() {
       </Route>
       <Route path = "/reviews/:username" element = {<ReviewsPage />}></Route>
       <Route path="/verify-email/:key" element={<VerifyEmailPage />} />
+      <Route path="/resend-email/" element={<VerifyEmailPage />} />
     </Routes>
     </>
   );

@@ -1,21 +1,24 @@
 import { useParams } from "react-router";
-import { useEffect } from "react";
-import post from "../functions/post";
+import { useEffect, useState } from "react";
+import VerifyEmail from "../functions/VerifyEmail";
 
 const VerifyEmailPage = () =>{
 let params = useParams();
 const data = {"key":params.key}
+const [result, setResult] = useState({status: "pending"});
 
-const VerifyEmail = async(event) =>{
-const response = await post({"url": "/api/auth/registration/verify-email/", "data": data});
-console.log(data)
-}
 useEffect(()=>{
     const Verify = async () =>{
-        await VerifyEmail();
+       let value = await VerifyEmail(data);
+        setResult(value);
     }
     Verify();
 }, [])
+return(
+    result.status == "success" &&(
+        <h1>Email Verified</h1>
+    )
+)
 }
 
 export default VerifyEmailPage; 

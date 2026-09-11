@@ -1,5 +1,5 @@
 import { useState } from 'react';
-
+import ResendVerifyEmail from "../functions/ResendVerifyEmail";
 const SignUpForm = () => {
     const [isVisible, setVisible] = useState(false);
     const [isSubmitted, setSubmitted] = useState(false);
@@ -8,9 +8,6 @@ const SignUpForm = () => {
     const [password1, setPassword1] = useState('');
     const [password2, setPassword2] = useState('');
 
-    function openSignUpForm() {
-        setVisible(true);
-    }
     const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -38,6 +35,7 @@ const SignUpForm = () => {
     }
 };
      return (
+        <>
         <form>
             <label>Username:</label>
             <input type = "text" value = {username} onChange={(e) => setUsername(e.target.value)}/>
@@ -51,8 +49,15 @@ const SignUpForm = () => {
             <label>Make Sure Password Matches:</label>
             <input type = "password" value = {password2} onChange= {(e) => setPassword2(e.target.value)}/>
             
-            <button onClick = {handleSubmit}>Sign Up</button>
+            <button onClick ={(event) =>{
+                handleSubmit(event);
+                setVisible(true);
+            }}>Sign Up</button>
         </form>
+        {isVisible &&(
+            <button onClick = {() => ResendVerifyEmail(email)}>Resend Email Verification</button>
+        )}
+        </>
     );
 };
 
