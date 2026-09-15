@@ -11,7 +11,7 @@ const SignUpForm = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-    const data = { username, password1, password2, email };
+    const data = { username, password1, password2, "email": email.toLowerCase()};
 
     
     try {
