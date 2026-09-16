@@ -141,9 +141,14 @@ ACCOUNT_CONFIRM_EMAIL_ON_GET = False
 
 ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*']
 
-ACCOUNT_LOGIN_METHODS = {'username'}
+ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 

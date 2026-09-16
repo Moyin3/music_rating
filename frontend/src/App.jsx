@@ -10,6 +10,8 @@ import LoginCheck from "./functions/LoginCheck";
 import AuthContext from "./functions/AuthContext";
 import ReviewsPage from "./pages/ReviewsPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 function App() {
   const [checked, setChecked] = useState(false);
@@ -37,6 +39,8 @@ function App() {
       <Route path = "/reviews/:username" element = {<ReviewsPage />}></Route>
       <Route path="/verify-email/:key" element={<VerifyEmailPage />} />
       <Route path="/resend-email/" element={<VerifyEmailPage />} />
+      <Route path="/forgot-password/" element = {<ForgotPasswordPage />} />
+      <Route path="/reset-password/:uid/:token" element = {<ResetPasswordPage />} />
     </Routes>
     </>
   );

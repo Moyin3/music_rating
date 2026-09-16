@@ -4,7 +4,12 @@ from django.urls import path, include, re_path
 from api.views import (AlbumDetailAPIView, SongDetailAPIView, ArtistDetailAPIView, 
                        RatingDetailView, RatingCreateView, SpotifySearchView, RatingListView, UsernameSearchView)
 from dj_rest_auth.registration.views import VerifyEmailView, ResendEmailVerificationView
+from dj_rest_auth.views import PasswordResetConfirmView, PasswordResetView
 from django.views.generic import TemplateView
+from django.shortcuts import redirect
+
+def redirect_to_frontend_reset(request, uidb64, token):
+    return redirect(f"http://127.0.0.1:5173/reset-password/{uidb64}/{token}/")
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -22,14 +27,13 @@ urlpatterns = [
             TemplateView.as_view(),
             name = "account_confirm_email",
     ),
+    # This path is being added so that the password reset email can be sent, seems
+    # dj rest auth has an issue where it isn't trying to reverse the correct name, 
+    # it reverses password_reset_confirm instead of rest_password_reset_confirm which
+    # dj rest auth have written"""
     path(
-        "api/auth/registration/verify-email/",
-        VerifyEmailView.as_view(),
-        name = "rest_verify_email",
-    ),
-    path(
-        "api/auth/registration/resend-email/",
-        ResendEmailVerificationView.as_view(),
-        name = "resend_verify_email",
+        "api/dj-rest-auth/password/reset/confirm/<uidb64>/<token>/",
+        redirect_to_frontend_reset,
+        name = "password_reset_confirm"
     ),
     ] + debug_toolbar_urls()
