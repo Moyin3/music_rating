@@ -137,11 +137,40 @@ TEMPLATES = [
 ]
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 
+ACCOUNT_CONFIRM_EMAIL_ON_GET = False
+
+ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*']
 
-ACCOUNT_LOGIN_METHODS = {'username'}
+ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = "smtp.mailgun.org"
+
+EMAIL_USE_TLS = True
+
+EMAIL_PORT = 587
+
+EMAIL_HOST_USER = "yeeno@sandbox4878d83ffd6e42d199779738f51c097f.mailgun.org"
+
+EMAIL_HOST_PASSWORD = env("SMTP_PASSWORD")
+
+ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = False
+
+ACCOUNT_EMAIL_CONFIRMATION_URL = "http://127.0.0.1:5173/verify-email/{key}"
+
+ACCOUNT_ADAPTER = "music_rating.adapters.MyAccountAdapter"
+
+ACCOUNT_RATE_LIMITS = {
+    "confirm_email": "1/60s/key",
+}
 
 SITE_ID = 1
 

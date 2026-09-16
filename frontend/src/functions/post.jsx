@@ -2,6 +2,7 @@ import TokenRefresh from "./TokenRefresh";
 
 const post = async ({url, data}) => {
     let result = {"status": null, "json": null};
+    console.log("Data that's being posted", data);
     let postRequest = {method: "POST", credentials: "include", headers:{ "Content-Type": "application/json"}, body:JSON.stringify(data)}
     try{
         const response = await fetch(url, postRequest);
