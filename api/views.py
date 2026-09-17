@@ -9,6 +9,9 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .permissions import IsOwnerOrReadOnly
 from django.views import View
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from dj_rest_auth.registration.views import SocialLoginView
 import logging
 
 logger = logging.getLogger(__name__)
@@ -196,6 +199,10 @@ class UsernameSearchView(ListAPIView):
             logger.warning("No username matches")
             return UserProfile.objects.none()
 
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
+    callback_url = 'http://127.0.0.1:5173/auth/google/login/callback/'
+    client_class = OAuth2Client
 
 """Separate from the API View, just a small view that uses the SpotifyUtils class
 to handle search, and since it's just this small view, I've decided not to use a
