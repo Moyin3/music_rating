@@ -174,6 +174,8 @@ ACCOUNT_RATE_LIMITS = {
 
 SITE_ID = 1
 
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 WSGI_APPLICATION = "music_rating_website.wsgi.application"

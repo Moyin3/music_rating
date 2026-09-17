@@ -3,6 +3,7 @@ import LoginCheck from '../functions/LoginCheck';
 import post from '../functions/post';
 import { useLocation, useNavigate, Link } from "react-router";
 import AuthContext from '../functions/AuthContext';
+import GoogleLoginButton from "../functions/GoogleAuth";
 
 const LoginForm = () => {
     const [value, setValue] = useState('');
@@ -34,6 +35,7 @@ const LoginForm = () => {
     };
     return (
         <>
+        <GoogleLoginButton />
         <form onSubmit = {handleSubmit}>
         <label>Username/Email:</label>
         <input type = "text" value = {value} onChange={(e) => setValue(e.target.value)}/>

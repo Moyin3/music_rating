@@ -7,7 +7,7 @@ const NavigationBar = () => {
     return(
         <div>
             <Link to= "/">
-            <button>Home</button>
+            <button>RipeGrapes</button>
             </Link>
             <Searchbar />
             <button>Artists</button>

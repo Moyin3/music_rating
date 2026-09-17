@@ -12,6 +12,7 @@ import ReviewsPage from "./pages/ReviewsPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import GoogleCallbackPage from "./pages/GoogleCallbackPage";
 
 function App() {
   const [checked, setChecked] = useState(false);
@@ -41,6 +42,7 @@ function App() {
       <Route path="/resend-email/" element={<VerifyEmailPage />} />
       <Route path="/forgot-password/" element = {<ForgotPasswordPage />} />
       <Route path="/reset-password/:uid/:token" element = {<ResetPasswordPage />} />
+      <Route path="/auth/google/login/callback/" element = {<GoogleCallbackPage />} />
     </Routes>
     </>
   );

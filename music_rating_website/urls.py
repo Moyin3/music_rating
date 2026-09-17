@@ -2,9 +2,7 @@ from django.contrib import admin
 from debug_toolbar.toolbar import debug_toolbar_urls
 from django.urls import path, include, re_path
 from api.views import (AlbumDetailAPIView, SongDetailAPIView, ArtistDetailAPIView, 
-                       RatingDetailView, RatingCreateView, SpotifySearchView, RatingListView, UsernameSearchView)
-from dj_rest_auth.registration.views import VerifyEmailView, ResendEmailVerificationView
-from dj_rest_auth.views import PasswordResetConfirmView, PasswordResetView
+                       RatingDetailView, RatingCreateView, SpotifySearchView, RatingListView, UsernameSearchView, GoogleLogin)
 from django.views.generic import TemplateView
 from django.shortcuts import redirect
 
@@ -36,4 +34,5 @@ urlpatterns = [
         redirect_to_frontend_reset,
         name = "password_reset_confirm"
     ),
+    path('api/dj-rest-auth/google/', GoogleLogin.as_view(), name='google_login'),
     ] + debug_toolbar_urls()
