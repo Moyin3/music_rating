@@ -1,0 +1,18 @@
+.navBar{
+    width: auto;
+    border: 1px solid red;
+}
+.webpageName{
+    position: relative;
+    left: 30px;
+}
+
+.signUp{
+    position: relative;
+    right: 130px; 
+}
+
+.login{
+    position: relative;
+    right: 0px;
+}
