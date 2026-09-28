@@ -1,0 +1,106 @@
+/*
+  Design tokens — derived from "The Bible" (Refactoring UI notes).
+  Import once globally (e.g. in main.jsx or index.css) so every
+  CSS Module can reference these instead of hardcoding values.
+*/
+
+:root {
+  /* ---------- Type scale (px, per Size notes) ---------- */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-md: 18px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 30px;
+  --text-3xl: 36px;
+  --text-4xl: 48px;
+  --text-5xl: 60px;
+  --text-6xl: 72px;
+
+  /* ---------- Font weight (only two, per Hierarchy notes) ---------- */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* Line-height: inverse to font size — tight for large headings,
+     relaxed for small/dense text. */
+  --leading-tight: 1.1;
+  --leading-snug: 1.3;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+
+  /* Comfortable paragraph measure (45–75 characters per Fonts notes) */
+  --measure: 65ch;
+
+  /* ---------- Greys (9 steps, cool grey per Colour notes) ---------- */
+  --grey-50: hsl(220, 20%, 98%);
+  --grey-100: hsl(220, 16%, 94%);
+  --grey-200: hsl(220, 14%, 88%);
+  --grey-300: hsl(220, 12%, 78%);
+  --grey-400: hsl(220, 10%, 64%);
+  --grey-500: hsl(220, 9%, 48%);
+  --grey-600: hsl(220, 10%, 36%);
+  --grey-700: hsl(220, 12%, 26%);
+  --grey-800: hsl(220, 14%, 16%);
+  --grey-900: hsl(220, 16%, 10%);
+
+  /* ---------- Primary (9 shades, HSL per Colour notes) ----------
+     Placeholder hue 255 (indigo/violet) — change --primary-hue only,
+     these are already spaced so the ramp stays consistent. */
+  --primary-hue: 255;
+  --primary-50: hsl(var(--primary-hue), 90%, 97%);
+  --primary-100: hsl(var(--primary-hue), 85%, 92%);
+  --primary-200: hsl(var(--primary-hue), 80%, 84%);
+  --primary-300: hsl(var(--primary-hue), 75%, 72%);
+  --primary-400: hsl(var(--primary-hue), 70%, 60%);
+  --primary-500: hsl(var(--primary-hue), 70%, 50%); /* base / button bg */
+  --primary-600: hsl(var(--primary-hue), 72%, 42%);
+  --primary-700: hsl(var(--primary-hue), 74%, 34%);
+  --primary-800: hsl(var(--primary-hue), 76%, 24%); /* text on light bg */
+  --primary-900: hsl(var(--primary-hue), 78%, 14%);
+
+  /* ---------- Accent colours (status only, per Colour notes) ---------- */
+  --success-light: hsl(142, 70%, 92%);
+  --success-base: hsl(142, 65%, 42%);
+  --success-dark: hsl(142, 70%, 24%);
+
+  --warning-light: hsl(45, 90%, 92%);
+  --warning-base: hsl(45, 90%, 50%);
+  --warning-dark: hsl(45, 85%, 28%);
+
+  --danger-light: hsl(0, 80%, 94%);
+  --danger-base: hsl(0, 70%, 50%);
+  --danger-dark: hsl(0, 70%, 32%);
+
+  /* ---------- Spacing (margin/padding/gap, 4px base) ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* ---------- Border ---------- */
+  --border-thin: 1px;
+  --border-thick: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* ---------- Elevation (5 fixed levels, per Depth notes) ---------- */
+  --shadow-1: 0 1px 2px hsl(220 20% 10% / 0.06);
+  --shadow-2: 0 2px 4px hsl(220 20% 10% / 0.08);
+  --shadow-3: 0 4px 8px hsl(220 20% 10% / 0.10);
+  --shadow-4: 0 8px 16px hsl(220 20% 10% / 0.12);
+  --shadow-5: 0 16px 32px hsl(220 20% 10% / 0.16);
+
+  /* ---------- Opacity ---------- */
+  --opacity-disabled: 0.5;
+  --opacity-hover: 0.85;
+  --opacity-muted: 0.65;
+}
