@@ -15,7 +15,7 @@ const NavigationBar = () => {
             <button>Albums</button>
             <button>Tracks</button> */}
             <SignUpButton className= {styles.signUp} />
-            <LoginButton className= {styles.login}/>
+            <LoginButton />
         </div>
     )
 }

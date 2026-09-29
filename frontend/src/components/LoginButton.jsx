@@ -28,7 +28,7 @@ const LoginButton = () => {
         <>{user == null &&(
         <>
         <Link to= "/login">
-    <button>Login</button>
+    <button className={styles.login}>Login</button>
     </Link>
     </>
     )}

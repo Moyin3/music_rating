@@ -1,18 +1,21 @@
 .navBar{
     width: auto;
-    border: 1px solid red;
+    display: flex;
+    background-color: var(--primary-800);
+    justify-content: flex-start;
+    align-items: center;
 }
 .webpageName{
-    position: relative;
-    left: 30px;
+    background-color: var(--primary-800);
+    color: var(--grey-50);
 }
 
 .signUp{
-    position: relative;
-    right: 130px; 
+    margin-left: auto;
 }
 
-.login{
+
+.searchbar{
     position: relative;
-    right: 0px;
+
 }

@@ -24,17 +24,17 @@
   --font-semibold: 600;
   --font-bold: 700;
 
-  /* Line-height: inverse to font size — tight for large headings,
+  /* line-height: inverse to font size — tight for large headings,
      relaxed for small/dense text. */
   --leading-tight: 1.1;
   --leading-snug: 1.3;
   --leading-normal: 1.5;
   --leading-relaxed: 1.7;
 
-  /* Comfortable paragraph measure (45–75 characters per Fonts notes) */
+  /* comfortable paragraph measure (45–75 characters per fonts notes) */
   --measure: 65ch;
 
-  /* ---------- Greys (9 steps, cool grey per Colour notes) ---------- */
+  /* ---------- greys (9 steps, cool grey per colour notes) ---------- */
   --grey-50: hsl(220, 20%, 98%);
   --grey-100: hsl(220, 16%, 94%);
   --grey-200: hsl(220, 14%, 88%);
@@ -46,20 +46,20 @@
   --grey-800: hsl(220, 14%, 16%);
   --grey-900: hsl(220, 16%, 10%);
 
-  /* ---------- Primary (9 shades, HSL per Colour notes) ----------
-     Placeholder hue 255 (indigo/violet) — change --primary-hue only,
+  /* ---------- primary (9 shades, hsl per colour notes) ----------
+     placeholder hue 255 (indigo/violet) — change --primary-hue only,
      these are already spaced so the ramp stays consistent. */
   --primary-hue: 255;
-  --primary-50: hsl(var(--primary-hue), 90%, 97%);
-  --primary-100: hsl(var(--primary-hue), 85%, 92%);
-  --primary-200: hsl(var(--primary-hue), 80%, 84%);
-  --primary-300: hsl(var(--primary-hue), 75%, 72%);
-  --primary-400: hsl(var(--primary-hue), 70%, 60%);
-  --primary-500: hsl(var(--primary-hue), 70%, 50%); /* base / button bg */
-  --primary-600: hsl(var(--primary-hue), 72%, 42%);
-  --primary-700: hsl(var(--primary-hue), 74%, 34%);
-  --primary-800: hsl(var(--primary-hue), 76%, 24%); /* text on light bg */
-  --primary-900: hsl(var(--primary-hue), 78%, 14%);
+  --primary-50: hsl(var(--primary-hue), 52%, 97%);
+  --primary-100: hsl(var(--primary-hue), 49%, 92%);
+  --primary-200: hsl(var(--primary-hue), 46%, 84%);
+  --primary-300: hsl(var(--primary-hue), 43%, 72%);
+  --primary-400: hsl(var(--primary-hue), 41%, 60%);
+  --primary-500: hsl(var(--primary-hue), 41%, 50%); /* base / button bg */
+  --primary-600: hsl(var(--primary-hue), 42%, 42%);
+  --primary-700: hsl(var(--primary-hue), 43%, 34%);
+  --primary-800: hsl(var(--primary-hue), 44%, 24%); /* text on light bg */
+  --primary-900: hsl(var(--primary-hue), 45%, 14%);
 
   /* ---------- Accent colours (status only, per Colour notes) ---------- */
   --success-light: hsl(142, 70%, 92%);
