@@ -7,8 +7,8 @@ import styles from "./styles/Navigationbar.module.css";
 const NavigationBar = () => {
     return(
         <div className={styles.navBar}>
-            <Link to= "/">
-            <button className= {styles.webpageName}>RipeGrapes</button>
+            <Link to= "/" className= {styles.webpageName}>
+            <button >RipeGrapes</button>
             </Link>
             <Searchbar  className="searchbar"/>
            {/* <button>Artists</button> 

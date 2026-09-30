@@ -2,20 +2,21 @@
     width: auto;
     display: flex;
     background-color: var(--primary-800);
-    justify-content: flex-start;
     align-items: center;
 }
+/* Including this here because this is just a button,
+and it makes the CSS easy, whereas both signup and login
+are more complex components so they have their own styles pages */
+
 .webpageName{
-    background-color: var(--primary-800);
+    margin-right: auto;
+}
+
+.webpageName > button{
     color: var(--grey-50);
+    background-color: var(--primary-800);
 }
 
 .signUp{
     margin-left: auto;
-}
-
-
-.searchbar{
-    position: relative;
-
 }

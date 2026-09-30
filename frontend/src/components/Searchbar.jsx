@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import SuggestionsDiv from './SuggestionsDiv';
+import styles from "./styles/Searchbar.module.css";
 
-export default function Searchbar({className}){
+export default function Searchbar(){
 
     const [query, setQuery] = useState('');
     const [isBoxVisible, setBoxVisible] = useState(true);
@@ -138,10 +139,10 @@ const spotifySearch = async(event) => {
 
     return (
     <>
-    <div className={className}>
-        <input type = "text" placeholder = "Search..." value = {query} onChange={(e) => setQuery(e.target.value)} />
+    <div className={styles.searchdiv}>
+        <input type = "text" placeholder = "Search..." value = {query} onChange={(e) => setQuery(e.target.value)}  className = {styles.searchbox}/>
         {isBoxVisible&&
-        <SuggestionsDiv results = {results} />}
+        <SuggestionsDiv results = {results} className = {styles.suggestions} />}
         </div>
         </>
     );
