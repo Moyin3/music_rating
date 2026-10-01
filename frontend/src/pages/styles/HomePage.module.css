@@ -1,0 +1,11 @@
+.homepageDesc{
+    margin: auto;
+    text-align: center;
+    color: var(--primary-300);
+    size: var(--text-3xl);
+}
+.homepageEnc{
+    text-align: center;
+    color: var(--primary-300);
+    size: var(--text-lg);
+}
