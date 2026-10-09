@@ -27,6 +27,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background-color: var(--grey-200);
+  flex-direction: column;
 }
 
 h1 {

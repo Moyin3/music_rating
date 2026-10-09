@@ -6,13 +6,13 @@ const HomePage = () => {
     return(
         <>
         <Navigationbar />
-        <body>
+        <main className = {styles.homeGrid}>
         <div className={styles.homeDiv}>
-        <h1 className={styles.homepageDesc}>A place for music opinion to be transformed into receipts and numbers</h1>
+        <h1 className={styles.homepageDesc}>Where music opinion is transformed into receipts and numbers</h1>
         <h2 className={styles.homepageEnc}>Start rating your favourite music now</h2>
-        <SignUpButton />
+        <SignUpButton className={styles.homepageButton}/>
         </div>
-        </body>
+        </main>
         </>
     )
 }

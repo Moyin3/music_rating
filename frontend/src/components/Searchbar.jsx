@@ -140,7 +140,7 @@ const spotifySearch = async(event) => {
     return (
     <>
     <div className={styles.searchdiv}>
-        <input type = "text" placeholder = "Search..." value = {query} onChange={(e) => setQuery(e.target.value)}  className = {styles.searchbox}/>
+        <input type = "text" placeholder = "Search..." spellCheck = {false} value = {query} onChange={(e) => setQuery(e.target.value)}  className = {styles.searchbox}/>
         {isBoxVisible&&
         <SuggestionsDiv results = {results} className = {styles.suggestions} />}
         </div>

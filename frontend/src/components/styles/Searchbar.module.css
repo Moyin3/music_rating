@@ -1,5 +1,6 @@
 .searchdiv{
-    width: 300px;
+    width: 400px;
+    position: relative;
 }
 
 .searchbox{
@@ -9,10 +10,29 @@
     border-width: var(--border-thin);
     border-color: var(--grey-400);
     box-sizing: border-box;
-    background-color: var(--grey-300);
+    background-color: var(--grey-200);
+    height: 25px;
+    position: relative;
+    color: var(--primary-600);
+    font-weight: var(--font-semibold);
 }
 
 .suggestions{
     width: 100%;
+    position: absolute;
     box-sizing: border-box;
+    background-color: var(--grey-50);
+    color: var(--primary-600);
+    font-weight: var(--font-normal);
+    box-shadow: var(--shadow-2), var(--shadow-5);
+    border-radius: var(--radius-md);
+}
+
+.suggestions > div{
+    padding: var(--space-1);
+    border-color: var(--grey-200);
+    border-style: solid;
+    border-width: var(--border-thin);
+    border-radius: var(--radius-sm);
+    width: auto;
 }

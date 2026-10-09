@@ -38,16 +38,16 @@ const SignUpForm = () => {
         <>
         <form>
             <label>Username:</label>
-            <input type = "text" value = {username} onChange={(e) => setUsername(e.target.value)}/>
+            <input type = "text" value = {username} placeholder='Username' onChange={(e) => setUsername(e.target.value)}/>
 
             <label>Email:</label>
-            <input type= "email" value = {email} onChange={(e) => setEmail(e.target.value)}/>
+            <input type= "email" value = {email} placeholder='FrankOceancomeback@gmail.com' onChange={(e) => setEmail(e.target.value)}/>
 
             <label>Set Password:</label>
-            <input type = "password" value = {password1} onChange={(e) => setPassword1(e.target.value)}/>
+            <input type = "password" value = {password1} placeholder='Password' onChange={(e) => setPassword1(e.target.value)}/>
 
-            <label>Make Sure Password Matches:</label>
-            <input type = "password" value = {password2} onChange= {(e) => setPassword2(e.target.value)}/>
+            <label>Confirm Password:</label>
+            <input type = "password" value = {password2} placeholder='Password' onChange= {(e) => setPassword2(e.target.value)}/>
             
             <button onClick ={(event) =>{
                 handleSubmit(event);

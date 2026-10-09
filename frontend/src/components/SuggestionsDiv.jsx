@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 
-const SuggestionsDiv = ({results}) => {
+const SuggestionsDiv = ({results, className}) => {
     const navigate = useNavigate();
 
 
@@ -22,27 +22,27 @@ const SuggestionsDiv = ({results}) => {
 } return(
         results.length === 0 ? "No results found" :
 
-        <div className="suggestions">
+        <div className= {className}>
     <>
     {results[1] && results[1].map((item) => {
                     if (item.type === 'track'){
                         return(
                         <div key = {item.id} onClick = {() => selectSuggestion(item)}>
-                        TRACK: <strong>{item.name}</strong> by {item.artists.map(artist => artist.name). join(', ')};
+                        TRACK: <strong>{item.name}</strong> by {item.artists.map(artist => artist.name). join(', ')}
                         </div>
                         );
                     }
                     else if (item.type === 'artist'){
                         return(
                             <div key = {item.id} onClick = {() => selectSuggestion(item)}>
-                                ARTIST: <strong>{item.name}</strong>;
+                                ARTIST: <strong>{item.name}</strong>
                             </div>
                         );
                     }
                     else if (item.type === 'album'){
                         return(
                             <div key = {item.id} onClick = {() => selectSuggestion(item)}>
-                                ALBUM: <strong>{item.name}</strong> by {item.artists.map(artist => artist.name).join(', ')};
+                                ALBUM: <strong>{item.name}</strong> by {item.artists.map(artist => artist.name).join(', ')}
                             </div>
                         )
                     }
