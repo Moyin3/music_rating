@@ -36,3 +36,6 @@
     border-radius: var(--radius-sm);
     width: auto;
 }
+
+/* Just realised I should probably have a hover effect
+so the user can actually see which suggestion they're choosing */

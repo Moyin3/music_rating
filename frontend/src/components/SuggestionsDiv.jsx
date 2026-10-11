@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router";
 
-const SuggestionsDiv = ({results, className}) => {
+const SuggestionsDiv = ({results, className, ref, tabIndex}) => {
     const navigate = useNavigate();
 
 
     function selectSuggestion(suggestion) {
+    console.log("click event")
     // Determine the type of the suggestion and redirect to the appropriate view
     if (suggestion?.type === 'track') {
         console.log("Data being sent from search:", suggestion)
@@ -22,7 +23,7 @@ const SuggestionsDiv = ({results, className}) => {
 } return(
         results.length === 0 ? "No results found" :
 
-        <div className= {className}>
+        <div className= {className} ref = {ref} tabIndex={tabIndex}>
     <>
     {results[1] && results[1].map((item) => {
                     if (item.type === 'track'){
