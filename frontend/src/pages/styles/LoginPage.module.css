@@ -1,0 +1,21 @@
+.loginGrid{
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    min-width: 100%;
+    min-height: calc(100vh - var(--nav-height));
+    grid-template-rows: repeat(9,1fr);
+    padding: var(--space-4);
+}
+
+.loginDiv{
+    background-color: var(--grey-50);
+    grid-column: 3 / 8;
+    grid-row: 1 / 9;
+    box-shadow: var(--shadow-3);
+    border-radius: var(--radius-lg);
+    display: grid;
+    grid-template-rows: repeat(9, 1fr);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    padding: var(--space-6);
+    align-self: start;
+}

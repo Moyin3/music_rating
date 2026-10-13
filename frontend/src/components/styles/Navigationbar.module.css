@@ -1,6 +1,6 @@
 .navBar{
     width: auto;
-    height: 50px;
+    height: var(--nav-height);
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     background-color: var(--primary-800);

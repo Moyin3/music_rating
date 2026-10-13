@@ -4,6 +4,7 @@ import post from '../functions/post';
 import { useLocation, useNavigate, Link } from "react-router";
 import AuthContext from '../functions/AuthContext';
 import GoogleLoginButton from "../functions/GoogleAuth";
+import styles from "./styles/LoginForm.module.css";
 
 const LoginForm = () => {
     const [value, setValue] = useState('');
@@ -35,19 +36,23 @@ const LoginForm = () => {
     };
     return (
         <>
-        <GoogleLoginButton />
-        <form onSubmit = {handleSubmit}>
-        <label>Username/Email:</label>
+        <form className={styles.loginForm} onSubmit = {handleSubmit}>
+        <div className = {styles.loginUsername}>
+        <label >Username/Email</label>
         <input type = "text" value = {value} onChange={(e) => setValue(e.target.value)}/>
+        </div>
 
-        <label>Password:</label>
-        <input type = "password" value = {password} onChange={(e) => setPassword(e.target.value)}/>
-        
-        <button type = "submit">Login</button>
-        </form>
-        <Link to = "/forgot-password/">
-        <button type = "button">Forget Password</button>
+        <div className = {styles.loginPassword}>
+        <label>Password</label>
+        <input type = "password" value = {password} autoComplete='current-password' onChange={(e) => setPassword(e.target.value)}/>
+        <Link to = "/forgot-password/" className={styles.forgotPassword}>
+        Forgot password
         </Link>
+        </div>
+        
+        <button className={styles.loginButton} type = "submit">Login</button>
+        <GoogleLoginButton className={styles.gmailButton} name = "Continue with Google" />
+        </form>
         </>
     );
     };

@@ -1,7 +1,7 @@
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const REDIRECT_URI = "http://127.0.0.1:5173/auth/google/login/callback/";
 
-function GoogleLoginButton() {
+function GoogleLoginButton({name, className}) {
   const handleLogin = () => {
     const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
     authUrl.searchParams.set('client_id', GOOGLE_CLIENT_ID);
@@ -14,7 +14,7 @@ function GoogleLoginButton() {
     window.location.href = authUrl.toString();
   };
 
-  return <button onClick={handleLogin}>Login with Google</button>;
+  return <button type = "button" onClick={handleLogin} className= {className}>{name}</button>;
 }
 
 // Callback page component

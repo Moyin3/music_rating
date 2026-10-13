@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import ResendVerifyEmail from "../functions/ResendVerifyEmail";
+import styles from "./styles/SignUpForm.module.css";
+import GoogleLoginButton from "../functions/GoogleAuth";
 const SignUpForm = () => {
     const [isVisible, setVisible] = useState(false);
     const [isSubmitted, setSubmitted] = useState(false);
@@ -36,27 +38,37 @@ const SignUpForm = () => {
 };
      return (
         <>
-        <form>
-            <label>Username:</label>
+        <form className = {styles.signUpForm}>
+            <div className={styles.signUpUsername}>
+            <label>Username</label>
             <input type = "text" value = {username} placeholder='Username' onChange={(e) => setUsername(e.target.value)}/>
+            </div>
 
-            <label>Email:</label>
+            <div className={styles.signUpEmail}>
+            <label>Email</label>
             <input type= "email" value = {email} placeholder='FrankOceancomeback@gmail.com' onChange={(e) => setEmail(e.target.value)}/>
+            </div>
 
-            <label>Set Password:</label>
-            <input type = "password" value = {password1} placeholder='Password' onChange={(e) => setPassword1(e.target.value)}/>
+            <div className = {styles.signUpPassword}>
+            <label>Password</label>
+            <input type = "password" value = {password1} placeholder='Password' autoComplete="new-password" onChange={(e) => setPassword1(e.target.value)}/>
+            </div>
 
-            <label>Confirm Password:</label>
-            <input type = "password" value = {password2} placeholder='Password' onChange= {(e) => setPassword2(e.target.value)}/>
+            <div className = {styles.signUpConfirmPassword}>
+            <label>Confirm Password</label>
+            <input type = "password" value = {password2} placeholder='Password' autoComplete='new-password' onChange= {(e) => setPassword2(e.target.value)}/>
+            </div>
             
-            <button onClick ={(event) =>{
+            <button className = {styles.signUpButton} onClick ={(event) =>{
                 handleSubmit(event);
                 setVisible(true);
             }}>Sign Up</button>
-        </form>
+        
+           <GoogleLoginButton name = "Continue with Google"  className = {styles.gmailButton}/>
         {isVisible &&(
-            <button onClick = {() => ResendVerifyEmail(email)}>Resend Email Verification</button>
+            <button className = {styles.resendEmail} onClick = {() => ResendVerifyEmail(email)}>Resend Email Verification</button>
         )}
+        </form>
         </>
     );
 };
