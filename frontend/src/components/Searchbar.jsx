@@ -154,7 +154,7 @@ const spotifySearch = async(event) => {
 
     return (
     <>
-    <div className={styles.searchdiv}>
+    <div className={styles.searchdiv} onBlur = {handleBlur}>
         <input type = "text" placeholder = "Search..." spellCheck = {false} onBlur = {handleBlur} onFocus = {() => {console.log("input focus"); handleFocus;}} value = {query} onChange={(e) => setQuery(e.target.value)}  className = {styles.searchbox}/>
         {isBoxVisible&&
         <SuggestionsDiv  onFocus={(e) => console.log("div focus", e.target)} onBlur={(e) => console.log("div blur", e.target, "->", e.relatedTarget)} tabIndex = {-1} results = {results} className = {styles.suggestions} ref = {myRef} />}

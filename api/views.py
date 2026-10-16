@@ -13,6 +13,7 @@ from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
 import logging
+from django.db.models import OuterRef, Subquery
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,17 @@ class RatingListView(ListAPIView):
     permission_classes = [AllowAny]
     serializer_class = RatingSerializer
     def get_queryset(self):
-        return Rating.objects.filter(user__username=self.request.query_params.get("username"))
+        user_ratings = Rating.objects.filter(user__username=self.request.query_params.get("username"))
+
+        newest = (
+            user_ratings
+            .filter(spotify_id=OuterRef("spotify_id"))
+            .order_by("-updated_at", "-pk")
+            .values("pk")[:1]
+        )
+        # pk is used in the off chance two things have the same timestamp,
+        # it makes sure results are deterministic
+        return user_ratings.filter(pk = Subquery(newest))
 
 class AlbumDetailAPIView(APIView):
     permission_classes = [AllowAny]
@@ -75,7 +86,7 @@ class AlbumDetailAPIView(APIView):
             "DON'T GATEKEEP!"
 
         if not user_rating:
-            user_rating = None
+            user_rating = "Log in or submit a rating. WHAT ARE YOU WAITING FOR!?"
         else:
             user_rating = user_rating.score
         

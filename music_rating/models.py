@@ -84,7 +84,7 @@ class Rating(models.Model):
 
         rating_object = None
         if self.content_type.model_class() == Song:
-            rating_object, _ = self.content_type.model_class().objects.get_or_create(spotify_id = self.spotify_id, album_spotify_id = self.album_spotify_id)
+            rating_object, _ = self.content_type.model_class().objects.get_or_create(spotify_id = self.spotify_id, defaults= {"album_spotify_id": self.album_spotify_id})
             #Everything below is essentially just a copy of the helper function, I don't like this
             #TODO: refactor later
             album_rating_object = (Rating.objects.filter(spotify_id = rating_object.album_spotify_id).order_by("-updated_at")).first()
@@ -130,7 +130,7 @@ class Rating(models.Model):
                 ).update(community_rating = community_rating)
 
         elif self.content_type.model_class() == Album:
-            rating_object, _ = self.content_type.model_class().objects.get_or_create(spotify_id = self.spotify_id, artist_spotify_id = self.artist_spotify_id)
+            rating_object, _ = self.content_type.model_class().objects.get_or_create(spotify_id = self.spotify_id, defaults={"artist_spotify_id": self.artist_spotify_id})
             #TODO: Refactor this nonsense too
             artist_rating_object = (Rating.objects.filter(spotify_id = rating_object.artist_spotify_id).order_by("-updated_at")).first()
             if artist_rating_object and artist_rating_object.rate_system.key == "average":
@@ -177,14 +177,14 @@ class Rating(models.Model):
         rating_object.save()
 
 class Song(models.Model):
-    spotify_id = models.CharField(max_length=50, db_index = True)
+    spotify_id = models.CharField(max_length=50, db_index = True, unique=True)
     album_spotify_id = models.CharField(max_length=255, db_index = True, null = True)
     community_rating = models.IntegerField(null = True)
         
     
     
 class Album(models.Model):
-    spotify_id = models.CharField(max_length=50, db_index=True)
+    spotify_id = models.CharField(max_length=50, db_index=True, unique = True)
     artist_spotify_id = models.CharField(max_length=255, db_index=True, null = True)
     community_rating = models.IntegerField(null = True)
 
@@ -196,5 +196,5 @@ class EP(models.Model):
     spotify_id = models.CharField(max_length=50, db_index=True)
 
 class Artist(models.Model):
-    spotify_id = models.CharField(max_length=50, db_index=True)
+    spotify_id = models.CharField(max_length=50, db_index=True, unique = True)
     community_rating = models.IntegerField(null = True)

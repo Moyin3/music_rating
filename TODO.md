@@ -5,3 +5,7 @@ Google login fails with â€œUser is already registered with this e-mail addressâ€
 Show a readable error in the UI instead of the raw non_field_errors response.
 
 Singles should probably have the same rating as their songs right, need to work this out later. 
+
+Make Title of content page clickable/navigateable if easy
+
+Need to make Column count css a bit more conditional for optimal design
