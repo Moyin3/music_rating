@@ -26,6 +26,7 @@
     font-weight: var(--font-normal);
     box-shadow: var(--shadow-2), var(--shadow-5);
     border-radius: var(--radius-md);
+    z-index: 10;
 }
 
 .suggestions > div{
@@ -35,6 +36,11 @@
     border-width: var(--border-thin);
     border-radius: var(--radius-sm);
     width: auto;
+}
+
+.suggestions > div:hover{
+    background-color: var(--grey-200);
+    cursor: pointer;
 }
 
 /* Just realised I should probably have a hover effect
