@@ -86,7 +86,7 @@ class AlbumDetailAPIView(APIView):
             "DON'T GATEKEEP!"
 
         if not user_rating:
-            user_rating = None
+            user_rating = "Log in or submit a rating. WHAT ARE YOU WAITING FOR!?"
         else:
             user_rating = user_rating.score
         

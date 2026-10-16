@@ -168,6 +168,9 @@ li:hover{
 .userRating{
     color: var(--primary-700);
     justify-self: center;
+    text-wrap: balance;
+    text-align: center;
+    margin-inline: auto;
 }
 
 /* Once again conditional formatting */
