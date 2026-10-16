@@ -36,10 +36,11 @@
     padding-inline: var(--space-2);
 }
 
-.albumTitle{
+.trackList{
     color: var(--primary-700);
-    font-weight: var(--font-medium);
+    font-weight: var(--font-semibold);
     justify-self: center;
+    font-size: var(--text-2xl);
 }
 
 .tracklistDiv{
@@ -137,15 +138,17 @@ li:hover{
 .communityRatingTitle{
     color: var(--primary-700);
     justify-self: center;
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
 }
 
 /* Want to wrap the text better so it isn't so wide */
 .communityRating{
     color: var(--primary-700);
-    justify-content: center;
     text-wrap: balance;
     text-align: center;
     margin-inline: auto;
+    font-size: var(--text-3xl);
 }
 
 /* The rating itself is going to have conditional formatting*/
@@ -153,16 +156,23 @@ li:hover{
 .epsSinglesTitle{
     color: var(--primary-700);
     justify-self: center;
+    font-weight: var(--font-semibold);
+    font-size: var(--text-2xl);
+
 }
 
 .albumsTitle{
     color: var(--primary-700);
     justify-self: center;
+    font-weight: var(--font-semibold);
+    font-size: var(--text-2xl);
 }
 
 .userRatingTitle{
     color: var(--primary-700);
     justify-self: center;
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
 }
 
 .userRating{
@@ -171,6 +181,24 @@ li:hover{
     text-wrap: balance;
     text-align: center;
     margin-inline: auto;
+}
+
+.score{
+    font-size: var(--text-5xl);
+    font-weight: var(--font-bold);
+    --t:  clamp(0, calc((var(--score) - 30) / 70), 1);
+  --lo: clamp(0, calc(var(--t) * 2), 1);
+  --hi: clamp(0, calc(var(--t) * 2 - 1), 1);
+
+  color: color-mix(
+    in oklch,
+    var(--primary-700) calc(var(--hi) * 100%),
+    color-mix(in oklch, var(--primary-500) calc(var(--lo) * 100%), var(--primary-300))
+  );
+}
+
+.message{
+    font-size: var(--text-xl);
 }
 
 /* Once again conditional formatting */
