@@ -82,8 +82,7 @@ class AlbumDetailAPIView(APIView):
         if AlbumObject:
             community_rating = AlbumObject.community_rating
         else:
-            community_rating = "Seems like the community have yet to find this gem." \
-            "DON'T GATEKEEP!"
+            community_rating = "Seems like the community have yet to find this gem. DON'T GATEKEEP."
 
         if not user_rating:
             user_rating = "Log in or submit a rating. WHAT ARE YOU WAITING FOR!?"
@@ -134,11 +133,11 @@ class SongDetailAPIView(APIView):
         if SongObject:
             community_rating = SongObject.community_rating
         else:
-            community_rating = "Seems like the community have yet to find this gem." \
-            "DON'T GATEKEEP"
+            community_rating = "Seems like the community have yet to find this gem. DON'T GATEKEEP."
 
         if not user_rating:
-            user_rating = None
+            user_rating = "Log in or submit a rating. WHAT ARE YOU WAITING FOR!?"
+
         else:
             user_rating = user_rating.score
 
@@ -185,11 +184,11 @@ class ArtistDetailAPIView(APIView):
         if ArtistObject:
             community_rating = ArtistObject.community_rating
         else:
-            community_rating = "Seems like the community have yet to find this gem." \
-            "DON'T GATEKEEP"
+            community_rating = "Seems like the community have yet to find this gem. DON'T GATEKEEP."
 
         if not user_rating:
-            user_rating = None
+            user_rating = "Log in or submit a rating. WHAT ARE YOU WAITING FOR!?"
+
         else:
             user_rating = user_rating.score
 

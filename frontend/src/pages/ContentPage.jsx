@@ -4,6 +4,13 @@ import CreateRatingButton from "../components/CreateRatingButton";
 import { useEffect, useState } from "react";
 import styles from "./styles/ContentPage.module.css";
 
+const isScore = (v) => typeof v === "number";
+
+const ratingClass = (v, extra) =>
+  `${extra} ${isScore(v) ? styles.score : styles.message}`;
+
+const ratingStyle = (v) => (isScore(v) ? {"--score": v} : undefined)
+
 const ContentPage = () => {
     let metadata = useLocation().state;
     const [backendData, setBackendData] = useState(null);
@@ -50,7 +57,7 @@ const ContentPage = () => {
         {metadata.data.type == "album" && backendData != null &&
         <>
         <div className = {styles.tracklistDiv}>
-        <h2 className = {styles.albumTitle}>Tracklist</h2>
+        <h2 className = {styles.trackList}>Tracklist</h2>
         <ul className = {styles.albumList}>
             {backendData.album_data?.track_list.map((no) =>(
                     <li className = {styles.trackInAlbum} key = {no[0]}>
@@ -99,7 +106,7 @@ const ContentPage = () => {
         <>
         <div className = {styles.communityDiv}>
         <h3 className = {styles.communityRatingTitle}>Community Rating</h3>
-        <p className = {styles.communityRating}>{backendData.community_rating}</p>
+        <p className = {ratingClass(backendData.community_rating, styles.communityRating)} style = {ratingStyle(backendData.community_rating)}>{backendData.community_rating}</p>
         </div>
         </>
         )}
@@ -107,7 +114,7 @@ const ContentPage = () => {
             <>
             <div className = {styles.userDiv}>
             <h3 className = {styles.userRatingTitle}>User Rating</h3>
-            <p className = {styles.userRating}>{backendData.user_rating}</p>
+            <p className = {ratingClass(backendData.user_rating, styles.userRating)} style = {ratingStyle(backendData.user_rating)}>{backendData.user_rating}</p>
             </div>
             </>
         )}
