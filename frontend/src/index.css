@@ -19,6 +19,21 @@
   box-sizing: border-box;
 }
 
+.score{
+    color: var(--primary-700); 
+    font-size: var(--text-5xl);
+    font-weight: var(--font-bold);
+    --t:  clamp(0, calc((var(--score) - 30) / 70), 1);
+  --lo: clamp(0, calc(var(--t) * 2), 1);
+  --hi: clamp(0, calc(var(--t) * 2 - 1), 1);
+
+  color: color-mix(
+    in oklch,
+    var(--primary-700) calc(var(--hi) * 100%),
+    color-mix(in oklch, var(--primary-500) calc(var(--lo) * 100%), var(--primary-300))
+  );
+}
+
 a {
   font-weight: 500;
   color: #646cff;

@@ -3,6 +3,12 @@ import {useEffect, useState, useContext} from "react";
 import {useLocation} from "react-router";
 import getReviews from "../functions/getReviews";
 import AuthContext from "../functions/AuthContext";
+import styles from "./styles/ReviewsPage.module.css";
+
+const formatReviewDate = (iso) => {
+  const d = new Date(iso);
+  return `${d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })} ${d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit"})}`;
+};
 
 const ReviewsPage = () =>{
     let username = useLocation().state;
@@ -18,24 +24,37 @@ const ReviewsPage = () =>{
         loadReviews();
     }, [username])
 return(
-    <>{(user == null || user.username != username) &&(
+    <>
+    <NavigationBar />
+    {(user == null || user.username != username) &&(
         <>
-        <h1>{username}'s Ratings:</h1>
+        <h1 className = {styles.title}>{username}'s Ratings:</h1>
         </>
     )
     }
-    <NavigationBar />
     {reviews && reviews.length != 0 &&
-    <div className="reviews">
+    <div className={styles.reviewList}>
     {reviews.map((no)=>(
-        <p key = {no.spotify_id}>{no.name}: {no.score}<br />{no.optional_writing}<br /> Created on: {no.created_at}</p>
+        <article className={styles.review} key = {no.spotify_id}>
+        <header className={styles.reviewHeader}>
+            <h2 className={styles.reviewName}>{no.name}</h2>
+            <span className = "score" style={{ "--score": no.score }}>
+                {no.score}
+            </span>
+            </header>
+        {no.optional_writing && (
+      <p className={styles.reviewText}>{no.optional_writing}</p>
+    )}
+    <time className={styles.reviewDate} dateTime={no.created_at}>
+    {formatReviewDate(no.created_at)}
+    </time>
+  </article>
     ))}
-    {/* TODO: I need to change how the timestamp is displayed, preferably to something more digestable. */}
     </div>
     
 }
 {(!reviews || reviews.length == 0) && 
-<p>No reviews to be found here</p>}
+<p className = {styles.noReviews}>No reviews to be found here</p>}
     </>
 )
 }
