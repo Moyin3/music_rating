@@ -9,3 +9,7 @@ Singles should probably have the same rating as their songs right, need to work 
 Make Title of content page clickable/navigateable if easy
 
 Need to make Column count css a bit more conditional for optimal design
+
+Lowkey would be a good idea of the titles for the user's reviews were clickable
+
+suggestions div needs to become invisible when a suggestion is clicked
