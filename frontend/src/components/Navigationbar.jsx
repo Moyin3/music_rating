@@ -8,14 +8,14 @@ const NavigationBar = () => {
     return(
         <div className={styles.navBar}>
             <Link to= "/" className= {styles.webpageName}>
-            <button >RipeGrapes</button>
+            RipeGrapes
             </Link>
             <Searchbar  className="searchbar"/>
            {/* <button>Artists</button> 
             <button>Albums</button>
             <button>Tracks</button> */}
             <div className = {styles.signUpAndLogin}>
-            <SignUpButton />
+            <SignUpButton className = {styles.signUpButton}/>
             <LoginButton />
             </div>
         </div>

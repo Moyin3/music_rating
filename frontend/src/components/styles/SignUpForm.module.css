@@ -75,6 +75,7 @@ input{
     width: 100%;
     font-size: var(--text-base);
     height: 25px;
+    color: var(--primary-700);
 }
 
 .resendEmail{

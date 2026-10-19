@@ -28,6 +28,7 @@ p{
     font-size: var(--text-xl);
     color: var(--primary-600);
     text-align: center;
+    margin-top: var(--space-8);
 }
 
 .title{

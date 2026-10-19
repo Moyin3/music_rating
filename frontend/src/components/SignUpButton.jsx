@@ -5,7 +5,7 @@
  return(
     <>
     <Link to= "/sign-up" className = {className}>
- <button className = {styles.signUpBtn}>Sign up</button>
+   Sign up
  </Link>
  </>
  )

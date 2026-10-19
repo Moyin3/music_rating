@@ -6,7 +6,7 @@ import styles from "./styles/ContentPage.module.css";
 
 const isScore = (v) => typeof v === "number";
 
-const ratingClass = (v, extra = "") =>
+const ratingClass = (v, extra) =>
   `${extra} ${isScore(v) ? "score" : styles.message}`;
 
 const ratingStyle = (v) => (isScore(v) ? {"--score": v} : undefined)
