@@ -12,6 +12,8 @@ are more complex components so they have their own styles pages */
 
 .webpageName{
     margin-right: auto;
+    color: var(--grey-50);
+    padding-left: var(--space-2);
 }
 
 .webpageName > button{
@@ -23,4 +25,10 @@ are more complex components so they have their own styles pages */
 .signUpAndLogin{
     margin-left: auto;
     font-size: var(--text-base);
+}
+
+.signUpButton{
+    background-color: var(--primary-800);
+    color: var(--grey-50);
+    padding-right: var(--space-2);
 }
