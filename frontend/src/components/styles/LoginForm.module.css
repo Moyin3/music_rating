@@ -85,3 +85,31 @@ input{
 .forgotPassword:focus-visible {
   outline: 2px solid currentColor;
 }
+
+.alert{
+    padding: var(--space-4);
+    background-color: var(--danger-base);
+    color: var(--grey-50);
+    margin-bottom: var(--space-4);
+    width: fit-content;
+    position: absolute;
+    bottom: var(--space-8);
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+
+.closeBtn {
+  margin-left: var(--space-4);
+  color: var(--grey-50);
+  font-weight: bold;
+  float: right;
+  font-size: var(--text-xl);
+  line-height: var(--text-lg);
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* When moving the mouse over the close button */
+.closeBtn:hover {
+  color: black;
+}
