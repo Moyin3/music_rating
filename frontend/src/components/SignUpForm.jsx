@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ResendVerifyEmail from "../functions/ResendVerifyEmail";
 import styles from "./styles/SignUpForm.module.css";
 import GoogleLoginButton from "../functions/GoogleAuth";
@@ -9,11 +9,19 @@ const SignUpForm = () => {
     const [email, setEmail] = useState('');
     const [password1, setPassword1] = useState('');
     const [password2, setPassword2] = useState('');
+    const [alert, setAlert] = useState([]);
+    const [alertVisible, setAlertVisible] = useState(false);
+    
+    const closeAlert = () =>{
+        setAlertVisible(false);
+    }
 
     const handleSubmit = async (event) => {
         event.preventDefault();
 
     const data = { username, password1, password2, "email": email.toLowerCase()};
+    let result = {"status": null, "json": null};
+    let errors = [];
 
     
     try {
@@ -25,15 +33,24 @@ const SignUpForm = () => {
             body: JSON.stringify(data)
 
         });
-        
-        if (!response.ok) {
-            throw new Error('Something went wrong');
-        }
 
-        const result = await response.json();
-        console.log(result);
+        
+        if (response.status === 201) {
+           result = {"status": "success", "json": await response.json()};
+        }else{
+            result = {"status": "sign-up failed", "json": await response.json()};
+        errors = Object.entries(result.json).flatMap(
+            ([field, messages]) => [].concat(messages).map(m => `${field}: ${m}`)
+        )
+        }
     } catch (error) {
+        result = {"status": `error: ${error}`, "json": null};
         console.error("Error:", error)
+    }
+
+    if(result.status != "success"){
+        setAlert(errors)
+        setAlertVisible(true);
     }
 };
      return (
@@ -69,6 +86,16 @@ const SignUpForm = () => {
             <button className = {styles.resendEmail} onClick = {() => ResendVerifyEmail(email)}>Resend Email Verification</button>
         )}
         </form>
+        {alertVisible && (
+            <div className = {styles.alert}>
+                <span className = {styles.closeBtn} onClick = {closeAlert}>&times;
+                </span>
+                <ul>
+                    {alert.map(msg => <li key = {msg}>{msg}
+                    </li>)}
+                </ul>
+            </div>
+        )}
         </>
     );
 };

@@ -100,3 +100,47 @@ input{
 .resendEmail:focus-visible {
   outline: 2px solid currentColor;
 }
+.alert {
+  position: fixed;
+  top: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(90vw, 28rem);
+  background: var(--danger-light);
+  color: var(--danger-dark);
+  border: var(--border-thin) solid var(--danger-base);
+  border-left-width: 4px;
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+  box-shadow: var(--shadow-3);
+  z-index: 100;
+}
+
+.alert ul {
+  margin: 0;
+  padding: 0;
+}
+
+.alert li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  background: transparent;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: var(--text-lg);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.closeBtn:hover {
+  opacity: var(--opacity-hover);
+}
