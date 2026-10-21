@@ -22,7 +22,6 @@ const ResetPasswordForm = ({uid, token}) =>{
             setMessage({ type: "success", text: Array.isArray(first) ? first[0] : first});
         }else{
             setMessage({ type: "alert", text:Array.isArray(first) ? first[0] : first});
-            setAlertVisible(true);
         }
     }
 return(
