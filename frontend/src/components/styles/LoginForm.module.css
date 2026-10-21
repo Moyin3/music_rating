@@ -86,30 +86,31 @@ input{
   outline: 2px solid currentColor;
 }
 
-.alert{
-    padding: var(--space-4);
-    background-color: var(--danger-base);
-    color: var(--grey-50);
-    margin-bottom: var(--space-4);
-    width: fit-content;
-    position: absolute;
-    bottom: var(--space-8);
-    left: 50%;
-    transform: translate(-50%, 0);
+.alert {
+  position: fixed;
+  top: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(90vw, 28rem);
+  background: var(--danger-light);
+  color: var(--danger-dark);
+  border: var(--border-thin) solid var(--danger-base);
+  border-left-width: 4px;
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+  box-shadow: var(--shadow-3);
+  z-index: 100;
 }
 
 .closeBtn {
-  margin-left: var(--space-4);
-  color: var(--grey-50);
-  font-weight: bold;
-  float: right;
-  font-size: var(--text-xl);
-  line-height: var(--text-lg);
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: var(--text-lg);
+  line-height: 1;
   cursor: pointer;
-  transition: 0.3s;
 }
 
-/* When moving the mouse over the close button */
 .closeBtn:hover {
-  color: black;
+  opacity: var(--opacity-hover);
 }
