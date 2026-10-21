@@ -9,50 +9,49 @@ const SignUpForm = () => {
     const [email, setEmail] = useState('');
     const [password1, setPassword1] = useState('');
     const [password2, setPassword2] = useState('');
-    const [alert, setAlert] = useState([]);
-    const [alertVisible, setAlertVisible] = useState(false);
     
-    const closeAlert = () =>{
-        setAlertVisible(false);
+
+    // replaces alert, alertVisible, success, successVisible, closeAlert, closeSuccess
+    const [notice, setNotice] = useState(null);
+
+    const handleResend = async () =>{
+        const result = await ResendVerifyEmail(email);
+        if (result.ok){
+            setNotice({type: "success", messages: ["Verification email has been resent"]})
+        } else{
+            /* Just realised the backend actually gives a response
+            should use that instead of this message */
+            setNotice({type: "alert", messages: ["Something has gone wrong"]})
+        }
     }
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        setNotice(null);
 
-    const data = { username, password1, password2, "email": email.toLowerCase()};
-    let result = {"status": null, "json": null};
-    let errors = [];
+        const data = { username, password1, password2, email: email.toLowerCase() };
 
-    
-    try {
-        const response = await fetch ("http://127.0.0.1:8000/api/dj-rest-auth/registration/", {
-            method: "POST", 
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
+        try {
+            const response = await fetch("http://127.0.0.1:8000/api/dj-rest-auth/registration/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+            const body = await response.json();
 
-        });
-
-        
-        if (response.status === 201) {
-           result = {"status": "success", "json": await response.json()};
-        }else{
-            result = {"status": "sign-up failed", "json": await response.json()};
-        errors = Object.entries(result.json).flatMap(
-            ([field, messages]) => [].concat(messages).map(m => `${field}: ${m}`)
-        )
+            if (response.ok) {
+                setNotice({ type: "success", messages: ["Sign up successful. Please verify your email."] });
+            } else {
+                const messages = Object.entries(body).flatMap(
+                    ([field, msgs]) => [].concat(msgs).map(m => `${field}: ${m}`)
+                );
+                setNotice({ type: "alert", messages });
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            setNotice({ type: "alert", messages: ["Something went wrong. Please try again."] });
         }
-    } catch (error) {
-        result = {"status": `error: ${error}`, "json": null};
-        console.error("Error:", error)
-    }
-
-    if(result.status != "success"){
-        setAlert(errors)
-        setAlertVisible(true);
-    }
-};
+    };
      return (
         <>
         <form className = {styles.signUpForm}>
@@ -83,21 +82,16 @@ const SignUpForm = () => {
         
            <GoogleLoginButton name = "Continue with Google"  className = {styles.gmailButton}/>
         {isVisible &&(
-            <button className = {styles.resendEmail} onClick = {() => ResendVerifyEmail(email)}>Resend Email Verification</button>
+            <button type = "button" className = {styles.resendEmail} onClick = {handleResend}>Resend Email Verification</button>
         )}
         </form>
-        {alertVisible && (
-            <div className = {styles.alert}>
-                <span className = {styles.closeBtn} onClick = {closeAlert}>&times;
-                </span>
-                <ul>
-                    {alert.map(msg => <li key = {msg}>{msg}
-                    </li>)}
-                </ul>
-            </div>
-        )}
-        </>
+        {notice && (
+    <div className={notice.type}>
+        <span className={styles.closeBtn} onClick={() => setNotice(null)}>&times;</span>
+        <ul>{notice.messages.map(m => <li key={m}>{m}</li>)}</ul>
+    </div>
+    )}
+     </>
     );
 };
-
 export default SignUpForm;

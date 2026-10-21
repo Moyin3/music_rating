@@ -17,3 +17,5 @@ suggestions div needs to become invisible when a suggestion is clicked
 styling of page for singles isn't nice, think this feeds into the column count stuff though.
 
 Songs shouldn't have the rate method option
+
+request function wrapper

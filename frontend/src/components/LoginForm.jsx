@@ -63,8 +63,8 @@ const LoginForm = () => {
                 <button className={styles.loginButton} type = "submit">Login</button>
         <GoogleLoginButton className={styles.gmailButton} name = "Continue with Google" />
         </form>
-        {alertVisible && <div className = {styles.alert}>
-            <span className = {styles.closeBtn} onClick = {closeAlert}>
+        {alertVisible && <div className = "alert">
+            <span className = "closeBtn" onClick = {closeAlert}>
                 &times;
             </span>
             {alert}
