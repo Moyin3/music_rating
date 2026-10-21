@@ -4,10 +4,17 @@ import styles from "./styles/ForgotPasswordForm.module.css";
 
 const ForgotPasswordForm = () => {
     const [email, setEmail] = useState("");
+    const [message, setMessage] = useState(null);
+
     const handleSubmit = async(event) =>{
         event.preventDefault();
         const response = await post({"url": "/api/dj-rest-auth/password/reset/", "data": {"email": email.toLowerCase()}});
         console.log(response);
+        if (response.status === "success"){
+            setMessage({type: "success", text: "An email has been sent"});
+        }else{
+            setMessage({type: "alert", text: "Something has gone wrong, please try again"})
+        }
     }
     return(
         <>
@@ -23,6 +30,12 @@ const ForgotPasswordForm = () => {
         </div>
         <button className = {styles.submit} type = "submit">Submit</button>
     </form>
+    {message && (
+    <div className = {message.type}>
+        <span className = "closeBtn" onClick = {() => setMessage(null)}>&times;</span>
+        {message.text}
+    </div>
+    )}
     </main>
     </>
     )

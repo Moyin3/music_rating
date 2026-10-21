@@ -11,9 +11,17 @@ const SignUpForm = () => {
     const [password2, setPassword2] = useState('');
     const [alert, setAlert] = useState([]);
     const [alertVisible, setAlertVisible] = useState(false);
+    const [success, setSuccess] = useState('');
+    const [successVisible, setSuccessVisible] = useState(false);
     
+    /* This logic for the warning pop ups is screaming for a refactor,
+    shame I'm not brilliant enough to do it concisely enough the first time */
     const closeAlert = () =>{
         setAlertVisible(false);
+    }
+
+    const closeSuccess = () =>{
+        setSuccessVisible(false);
     }
 
     const handleSubmit = async (event) => {
@@ -37,6 +45,8 @@ const SignUpForm = () => {
         
         if (response.status === 201) {
            result = {"status": "success", "json": await response.json()};
+           setSuccess("Sign up successful. Please verify your email");
+           setSuccessVisible(true);
         }else{
             result = {"status": "sign-up failed", "json": await response.json()};
         errors = Object.entries(result.json).flatMap(
@@ -94,6 +104,14 @@ const SignUpForm = () => {
                     {alert.map(msg => <li key = {msg}>{msg}
                     </li>)}
                 </ul>
+            </div>
+        )}
+        {successVisible && (
+            <div className = {styles.success}>
+                <span className = {styles.closeBtn} onClick = {closeSuccess}>
+                    &times;
+                </span>
+                {success};
             </div>
         )}
         </>

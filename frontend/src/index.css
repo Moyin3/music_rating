@@ -87,3 +87,49 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+.alert {
+  position: fixed;
+  top: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(90vw, 28rem);
+  background: var(--danger-light);
+  color: var(--danger-dark);
+  border: var(--border-thin) solid var(--danger-base);
+  border-left-width: 4px;
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+  box-shadow: var(--shadow-3);
+  z-index: 100;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: var(--text-lg);
+  line-height: 1;
+  cursor: pointer;
+  position: absolute;
+  top: 2px;
+  right: var(--space-1);
+}
+
+.closeBtn:hover {
+  opacity: var(--opacity-hover);
+}
+.success {
+  position: fixed;
+  top: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(90vw, 28rem);
+  background: var(--success-light);
+  color: var(--success-dark);
+  border: var(--border-thin) solid var(--success-base);
+  border-left-width: 4px;
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+  box-shadow: var(--shadow-3);
+  z-index: 100;
+}
