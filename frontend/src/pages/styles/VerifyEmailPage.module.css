@@ -1,18 +1,4 @@
-.pending {
-  position: fixed;
-  top: var(--space-4);
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(90vw, 28rem);
-  background: var(--grey-50);
-  color: var(--grey-600);
-  border: var(--border-thin) solid var(--grey-200);
-  border-left-width: 4px;
-  border-radius: var(--radius-md);
-  padding: var(--space-2);
-  box-shadow: var(--shadow-3);
-  z-index: 100;
-}
+
 .verifyDiv{
     background-color: var(--grey-50);
     width: 750px;

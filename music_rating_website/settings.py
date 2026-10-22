@@ -177,6 +177,11 @@ ACCOUNT_RATE_LIMITS = {
 SITE_ID = 1
 
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+SOCIALACCOUNT_PROVIDERS = {
+  'google': {
+      'EMAIL_AUTHENTICATION': True
+  }
+}
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 

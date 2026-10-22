@@ -27,7 +27,7 @@ return(
     <main className={styles.main}>
         <div className = {styles.verifyDiv}>
     {result.status === "pending" &&(
-        <div className={styles.pending}>
+        <div className= "pending">
             pending...
         </div>
     )}

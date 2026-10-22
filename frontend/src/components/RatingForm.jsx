@@ -70,7 +70,7 @@ const RatingForm = ( {name, type, spotify_id, album_spotify_id, artist_spotify_i
             </div>
             <div className = {styles.explicitReviewDiv}>
             <label className = {styles.ReviewTitle}>Review</label>
-            <textarea placeholder="Please leave us some choice words regarding your rating. (Optional)" className = {styles.comment} type = "textarea" value = {review} onChange = {(e) => setReview(e.target.value)}/>
+            <textarea placeholder="Please leave us some choice words regarding your rating. (Optional)" className = {styles.comment} value = {review} onChange = {(e) => setReview(e.target.value)}/>
             </div>
             </>
             }
