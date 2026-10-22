@@ -19,3 +19,6 @@ styling of page for singles isn't nice, think this feeds into the column count s
 Songs shouldn't have the rate method option
 
 request function wrapper
+
+Maybe have the error div that shows for gmail sign up be styled differently, too
+lazy to change how it looks now.

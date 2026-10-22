@@ -21,19 +21,24 @@ function GoogleLoginButton({name, className}) {
 export async function handleGoogleCallback() {
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
-
+  
+  try{
   const response = await fetch('/api/dj-rest-auth/google/', {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code }),
   });
-  if (!response.ok){
+  if (response.ok){
+  const data = await response.json();
+  return { success: true, data};
+  }else{
     const error = await response.json();
     return { success: false, error};
   }
-  const data = await response.json();
-  return { success: true, data};
+} catch (error){
+  return {success: false, error};
+}
 }
 
 export default GoogleLoginButton;
