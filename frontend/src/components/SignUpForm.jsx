@@ -14,6 +14,17 @@ const SignUpForm = () => {
     // replaces alert, alertVisible, success, successVisible, closeAlert, closeSuccess
     const [notice, setNotice] = useState(null);
 
+    const handleResend = async () =>{
+        const result = await ResendVerifyEmail(email);
+        if (result.ok){
+            setNotice({type: "success", messages: ["Verification email has been resent"]})
+        } else{
+            /* Just realised the backend actually gives a response
+            should use that instead of this message */
+            setNotice({type: "alert", messages: ["Something has gone wrong"]})
+        }
+    }
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         setNotice(null);
@@ -71,7 +82,7 @@ const SignUpForm = () => {
         
            <GoogleLoginButton name = "Continue with Google"  className = {styles.gmailButton}/>
         {isVisible &&(
-            <button className = {styles.resendEmail} onClick = {() => ResendVerifyEmail(email)}>Resend Email Verification</button>
+            <button type = "button" className = {styles.resendEmail} onClick = {handleResend}>Resend Email Verification</button>
         )}
         </form>
         {notice && (
