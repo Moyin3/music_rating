@@ -1,4 +1,4 @@
-.homepageDesc{
+.homepageDescription{
     margin: auto;
     text-align: center;
     color: var(--primary-600);
@@ -7,7 +7,7 @@
     max-width: var(--measure);
     line-height: var(--leading-tight);
 }
-.homepageEnc{
+.homepageEncouragement{
     text-align: center;
     color: var(--primary-600);
     font-weight: var(--font-semibold);
