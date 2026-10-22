@@ -4,7 +4,6 @@ import styles from "./styles/SignUpForm.module.css";
 import GoogleLoginButton from "../functions/GoogleAuth";
 const SignUpForm = () => {
     const [isVisible, setVisible] = useState(false);
-    const [isSubmitted, setSubmitted] = useState(false);
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password1, setPassword1] = useState('');
@@ -16,12 +15,16 @@ const SignUpForm = () => {
 
     const handleResend = async () =>{
         const result = await ResendVerifyEmail(email);
-        if (result.ok){
-            setNotice({type: "success", messages: ["Verification email has been resent"]})
+        if (result.status === "success"){
+            setNotice({type: "success", messages: ["Verification email has been resent."]})
         } else{
             /* Just realised the backend actually gives a response
             should use that instead of this message */
-            setNotice({type: "alert", messages: ["Something has gone wrong"]})
+            const body = result.json;
+            const messages = Object.entries(body).flatMap(
+                ([field, msgs]) => [].concat(msgs).map(m => `${field}: ${m}`)
+            );
+            setNotice({type: "alert", messages });
         }
     }
 
