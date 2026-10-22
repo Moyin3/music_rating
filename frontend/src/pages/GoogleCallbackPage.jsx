@@ -4,7 +4,6 @@ import NavigationBar from "../components/Navigationbar";
 import { useNavigate } from "react-router";
 import LoginCheck from "../functions/LoginCheck";
 import AuthContext from '../functions/AuthContext';
-import styles from "./styles/GoogleCallbackPage.module.css";
 
 const GoogleCallbackPage = () =>{
 const navigate = useNavigate();
