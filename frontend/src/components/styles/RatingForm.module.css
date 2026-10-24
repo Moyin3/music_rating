@@ -1,0 +1,98 @@
+.ratingMain{
+    display: grid;
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+    min-width: 100%;
+    min-height: calc(100vh - var(--nav-height));
+    grid-template-rows: repeat(9, minmax(0, 1fr));
+    padding: var(--space-4);
+}
+.ratingForm{
+    background-color: var(--grey-50);
+    grid-column: 3 / 8;
+    grid-row: 1 / 9;
+    box-shadow: var(--shadow-3);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3);
+    display: grid;
+    height: fit-content;
+}
+.Title{
+    font-size: var(--text-2xl);
+    justify-self: center;
+}
+
+.ratingInput{
+    background-color: var(--grey-100);
+    border-radius: var(--radius-sm);
+    border: solid var(--grey-200) var(--border-thick);
+    appearance: none;
+    font-size: var(--text-5xl);
+    height: fit-content;
+    color: var(--primary-700);
+    width: fit-content;
+    justify-self: center;
+    text-align: center;
+}
+.ratingInput::-webkit-outer-spin-button,
+.ratingInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+
+.ratingDropdown{
+    background-color: var(--grey-100);
+    border-radius: var(--radius-sm);
+    border: solid var(--grey-200) var(--border-thick);
+    color: var(--primary-700);
+}
+
+.ratingDiv{
+    text-align: center;
+}
+
+.comment{
+    height: 200px;
+    background-color: var(--grey-100);
+    border-radius: var(--radius-md);
+    border: solid var(--border-thick) var(--grey-200);
+    text-align: start;
+    margin-bottom: var(--space-2);
+    width: 100%;
+    display: block;
+    font-size: var(--text-base);
+    font-family: inherit;
+    padding: var(--space-2);
+    resize: vertical;
+    color: var(--primary-700);
+}
+
+.hint {
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--grey-500);
+}
+
+.ratingDropdown{
+    display: block;
+}
+
+.rateMethodDiv{
+    align-self: center;
+}
+
+
+
+.save{
+    border-radius: var(--radius-sm);
+    grid-column: 1/-1;
+    height: 50px;
+    margin-top: auto;
+    background-color: var(--grey-400);
+    align-self: end;
+}
+
+.save:hover{
+    background-color: var(--primary-700);
+    color: var(--grey-50);
+}

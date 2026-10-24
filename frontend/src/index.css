@@ -7,10 +7,31 @@
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 
+  --nav-height: 50px;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+.score{
+    color: var(--primary-700); 
+    font-size: var(--text-5xl);
+    font-weight: var(--font-bold);
+    --t:  clamp(0, calc((var(--score) - 30) / 70), 1);
+  --lo: clamp(0, calc(var(--t) * 2), 1);
+  --hi: clamp(0, calc(var(--t) * 2 - 1), 1);
+
+  color: color-mix(
+    in oklch,
+    var(--primary-700) calc(var(--hi) * 100%),
+    color-mix(in oklch, var(--primary-500) calc(var(--lo) * 100%), var(--primary-300))
+  );
 }
 
 a {
@@ -24,10 +45,10 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-color: var(--grey-200);
+  flex-direction: column;
 }
 
 h1 {
@@ -65,4 +86,66 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+.alert {
+  position: fixed;
+  top: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(90vw, 28rem);
+  background: var(--danger-light);
+  color: var(--danger-dark);
+  border: var(--border-thin) solid var(--danger-base);
+  border-left-width: 4px;
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+  box-shadow: var(--shadow-3);
+  z-index: 100;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: var(--text-lg);
+  line-height: 1;
+  cursor: pointer;
+  position: absolute;
+  top: 2px;
+  right: var(--space-1);
+}
+
+.closeBtn:hover {
+  opacity: var(--opacity-hover);
+}
+.success {
+  position: fixed;
+  top: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(90vw, 28rem);
+  background: var(--success-light);
+  color: var(--success-dark);
+  border: var(--border-thin) solid var(--success-base);
+  border-left-width: 4px;
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+  box-shadow: var(--shadow-3);
+  z-index: 100;
+}
+
+.pending {
+  position: fixed;
+  top: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(90vw, 28rem);
+  background: var(--grey-50);
+  color: var(--grey-600);
+  border: var(--border-thin) solid var(--grey-200);
+  border-left-width: 4px;
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+  box-shadow: var(--shadow-3);
+  z-index: 100;
 }

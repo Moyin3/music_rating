@@ -26,7 +26,7 @@ const post = async ({url, data}) => {
             }else if (response.status ===200){
                 result = {"status": "success", "json": await response.json()}
             }else{
-                result = {"status": "error: request failed", "json": null}
+                result = {"status": "error: request failed", "json": await response.json()}
             }
     }catch(error){
         console.error("Error:", error);

@@ -152,15 +152,17 @@ ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-EMAIL_HOST = "smtp.mailgun.org"
+EMAIL_HOST = "smtp.eu.mailgun.org"
 
 EMAIL_USE_TLS = True
 
 EMAIL_PORT = 587
 
-EMAIL_HOST_USER = "yeeno@sandbox4878d83ffd6e42d199779738f51c097f.mailgun.org"
+EMAIL_HOST_USER = env("SMTP_LOGIN")
 
 EMAIL_HOST_PASSWORD = env("SMTP_PASSWORD")
+
+EMAIL_TIMEOUT = 10
 
 ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = False
 
@@ -175,6 +177,11 @@ ACCOUNT_RATE_LIMITS = {
 SITE_ID = 1
 
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+SOCIALACCOUNT_PROVIDERS = {
+  'google': {
+      'EMAIL_AUTHENTICATION': True
+  }
+}
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 

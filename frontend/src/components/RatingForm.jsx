@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation} from "react-router";
 import post from "../functions/post";
+import styles from "./styles/RatingForm.module.css";
 
+const rateMethodHints = {
+  1: "You enter the score yourself.",
+  2: "Takes an average of songs in an album, or scores in an artist's discography.",
+};
 
 const RatingForm = ( {name, type, spotify_id, album_spotify_id, artist_spotify_id} ) => {
 
@@ -9,9 +14,10 @@ const RatingForm = ( {name, type, spotify_id, album_spotify_id, artist_spotify_i
     const [review, setReview] = useState('');
     const [rateSystem, setRateSystem] = useState("1");
     const [isVisible, setVisible] = useState(true);
+    const [notice, setNotice] = useState(null);
     let navigate = useNavigate();
+    const location = useLocation();
 
-    console.log("Genuinely confused", name, type, spotify_id, album_spotify_id, artist_spotify_id)
     const handleSave = async (event) => {
         event.preventDefault();
 
@@ -23,17 +29,21 @@ const RatingForm = ( {name, type, spotify_id, album_spotify_id, artist_spotify_i
 
         const response = await post({"url": "/api/ratings/", "data": data});
         
+        let first = null;
+
+       console.log("offline check", response);
         if (response.status == "success"){
-            console.log(response)
-            //Do nothing I guess
+            setNotice({type: "success", message: "Rating saved"});
+            navigate(`/${type}/${spotify_id}/`, {state: {"data": {name, type, "id": spotify_id, "album_spotify_id": album_spotify_id, "artist_spotify_id": artist_spotify_id}}})
         }else if (response.status == "need login"){
-            navigate("/login")
+            navigate("/login", {state: {priorData: {location, Data: {name, type, "id": spotify_id, "album_spotify_id": album_spotify_id, "artist_spotify_id": artist_spotify_id}}}})
         }
         else if (response.status == "error: request failed"){
-            //Also need to handle this later, but should be easier to fix
+            first = Object.values(response.json)[0];
+            setNotice({type: "alert", message: Array.isArray(first) ? first[0] : first});
         }
         else{
-            //Need to handle this later
+            setNotice({type: "alert", message: "Couldn't save rating, try again"});
         }
             
     }
@@ -44,31 +54,59 @@ const RatingForm = ( {name, type, spotify_id, album_spotify_id, artist_spotify_i
     }, [type]);
 
     return(
-        <form>{rateSystem == 1 &&
+        <main className = {styles.ratingMain}>
+        <form className = {styles.ratingForm}>
+        <label className={styles.Title}>{name}</label>
+            {rateSystem == 1 &&
             <>
-            <label id = "Form Title">{name}</label>
-            <label>Review</label>
-            <input type = "text" value = {review} onChange = {(e) => setReview(e.target.value)}/>
-            <label>Rating</label>
-            <input type = "number" min = "1" max = "100" value = {rating} onChange = {(e) => setRating(e.target.value)} />
-            <select value = {rateSystem} onChange = {(e) => setRateSystem(e.target.value)} name = "rate-system">
-                <option value = "1">explicit</option>
-                <option value = "2">average</option>
+           <div className={styles.rateMethodDiv}>
+            <label className={styles.rateMethodTitle} htmlFor="rate-method">Rate Method</label>
+            <select id="rate-method" aria-describedby="rate-method-hint" className={styles.ratingDropdown} value={rateSystem} onChange={(e) => setRateSystem(e.target.value)} name="rate-system">
+                <option value="1">explicit</option>
+                <option value="2">average</option>
             </select>
+            <p id="rate-method-hint" className={styles.hint}>
+                {rateMethodHints[rateSystem]}
+            </p>
+            </div> 
+            <div className = {styles.ratingDiv}>
+            <label className = {styles.ratingTitle}>Rating</label>
+            <input className = {styles.ratingInput} type = "number" min = "1" max = "100" value = {rating} onChange = {(e) => setRating(e.target.value)} />
+            </div>
+            <div className = {styles.explicitReviewDiv}>
+            <label className = {styles.ReviewTitle}>Review</label>
+            <textarea placeholder="Please leave us some choice words regarding your rating. (Optional)" className = {styles.comment} value = {review} onChange = {(e) => setReview(e.target.value)}/>
+            </div>
             </>
             }
             {rateSystem == 2 && 
             <>
-            <label>Review</label>
-            <input type = "text" value = {review} onChange = {(e) => setReview(e.target.value)}/>
-            <label>Rate System</label>
-            <select value = {rateSystem} onChange = {(e) => setRateSystem(e.target.value)} name = "rate-system">
-                <option value = "1">explicit</option>
-                <option value = "2">average</option>
+            <div className={styles.rateMethodDiv}>
+            <label className={styles.rateMethodTitle} htmlFor="rate-method">Rate Method</label>
+            <select id="rate-method" aria-describedby="rate-method-hint" className={styles.ratingDropdown} value={rateSystem} onChange={(e) => setRateSystem(e.target.value)} name="rate-system">
+                <option value="1">explicit</option>
+                <option value="2">average</option>
             </select>
+            <p id="rate-method-hint" className={styles.hint}>
+                {rateMethodHints[rateSystem]}
+            </p>
+            </div> 
+            <div className = {styles.averageReviewDiv}>
+            <label className = {styles.ReviewTitle}>Review</label>
+            <textarea placeholder="Please leave us some choice words regarding your rating. (Optional)" className = {styles.comment} value = {review} onChange = {(e) => setReview(e.target.value)}/>
+            </div>
             </>}
-            <button onClick = {handleSave}>Save</button>
+            <button className = {styles.save} onClick = {handleSave}>Save</button>
         </form>
+    {notice && (
+        <div className = {notice.type}>
+            <span className = "closeBtn" onClick = {() => setNotice(null)}>
+                &times;
+            </span>
+            {notice.message}
+            </div>
+        )}
+        </main>
     )
 }
 

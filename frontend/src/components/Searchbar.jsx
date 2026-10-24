@@ -1,11 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef} from 'react';
 import SuggestionsDiv from './SuggestionsDiv';
+import styles from "./styles/Searchbar.module.css";
 
 export default function Searchbar(){
 
     const [query, setQuery] = useState('');
     const [isBoxVisible, setBoxVisible] = useState(true);
     const [results, setResults] = useState([]);
+
+    const myRef = useRef(null);
+/* Very aware these two functions can be merged into one function
+but feel this works, and it might be better for stuff in the future */
+
+const handleBlur = (e) => {
+    console.log("input blur ->", e.relatedTarget);
+    if (myRef.current.contains(e.relatedTarget)){
+    /* do nothing */
+    }
+    else{setBoxVisible(false);}
+}
+const handleFocus = () => {
+    setBoxVisible(true);
+}
 
 function levenshtein(a, b) {
     const tmp = [];
@@ -133,14 +149,16 @@ const spotifySearch = async(event) => {
                 setResults([resA, resB]);
             }
             fetchData();
-            console.log("These are the results:", results)
+            console.log("result event")
         }, [query]);
 
     return (
     <>
-        <input type = "text" placeholder = "Search..." value = {query} onChange={(e) => setQuery(e.target.value)} />
+    <div className={styles.searchdiv} onBlur = {handleBlur}>
+        <input type = "text" placeholder = "Search..." spellCheck = {false} onBlur = {handleBlur} onFocus = {() => {console.log("input focus"); handleFocus;}} value = {query} onChange={(e) => setQuery(e.target.value)}  className = {styles.searchbox}/>
         {isBoxVisible&&
-        <SuggestionsDiv results = {results} />}
+        <SuggestionsDiv  onFocus={(e) => console.log("div focus", e.target)} onBlur={(e) => console.log("div blur", e.target, "->", e.relatedTarget)} tabIndex = {-1} results = {results} className = {styles.suggestions} ref = {myRef} />}
+        </div>
         </>
     );
 

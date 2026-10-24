@@ -1,0 +1,53 @@
+.navBar{
+    width: auto;
+    height: var(--nav-height);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    background-color: var(--primary-800);
+    align-items: center;
+}
+/* Including this here because this is just a button,
+and it makes the CSS easy, whereas both signup and login
+are more complex components so they have their own styles pages */
+
+.webpageName{
+  justify-self: start;
+  display: inline-block;
+  margin-left: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font: inherit;
+  line-height: var(--leading-normal);
+  color: var(--grey-50);
+  background: var(--primary-800);
+  border: 0;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.webpageName:hover {
+  background: var(--primary-700);
+  color: var(--grey-50);
+}
+
+.signUpAndLogin{
+    margin-left: auto;
+    font-size: var(--text-base);
+}
+.signUpButton {
+  display: inline-block;
+  padding: var(--space-2) var(--space-4);
+  font: inherit;
+  line-height: var(--leading-normal);
+  color: var(--grey-50);
+  background: var(--primary-800);
+  border: 0;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.signUpButton:hover {
+  background: var(--primary-700);
+  color: var(--grey-50);
+}
