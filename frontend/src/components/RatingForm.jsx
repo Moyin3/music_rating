@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation} from "react-router";
 import post from "../functions/post";
 import styles from "./styles/RatingForm.module.css";
 
@@ -14,9 +14,10 @@ const RatingForm = ( {name, type, spotify_id, album_spotify_id, artist_spotify_i
     const [review, setReview] = useState('');
     const [rateSystem, setRateSystem] = useState("1");
     const [isVisible, setVisible] = useState(true);
+    const [notice, setNotice] = useState(null);
     let navigate = useNavigate();
+    const location = useLocation();
 
-    console.log("Genuinely confused", name, type, spotify_id, album_spotify_id, artist_spotify_id)
     const handleSave = async (event) => {
         event.preventDefault();
 
@@ -28,17 +29,21 @@ const RatingForm = ( {name, type, spotify_id, album_spotify_id, artist_spotify_i
 
         const response = await post({"url": "/api/ratings/", "data": data});
         
+        let first = null;
+
+       console.log("offline check", response);
         if (response.status == "success"){
-            console.log(response)
-            //Do nothing I guess
+            setNotice({type: "success", message: "Rating saved"});
+            navigate(`/${type}/${spotify_id}/`, {state: {"data": {name, type, "id": spotify_id, "album_spotify_id": album_spotify_id, "artist_spotify_id": artist_spotify_id}}})
         }else if (response.status == "need login"){
-            navigate("/login")
+            navigate("/login", {state: {priorData: {location, Data: {name, type, "id": spotify_id, "album_spotify_id": album_spotify_id, "artist_spotify_id": artist_spotify_id}}}})
         }
         else if (response.status == "error: request failed"){
-            //Also need to handle this later, but should be easier to fix
+            first = Object.values(response.json)[0];
+            setNotice({type: "alert", message: Array.isArray(first) ? first[0] : first});
         }
         else{
-            //Need to handle this later
+            setNotice({type: "alert", message: "Couldn't save rating, try again"});
         }
             
     }
@@ -93,6 +98,14 @@ const RatingForm = ( {name, type, spotify_id, album_spotify_id, artist_spotify_i
             </>}
             <button className = {styles.save} onClick = {handleSave}>Save</button>
         </form>
+    {notice && (
+        <div className = {notice.type}>
+            <span className = "closeBtn" onClick = {() => setNotice(null)}>
+                &times;
+            </span>
+            {notice.message}
+            </div>
+        )}
         </main>
     )
 }

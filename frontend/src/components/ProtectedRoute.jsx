@@ -2,7 +2,7 @@ import { Navigate, Outlet, useLocation } from "react-router";
 
 const ProtectedRoute = (props) =>{
 const location = useLocation();
-const Data = location.state;
+const Data = location.state?.data ?? location.state?.priorData?.data;
 console.log("Is it getting here?", Data)
     return (
         props.isAuthenticated ?

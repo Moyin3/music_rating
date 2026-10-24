@@ -22,3 +22,5 @@ request function wrapper
 
 Maybe have the error div that shows for gmail sign up be styled differently, too
 lazy to change how it looks now.
+
+Some kind of loop can happen if I'm on the rating form log out, then login.

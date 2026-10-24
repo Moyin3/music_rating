@@ -3,13 +3,10 @@ import RatingForm from "../components/RatingForm";
 import { useLocation } from "react-router";
 
 const ContentRatingPage = () => {
-    console.log("info being sent to the rating", useLocation().state);
-    let {name, type, id, album_spotify_id, artist_spotify_id} = {};
-    if (useLocation()?.state?.data){
-    ({name, type, id, album_spotify_id, artist_spotify_id} = useLocation().state.data);
-    }else{
-    ({name, type, id, album_spotify_id, artist_spotify_id} = useLocation().state.priorData.data);
-    }
+    const location = useLocation();
+    const d = location.state?.data ?? location.state?.priorData?.data ?? {};
+    const {name, type, id, album_spotify_id, artist_spotify_id} = d;
+    console.log("info being sent to the rating", location.state);
 return(
     <>
     <NavigationBar />

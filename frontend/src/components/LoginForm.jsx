@@ -33,7 +33,11 @@ const LoginForm = () => {
     if (response.status == "success"){
         console.log(response)
         setUser(await LoginCheck());
-        navigate(location.state?.priorData?.location?.pathname || "/", {replace: true, state: {priorData}});
+        /* comma after "/" is separating the replace true bracket, essentially
+        the state there is always being sent for simplicity rather than branching
+        on whether or not priorData is null or not */
+        console.log("relaying", priorData)
+        navigate(location.state?.priorData?.location?.pathname || "/", {replace: true, state: {data: priorData}});
     }else if (response.status == "error: request failed"){
         setAlert(Array.isArray(first) ? first[0] : first);
         setAlertVisible(true);
