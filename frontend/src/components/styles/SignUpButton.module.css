@@ -2,3 +2,7 @@
     background-color: var(--primary-800);
     color: var(--grey-50);
 }
+
+.signUpBtn:hover{
+    background-color: var(--primary-700);
+}

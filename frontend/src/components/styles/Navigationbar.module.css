@@ -11,24 +11,43 @@ and it makes the CSS easy, whereas both signup and login
 are more complex components so they have their own styles pages */
 
 .webpageName{
-    margin-right: auto;
-    color: var(--grey-50);
-    padding-left: var(--space-2);
+  justify-self: start;
+  display: inline-block;
+  margin-left: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font: inherit;
+  line-height: var(--leading-normal);
+  color: var(--grey-50);
+  background: var(--primary-800);
+  border: 0;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  cursor: pointer;
 }
 
-.webpageName > button{
-    color: var(--grey-50);
-    background-color: var(--primary-800);
-    font-size: var(--text-base);
+.webpageName:hover {
+  background: var(--primary-700);
+  color: var(--grey-50);
 }
 
 .signUpAndLogin{
     margin-left: auto;
     font-size: var(--text-base);
 }
+.signUpButton {
+  display: inline-block;
+  padding: var(--space-2) var(--space-4);
+  font: inherit;
+  line-height: var(--leading-normal);
+  color: var(--grey-50);
+  background: var(--primary-800);
+  border: 0;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  cursor: pointer;
+}
 
-.signUpButton{
-    background-color: var(--primary-800);
-    color: var(--grey-50);
-    padding-right: var(--space-2);
+.signUpButton:hover {
+  background: var(--primary-700);
+  color: var(--grey-50);
 }

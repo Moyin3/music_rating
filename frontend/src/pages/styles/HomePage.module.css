@@ -38,3 +38,14 @@ page is empty*/
     grid-template-rows: repeat(5, 1fr);
     grid-template-columns: repeat(3, 1fr);
 }
+.homepageButton{
+    background-color: var(--primary-800);
+    color: var(--grey-50);
+    padding: var(--space-4);
+    border-radius: var(--radius-sm);
+}
+
+.homepageButton:hover{
+    background-color: var(--primary-600);
+    color: var(--grey-50);
+}
