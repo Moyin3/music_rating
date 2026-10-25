@@ -35,7 +35,7 @@ const SignUpForm = () => {
         const data = { username, password1, password2, email: email.toLowerCase() };
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/dj-rest-auth/registration/", {
+            const response = await fetch("/api/dj-rest-auth/registration/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),

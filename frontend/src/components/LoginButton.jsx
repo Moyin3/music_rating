@@ -13,7 +13,7 @@ const LoginButton = () => {
         event.preventDefault();
 
 
-        const response = await post({"url": "http://127.0.0.1:8000/api/dj-rest-auth/logout/", "data": []})
+        const response = await post({"url": "/api/dj-rest-auth/logout/", "data": []})
 
         if (response.status == "success"){
             console.log(response)

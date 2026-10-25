@@ -211,7 +211,7 @@ class UsernameSearchView(ListAPIView):
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-    callback_url = 'http://127.0.0.1:5173/auth/google/login/callback/'
+    callback_url = '/auth/google/login/callback/'
     client_class = OAuth2Client
 
 """Separate from the API View, just a small view that uses the SpotifyUtils class
