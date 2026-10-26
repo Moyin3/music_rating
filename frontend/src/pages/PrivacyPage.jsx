@@ -1,6 +1,10 @@
+import NavigationBar from "../components/Navigationbar";
+
 const PrivacyPage = () => {
     return(
-        <main style={{ maxWidth: "700px", margin: "2rem auto", padding: "0 1rem", lineHeight: 1.6 }}>
+      <>
+      <NavigationBar />
+        <main className = "privacy_page">
       <h1>Privacy Policy</h1>
       <p>Last updated: 26 October 2026</p>
 
@@ -62,6 +66,7 @@ const PrivacyPage = () => {
         If this policy changes, we will update the date at the top of this page.
       </p>
     </main>
+    </>
     )
 }
 

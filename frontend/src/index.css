@@ -149,3 +149,13 @@ button:focus-visible {
   box-shadow: var(--shadow-3);
   z-index: 100;
 }
+
+.privacy_page {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-4) var(--space-12);
+  line-height: 1.6;
+  min-height: calc(100vh - var(--nav-height));
+  color: var(--primary-700);
+  padding-bottom: var(--space-4);
+}
