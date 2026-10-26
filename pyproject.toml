@@ -24,6 +24,10 @@ django-allauth = "^65.14.0"
 pyjwt = "^2.10.1"
 cryptography = "^46.0.3"
 djangorestframework-simplejwt = "^5.5.1"
+gunicorn = "^26.2.0"
+uvicorn = "^0.54.0"
+whitenoise = "^6.12.0"
+dj-database-url = "^3.1.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
