@@ -14,7 +14,6 @@ from pathlib import Path
 import environ
 import sys
 import os
-from .settings import *  # noqa
 from datetime import timedelta
 import dj_database_url
 
@@ -35,24 +34,20 @@ DATABASES = {
     )
 }
 
-# Speed and safety
-PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
-EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
-
 
 SPOTIFY_CLIENT_ID = env("SPOTIFY_CLIENT_ID")
 SPOTIFY_CLIENT_SECRET = env("YOUR_SPOTIFY_CLIENT_SECRET")
 
 
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["127.0.0.1", "localhost"])
+if os.environ.get("RENDER_EXTERNAL_HOSTNAME"):
+    ALLOWED_HOSTS.append(os.environ["RENDER_EXTERNAL_HOSTNAME"])
 
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/0",  # Use Redis database 1
-        "VERSION": "",
-        "KEY_PREFIX": "",
+        "LOCATION": env("REDIS_URL", default="redis://127.0.0.1:6379/0"),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
@@ -89,6 +84,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -97,7 +93,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     "allauth.account.middleware.AccountMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 INTERNAL_IPS = [
@@ -253,13 +248,21 @@ if not DEBUG:
     # Tell Django to copy static assets into a path called `staticfiles` (this is specific to Render)
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-    # Enable the WhiteNoise storage backend, which compresses static files to reduce disk use
-    # and renames the files with unique names for each version to support long-term caching
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    STORAGES = {
+      "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+      "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+  }
+
+FRONTEND_URL = env("FRONTEND_URL", default="http://127.0.0.1:5173")
+CORS_ALLOWED_ORIGINS = [FRONTEND_URL]
+CSRF_TRUSTED_ORIGINS = [FRONTEND_URL]
+ACCOUNT_EMAIL_CONFIRMATION_URL = f"{FRONTEND_URL}/verify-email/{{key}}"
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 
 STATICFILES_DIRS = [BASE_DIR / "music_rating/static"]
-
-STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
 # Default primary key field type

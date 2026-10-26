@@ -1,5 +1,6 @@
 services:
   - type: web
+    region: frankfurt
     plan: free
     name: music_rating_website
     runtime: python
