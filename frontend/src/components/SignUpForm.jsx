@@ -60,12 +60,12 @@ const SignUpForm = () => {
         <form className = {styles.signUpForm}>
             <div className={styles.signUpUsername}>
             <label>Username</label>
-            <input type = "text" value = {username} placeholder='Username' onChange={(e) => setUsername(e.target.value)}/>
+            <input type = "text" value = {username} placeholder='Username' autoComplete = 'username' onChange={(e) => setUsername(e.target.value)}/>
             </div>
 
             <div className={styles.signUpEmail}>
             <label>Email</label>
-            <input type= "email" value = {email} placeholder='FrankOceancomeback@gmail.com' onChange={(e) => setEmail(e.target.value)}/>
+            <input type= "email" value = {email} placeholder='FrankOceancomeback@gmail.com' autoComplete='email' onChange={(e) => setEmail(e.target.value)}/>
             </div>
 
             <div className = {styles.signUpPassword}>

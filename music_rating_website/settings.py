@@ -135,17 +135,13 @@ ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*']
 
 ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
-EMAIL_HOST = "smtp.eu.mailgun.org"
-
-EMAIL_USE_TLS = True
-
-EMAIL_PORT = 587
-
-EMAIL_HOST_USER = env("SMTP_LOGIN")
-
-EMAIL_HOST_PASSWORD = env("SMTP_PASSWORD")
+EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+ANYMAIL = {
+       "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
+       "MAILGUN_SENDER_DOMAIN": env("MAILGUN_SENDER_DOMAIN"),
+       "MAILGUN_API_URL": "https://api.eu.mailgun.net/v3",
+   }
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
 EMAIL_TIMEOUT = 10
 
