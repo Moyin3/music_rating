@@ -14,6 +14,7 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
 import logging
 from django.db.models import OuterRef, Subquery
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -211,7 +212,7 @@ class UsernameSearchView(ListAPIView):
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-    callback_url = '/auth/google/login/callback/'
+    callback_url = f"{settings.FRONTEND_URL}/auth/google/login/callback/"
     client_class = OAuth2Client
 
 """Separate from the API View, just a small view that uses the SpotifyUtils class
