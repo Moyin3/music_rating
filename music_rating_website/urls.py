@@ -5,9 +5,10 @@ from api.views import (AlbumDetailAPIView, SongDetailAPIView, ArtistDetailAPIVie
                        RatingDetailView, RatingCreateView, SpotifySearchView, RatingListView, UsernameSearchView, GoogleLogin)
 from django.views.generic import TemplateView
 from django.shortcuts import redirect
+from django.conf import settings
 
 def redirect_to_frontend_reset(request, uidb64, token):
-    return redirect(f"http://127.0.0.1:5173/reset-password/{uidb64}/{token}/")
+    return redirect(f"{settings.FRONTEND_URL}/reset-password/{uidb64}/{token}/")
 
 urlpatterns = [
     path("admin/", admin.site.urls),

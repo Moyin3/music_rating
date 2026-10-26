@@ -38,6 +38,8 @@ DATABASES = {
 SPOTIFY_CLIENT_ID = env("SPOTIFY_CLIENT_ID")
 SPOTIFY_CLIENT_SECRET = env("SPOTIFY_CLIENT_SECRET")
 
+FRONTEND_URL = env("FRONTEND_URL", default="http://127.0.0.1:5173")
+
 
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["127.0.0.1", "localhost"])
@@ -147,7 +149,7 @@ EMAIL_TIMEOUT = 10
 
 ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = False
 
-ACCOUNT_EMAIL_CONFIRMATION_URL = "http://127.0.0.1:5173/verify-email/{key}"
+ACCOUNT_EMAIL_CONFIRMATION_URL = f"{FRONTEND_URL}/verify-email/{key}"
 
 ACCOUNT_ADAPTER = "music_rating.adapters.MyAccountAdapter"
 
