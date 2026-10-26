@@ -1,7 +1,7 @@
 const LoginCheck = async (event) => {
     let user = null;
     try{
-        const response = await fetch("http://127.0.0.1:8000/api/dj-rest-auth/user/",{
+        const response = await fetch("/api/dj-rest-auth/user/",{
             method: "GET",
             credentials: "include",
         }

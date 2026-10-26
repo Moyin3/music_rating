@@ -26,7 +26,7 @@ const LoginForm = () => {
     
     const data = value.includes('@') ? {email: value.toLowerCase(), password} : {username: value, password};
 
-    const response = await post({"url": "http://127.0.0.1:8000/api/dj-rest-auth/login/", "data": data})
+    const response = await post({"url": "/api/dj-rest-auth/login/", "data": data})
     
     const first = Object.values(response.json)[0];
 
