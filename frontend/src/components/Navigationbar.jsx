@@ -1,4 +1,4 @@
-import Searchbar from "./SearchBar";
+import Searchbar from "./Searchbar";
 import LoginButton from "./LoginButton";
 import { BrowserRouter, Link } from "react-router";
 import SignUpButton from "./SignUpButton";
