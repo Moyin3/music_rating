@@ -47,6 +47,7 @@ const RatingForm = ( {name, type, spotify_id, album_spotify_id, artist_spotify_i
         }
             
     }
+    console.log("Can't be arsed to see if this should be coming from somewhere", type);
     useEffect(() => {
         if (type == 'song'){
             setVisible(false);
@@ -59,6 +60,7 @@ const RatingForm = ( {name, type, spotify_id, album_spotify_id, artist_spotify_i
         <label className={styles.Title}>{name}</label>
             {rateSystem == 1 &&
             <>
+            {isVisible &&
            <div className={styles.rateMethodDiv}>
             <label className={styles.rateMethodTitle} htmlFor="rate-method">Rate Method</label>
             <select id="rate-method" aria-describedby="rate-method-hint" className={styles.ratingDropdown} value={rateSystem} onChange={(e) => setRateSystem(e.target.value)} name="rate-system">
@@ -69,6 +71,7 @@ const RatingForm = ( {name, type, spotify_id, album_spotify_id, artist_spotify_i
                 {rateMethodHints[rateSystem]}
             </p>
             </div> 
+            }
             <div className = {styles.ratingDiv}>
             <label className = {styles.ratingTitle}>Rating</label>
             <input className = {styles.ratingInput} type = "number" min = "1" max = "100" value = {rating} onChange = {(e) => setRating(e.target.value)} />

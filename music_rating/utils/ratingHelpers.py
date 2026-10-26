@@ -4,6 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from music_rating.models import Song, Album, Artist, Rating, RateSystem
 from django.db.models import Avg
 import logging
+from rest_framework.exceptions import ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -29,8 +30,8 @@ def album_rating_for_rate_system_2(user, album_spotify_id) -> int:
     # All songs that belong to this album
     songs = Song.objects.filter(album_spotify_id=album_spotify_id)
     if not songs.exists():
-        logger.error("Can't find any songs in this album")
-        return 0
+        logger.info("Can't find any songs in this album")
+        raise ValidationError("Nothing to average, use the explicit method")
 
     # User's ratings for those songs
     ratings = Rating.objects.filter(
@@ -40,8 +41,8 @@ def album_rating_for_rate_system_2(user, album_spotify_id) -> int:
     )
 
     if not ratings.exists():
-        logger.error("Ratings don't exist for this album to be averaged")
-        return 0
+        logger.info("Ratings don't exist for this album to be averaged")
+        raise ValidationError("Nothing to average, use the explicit method")
 
     avg_score = int(ratings.aggregate(avg=Avg("score"))["avg"])
 
@@ -65,8 +66,8 @@ def artist_rating_for_rate_system_2(user, artist_spotify_id) -> int:
     # Albums by this artist that exist in the DB
     albums = Album.objects.filter(artist_spotify_id=artist_spotify_id)
     if not albums.exists():
-        logger.warning("There are no album ratings to be averaged")
-        return 0
+        logger.info("There are no album ratings to be averaged")
+        raise ValidationError("Nothing to average, use the explicit method")
 
     # User's album ratings for those albums
     ratings = Rating.objects.filter(
@@ -77,7 +78,7 @@ def artist_rating_for_rate_system_2(user, artist_spotify_id) -> int:
 
     if not ratings.exists():
         logger.error("Ratings don't exist for this Artist to be averaged")
-        return 0
+        raise ValidationError("Nothing to average, use the explicit method")
 
     #TODO: Maybe introduce an error here or somewhere else so that people can't make an average rating, if there's nothing to average.
     avg_score = int(ratings.aggregate(avg=Avg("score"))["avg"])

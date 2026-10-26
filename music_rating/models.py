@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import logging
+from rest_framework.exceptions import ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -91,8 +92,8 @@ class Rating(models.Model):
             if album_rating_object and album_rating_object.rate_system.key == "average":
                 songs = Song.objects.filter(album_spotify_id=album_rating_object.spotify_id)
                 if not songs.exists():
-                    logger.error("Can't find any songs in this album")
-                    return 0
+                    logger.info("Can't find any songs in this album")
+                    raise ValidationError("Nothing to average, use the explicit method") 
                 ratings = Rating.objects.filter(
                         user=self.user,
                         content_type=song_ct,
@@ -100,8 +101,8 @@ class Rating(models.Model):
                     )
                 
                 if not ratings.exists():
-                    logger.error("Ratings don't exist for this album to be averaged")
-                    return 0
+                    logger.info("Ratings don't exist for this album to be averaged")
+                    raise ValidationError("Nothing to average, use the explicit method")
             
                 avg_score = int(ratings.aggregate(avg=Avg("score"))["avg"])
             
@@ -136,14 +137,14 @@ class Rating(models.Model):
             if artist_rating_object and artist_rating_object.rate_system.key == "average":
                 albums = Album.objects.filter(artist_spotify_id=artist_rating_object.spotify_id)
                 if not albums.exists():
-                    return 0
+                    raise ValidationError("Nothing to average, use the explicit method")
                 ratings = Rating.objects.filter(
                         user=self.user,
                         content_type=album_ct,
                         spotify_id__in=albums.values_list("spotify_id", flat=True)
                     ) 
                 if not ratings.exists():
-                    return 0
+                    raise ValidationError("Nothing to average, use the explicit method")
             
                 avg_score = int(ratings.aggregate(avg=Avg("score"))["avg"])
             
