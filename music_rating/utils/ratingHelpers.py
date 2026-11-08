@@ -21,7 +21,7 @@ def get_album_dict_from_id(request, spotify_id):
 
 
 # Takes an average of rated songs in the album
-#TODO: needs a guard in case a song isn't populated with its album spotify id
+# TODO: needs a guard in case a song isn't populated with its album spotify id
 def album_rating_for_rate_system_2(user, album_spotify_id) -> int:
     song_ct = ContentType.objects.get_for_model(Song)
     album_ct = ContentType.objects.get_for_model(Album)
@@ -56,8 +56,9 @@ def album_rating_for_rate_system_2(user, album_spotify_id) -> int:
 
     return avg_score
 
+
 # Takes an average of rated albums an artist has
-#TODO: needs a guard just in case an album isn't populated with its artist id
+# TODO: needs a guard just in case an album isn't populated with its artist id
 def artist_rating_for_rate_system_2(user, artist_spotify_id) -> int:
     album_ct = ContentType.objects.get_for_model(Album)
     artist_ct = ContentType.objects.get_for_model(Artist)
@@ -73,14 +74,14 @@ def artist_rating_for_rate_system_2(user, artist_spotify_id) -> int:
     ratings = Rating.objects.filter(
         user=user,
         content_type=album_ct,
-        spotify_id__in=albums.values_list("spotify_id", flat=True)
+        spotify_id__in=albums.values_list("spotify_id", flat=True),
     )
 
     if not ratings.exists():
         logger.error("Ratings don't exist for this Artist to be averaged")
         raise ValidationError("Nothing to average, use the explicit method")
 
-    #TODO: Maybe introduce an error here or somewhere else so that people can't make an average rating, if there's nothing to average.
+    # TODO: Maybe introduce an error here or somewhere else so that people can't make an average rating, if there's nothing to average.
     avg_score = int(ratings.aggregate(avg=Avg("score"))["avg"])
 
     Rating.objects.update_or_create(
@@ -93,12 +94,12 @@ def artist_rating_for_rate_system_2(user, artist_spotify_id) -> int:
 
     return avg_score
 
+
 def album_rating_for_rate_system_1(user, album_spotify_id) -> int | None:
     album_ct = ContentType.objects.get_for_model(Album)
 
     rating = (
-        Rating.objects
-        .filter(
+        Rating.objects.filter(
             user=user,
             content_type=album_ct,
             spotify_id=album_spotify_id,
@@ -114,8 +115,7 @@ def artist_rating_for_rate_system_1(user, artist_spotify_id) -> int | None:
     artist_ct = ContentType.objects.get_for_model(Artist)
 
     rating = (
-        Rating.objects
-        .filter(
+        Rating.objects.filter(
             user=user,
             content_type=artist_ct,
             spotify_id=artist_spotify_id,
