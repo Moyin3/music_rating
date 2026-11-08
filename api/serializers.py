@@ -4,7 +4,6 @@ from music_rating.models import (
     Rating,
     Song,
     UserProfile,
-    Song,
     Album,
     Single,
     EP,

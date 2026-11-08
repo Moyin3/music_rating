@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from music_rating.models import Song, Album, Artist, Rating, UserProfile
 from .serializers import RatingSerializer, UserProfileSerializer
 from rest_framework.views import APIView
