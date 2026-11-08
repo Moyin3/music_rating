@@ -6,7 +6,6 @@ from django.http import JsonResponse
 from urllib.parse import quote
 from django.core.cache import cache
 from django_redis import get_redis_connection
-import json
 import logging
 
 logger = logging.getLogger(__name__)
@@ -37,7 +36,6 @@ class SpotifyUtils:
 
         data = {"grant_type": "client_credentials"}
 
-        
         response = requests.post(self.TOKEN_URL, headers=headers, data=data, timeout=3)
         # success
         if response.status_code == 200:
@@ -72,15 +70,15 @@ class SpotifyUtils:
         if response.status_code == 200:
             return JsonResponse(response.json())
         else:
-            #TODO: improve error handling, can pass down Spotify's exact error response as done in the get_access_token method
+            # TODO: improve error handling, can pass down Spotify's exact error response as done in the get_access_token method
             return JsonResponse(
                 {"error": "Failed to fetch data from Spotify"}, status=400
             )
-    #Remember to change the None to raises once I've done exception handling
+
+    # Remember to change the None to raises once I've done exception handling
     def spotify_get_id(self, request) -> dict | None:
         spotify_id = request.GET.get("spotify_id", "")
         item_type = request.GET.get("type", "")
-
 
         cache_key = f"spotify_{item_type}_{spotify_id}"
         cached_item = cache.get(cache_key)
@@ -90,7 +88,7 @@ class SpotifyUtils:
 
         token = self._get_access_token(request)
         if not token:
-            #TODO: improve error handling, can pass down Spotify's exact error response as done in the get_access_token method
+            # TODO: improve error handling, can pass down Spotify's exact error response as done in the get_access_token method
             logger.error("Error: couldn't get access token")
             return None
 
@@ -109,7 +107,7 @@ class SpotifyUtils:
             if cache_object:
                 cache.set(cache_key, cache_object, timeout=300)  # 1 hour
                 return cache_object
-            #Need to fix error handling
+            # Need to fix error handling
             else:
                 logger.error("Error: Object couldn't be parsed")
                 return None

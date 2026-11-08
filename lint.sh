@@ -1,6 +1,6 @@
 #!/bin/bash
 # Run black for code formatting
-black . --exclude 'music_rating/models.py'
+black . 
 
 # Run mypy for type checking
 mypy .

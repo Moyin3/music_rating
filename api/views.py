@@ -1,8 +1,11 @@
-from django.shortcuts import render
 from music_rating.models import Song, Album, Artist, Rating, UserProfile
 from .serializers import RatingSerializer, UserProfileSerializer
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView, ListAPIView
+from rest_framework.generics import (
+    RetrieveUpdateDestroyAPIView,
+    CreateAPIView,
+    ListAPIView,
+)
 from rest_framework.response import Response
 from music_rating.utils.spotify import SpotifyUtils
 from django.contrib.contenttypes.models import ContentType
@@ -20,121 +23,130 @@ logger = logging.getLogger(__name__)
 
 spotify_handler = SpotifyUtils()
 
+
 class RatingCreateView(CreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
+
 
 class RatingDetailView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
 
+
 class RatingListView(ListAPIView):
     permission_classes = [AllowAny]
     serializer_class = RatingSerializer
+
     def get_queryset(self):
-        user_ratings = Rating.objects.filter(user__username=self.request.query_params.get("username"))
+        user_ratings = Rating.objects.filter(
+            user__username=self.request.query_params.get("username")
+        )
 
         newest = (
-            user_ratings
-            .filter(spotify_id=OuterRef("spotify_id"))
+            user_ratings.filter(spotify_id=OuterRef("spotify_id"))
             .order_by("-updated_at", "-pk")
             .values("pk")[:1]
         )
         # pk is used in the off chance two things have the same timestamp,
         # it makes sure results are deterministic
-        return user_ratings.filter(pk = Subquery(newest))
+        return user_ratings.filter(pk=Subquery(newest))
+
 
 class AlbumDetailAPIView(APIView):
     permission_classes = [AllowAny]
+
     def get(self, request, spotify_id) -> Response:
         request.GET = request.GET.copy()
         request.GET["type"] = "albums"
         request.GET["spotify_id"] = spotify_id
-        
-        
+
         album_data = spotify_handler.spotify_get_id(request)
-        
+
         if not album_data:
-            return Response(
-                {"detail": "Error fetching album details"},
-                status=500
-            )
+            return Response({"detail": "Error fetching album details"}, status=500)
 
-        #This line ensures that when the response is returned if the user is not authenticated user_rating is still simply None.
+        # This line ensures that when the response is returned if the user is not authenticated user_rating is still simply None.
         user_rating = None
-
 
         if request.user.is_authenticated:
             content_type = ContentType.objects.get_for_model(Album)
-            user_rating = (Rating.objects.filter(
-                user=request.user,
-                content_type=content_type,
-                spotify_id=spotify_id,
-            )
-            .select_related("rate_system")
-            .order_by("-updated_at").first()
+            user_rating = (
+                Rating.objects.filter(
+                    user=request.user,
+                    content_type=content_type,
+                    spotify_id=spotify_id,
+                )
+                .select_related("rate_system")
+                .order_by("-updated_at")
+                .first()
             )
 
-        AlbumObject = Album.objects.filter(spotify_id = spotify_id).first()
-
+        AlbumObject = Album.objects.filter(spotify_id=spotify_id).first()
 
         if AlbumObject:
             community_rating = AlbumObject.community_rating
         else:
-            community_rating = "Seems like the community have yet to find this gem. DON'T GATEKEEP."
+            community_rating = (
+                "Seems like the community have yet to find this gem. DON'T GATEKEEP."
+            )
 
         if not user_rating:
             user_rating = "Log in or submit a rating. WHAT ARE YOU WAITING FOR!?"
         else:
             user_rating = user_rating.score
-        
 
+        return Response(
+            {
+                "album_data": album_data,
+                "community_rating": community_rating,
+                "user_rating": user_rating,
+            },
+            status=200,
+        )
 
-        return Response({
-            "album_data": album_data,
-            "community_rating": community_rating,
-            "user_rating" : user_rating
-        }, status=200)
-    #TODO: Need to update error handling once I understand how SpotifyUtils works
+    # TODO: Need to update error handling once I understand how SpotifyUtils works
+
 
 class SongDetailAPIView(APIView):
     permission_classes = [AllowAny]
+
     def get(self, request, spotify_id) -> Response:
         request.GET = request.GET.copy()
         request.GET["type"] = "tracks"
         request.GET["spotify_id"] = spotify_id
 
-
         song_data = spotify_handler.spotify_get_id(request)
 
         if not song_data:
-            return Response(
-                {
-                    "detail": "Error fetching song details"
-                }, status=500
-            )
-            
-            #This line ensures that when the response is returned if the user is not authenticated user_rating is still simply None.
+            return Response({"detail": "Error fetching song details"}, status=500)
+
+            # This line ensures that when the response is returned if the user is not authenticated user_rating is still simply None.
         user_rating = None
 
         if request.user.is_authenticated:
             content_type = ContentType.objects.get_for_model(Song)
-            user_rating = (Rating.objects.filter(
-                user=request.user,
-                content_type=content_type,
-                spotify_id=spotify_id,
-            ).select_related("rate_system")
-            .order_by("-updated_at").first()
+            user_rating = (
+                Rating.objects.filter(
+                    user=request.user,
+                    content_type=content_type,
+                    spotify_id=spotify_id,
+                )
+                .select_related("rate_system")
+                .order_by("-updated_at")
+                .first()
             )
 
-        SongObject = Song.objects.filter(spotify_id = spotify_id).first()
+        SongObject = Song.objects.filter(spotify_id=spotify_id).first()
 
         if SongObject:
             community_rating = SongObject.community_rating
         else:
-            community_rating = "Seems like the community have yet to find this gem. DON'T GATEKEEP."
+            community_rating = (
+                "Seems like the community have yet to find this gem. DON'T GATEKEEP."
+            )
 
         if not user_rating:
             user_rating = "Log in or submit a rating. WHAT ARE YOU WAITING FOR!?"
@@ -142,50 +154,53 @@ class SongDetailAPIView(APIView):
         else:
             user_rating = user_rating.score
 
-        return Response({
-            "song_data": song_data,
-            "community_rating": community_rating,
-            "user_rating": user_rating,
-        }, status=200)
+        return Response(
+            {
+                "song_data": song_data,
+                "community_rating": community_rating,
+                "user_rating": user_rating,
+            },
+            status=200,
+        )
 
-    
+
 class ArtistDetailAPIView(APIView):
     permission_classes = [AllowAny]
+
     def get(self, request, spotify_id) -> Response:
         request.GET = request.GET.copy()
         request.GET["type"] = "artists"
         request.GET["spotify_id"] = spotify_id
-        
-        
+
         artist_data = spotify_handler.spotify_get_id(request)
-        
+
         if not artist_data:
-            return Response({
-                "detail": "Error finding Artist details"
-            }, status=500)
+            return Response({"detail": "Error finding Artist details"}, status=500)
 
-        
-
-            #This line ensures that when the response is returned if the user is not authenticated user_rating is still simply None.
+            # This line ensures that when the response is returned if the user is not authenticated user_rating is still simply None.
         user_rating = None
-
 
         if request.user.is_authenticated:
             content_type = ContentType.objects.get_for_model(Artist)
-            user_rating = (Rating.objects.filter(
-                user=request.user,
-                content_type=content_type,
-                spotify_id=spotify_id,
-            ).select_related("rate_system")
-            .order_by("-updated_at").first()
+            user_rating = (
+                Rating.objects.filter(
+                    user=request.user,
+                    content_type=content_type,
+                    spotify_id=spotify_id,
+                )
+                .select_related("rate_system")
+                .order_by("-updated_at")
+                .first()
             )
 
-        ArtistObject = Artist.objects.filter(spotify_id = spotify_id).first()
+        ArtistObject = Artist.objects.filter(spotify_id=spotify_id).first()
 
         if ArtistObject:
             community_rating = ArtistObject.community_rating
         else:
-            community_rating = "Seems like the community have yet to find this gem. DON'T GATEKEEP."
+            community_rating = (
+                "Seems like the community have yet to find this gem. DON'T GATEKEEP."
+            )
 
         if not user_rating:
             user_rating = "Log in or submit a rating. WHAT ARE YOU WAITING FOR!?"
@@ -193,35 +208,40 @@ class ArtistDetailAPIView(APIView):
         else:
             user_rating = user_rating.score
 
-        return Response({
-            "artist_data": artist_data,
-            "community_rating": community_rating,
-            "user_rating": user_rating,
-        }, status=200)
+        return Response(
+            {
+                "artist_data": artist_data,
+                "community_rating": community_rating,
+                "user_rating": user_rating,
+            },
+            status=200,
+        )
+
 
 class UsernameSearchView(ListAPIView):
     permission_classes = [AllowAny]
     serializer_class = UserProfileSerializer
+
     def get_queryset(self):
         username = self.request.query_params.get("username")
         if username is not None:
-            return UserProfile.objects.filter(user__username__icontains = username)
+            return UserProfile.objects.filter(user__username__icontains=username)
         else:
             logger.warning("No username matches")
             return UserProfile.objects.none()
+
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     callback_url = f"{settings.FRONTEND_URL}/auth/google/login/callback/"
     client_class = OAuth2Client
 
+
 """Separate from the API View, just a small view that uses the SpotifyUtils class
 to handle search, and since it's just this small view, I've decided not to use a
 different file to hold this class based view in."""
 
 
-
 class SpotifySearchView(View):
     def get(self, request):
         return spotify_handler.spotify_search(request)
-
