@@ -69,7 +69,6 @@ class EPModelTest(TestCase):
         self.assertEqual(self.ep.spotify_id, "33333")
 
 
-
 # TODO: Review these tests
 class SpotifyUtilsTests(TestCase):
     def setUp(self):

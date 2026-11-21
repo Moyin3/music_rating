@@ -8,6 +8,7 @@ from django.urls import reverse
 
 User = get_user_model()
 
+
 class RatingSerializerTests(TestCase):
     """Test suite for RatingSerializer with both rate systems and error handling."""
 
@@ -707,7 +708,6 @@ class APIArtistDetailIntegrationTest(TestCase):
         )
 
         self.assertEqual(response.status_code, 500)
-
 
 
 class DetailViewTests(TestCase):
