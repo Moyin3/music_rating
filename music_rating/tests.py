@@ -346,7 +346,6 @@ class ParseSpotifyItemTests(TestCase):
         self.assertIsNone(parsed)
 
     def test_parse_empty_data(self):
-
         request = self.factory.get("/")
         # Call the method with empty data
         parsed = self.spotify_utils._parse_spotify_item(None, request)
@@ -403,9 +402,7 @@ class RatingHelpersTests(TestCase):
 
     def test_artist_rating_for_rate_system_2(self):
         # User rates two albums (directly via rate system 2)
-        Album.objects.create(
-            spotify_id="album456", artist_spotify_id="artist123"
-        )
+        Album.objects.create(spotify_id="album456", artist_spotify_id="artist123")
 
         Rating.objects.create(
             user=self.user,

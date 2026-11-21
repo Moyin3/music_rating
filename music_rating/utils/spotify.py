@@ -141,7 +141,6 @@ class SpotifyUtils:
             "type": f"{data.get('type')}s",
         }
         if data.get("type") == "artist":
-
             artist_albums = self.get_artist_albums(parsed["spotify_id"], "album", token)
             artist_other = self.get_artist_albums(parsed["spotify_id"], "single", token)
 

@@ -1,6 +1,6 @@
 from django.test import TestCase, Client, RequestFactory
 from music_rating.models import Song, Artist, Album, Rating, RateSystem
-from unittest.mock import patch 
+from unittest.mock import patch
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
@@ -241,7 +241,6 @@ class RatingSerializerTests(TestCase):
         self.assertIn("score", serializer.errors)
 
     def test_serializer_creates_average_score_when_score_absent(self):
-
         from api.serializers import RatingSerializer
 
         # Set up: create multiple song ratings
