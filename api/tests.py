@@ -1,6 +1,6 @@
 from django.test import TestCase, Client, RequestFactory
-from music_rating.models import Song, Artist, Album, Single, EP, Rating, RateSystem
-from unittest.mock import patch, Mock
+from music_rating.models import Song, Artist, Album, Rating, RateSystem
+from unittest.mock import patch 
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
@@ -91,8 +91,8 @@ class RatingSerializerTests(TestCase):
         from api.serializers import RatingSerializer
 
         # Set up: create multiple song ratings
-        song1 = Song.objects.create(spotify_id="song_a", album_spotify_id="album123")
-        song2 = Song.objects.create(spotify_id="song_b", album_spotify_id="album123")
+        Song.objects.create(spotify_id="song_a", album_spotify_id="album123")
+        Song.objects.create(spotify_id="song_b", album_spotify_id="album123")
 
         Rating.objects.create(
             user=self.user,
@@ -136,7 +136,7 @@ class RatingSerializerTests(TestCase):
         from api.serializers import RatingSerializer
 
         # Create initial rating
-        initial_rating = Rating.objects.create(
+        Rating.objects.create(
             user=self.user,
             spotify_id="album123",
             content_type=ContentType.objects.get_for_model(Album),
@@ -245,8 +245,8 @@ class RatingSerializerTests(TestCase):
         from api.serializers import RatingSerializer
 
         # Set up: create multiple song ratings
-        song1 = Song.objects.create(spotify_id="song_a", album_spotify_id="album123")
-        song2 = Song.objects.create(spotify_id="song_b", album_spotify_id="album123")
+        Song.objects.create(spotify_id="song_a", album_spotify_id="album123")
+        Song.objects.create(spotify_id="song_b", album_spotify_id="album123")
 
         Rating.objects.create(
             user=self.user,
@@ -719,7 +719,7 @@ class DetailViewTests(TestCase):
     @patch("api.views.spotify_handler.spotify_get_id")
     def test_album_detail_success(self, mock_spotify_get_id):
         # Mock Spotify API response
-        mock_response_data = {
+        {
             "id": "test-spotify-id",
             "type": "album",
             "name": "Test Album",

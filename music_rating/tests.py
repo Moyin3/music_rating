@@ -1,4 +1,4 @@
-from django.test import TestCase, Client, RequestFactory
+from django.test import TestCase, RequestFactory
 from .models import Song, Artist, Album, Single, EP, Rating, RateSystem
 from unittest.mock import patch, Mock
 from music_rating.utils.spotify import SpotifyUtils
@@ -382,7 +382,7 @@ class RatingHelpersTests(TestCase):
 
     def test_album_rating_for_rate_system_2(self):
         # User rates two songs in the album
-        song2 = Song.objects.create(spotify_id="song456", album_spotify_id="album123")
+        Song.objects.create(spotify_id="song456", album_spotify_id="album123")
 
         Rating.objects.create(
             user=self.user,
@@ -403,7 +403,7 @@ class RatingHelpersTests(TestCase):
 
     def test_artist_rating_for_rate_system_2(self):
         # User rates two albums (directly via rate system 2)
-        album2 = Album.objects.create(
+        Album.objects.create(
             spotify_id="album456", artist_spotify_id="artist123"
         )
 
@@ -723,7 +723,7 @@ class RatingDatabaseConstraintTests(TestCase):
         """Test that same user can rate item with different rate systems."""
         rate_system_average = RateSystem.objects.create(key="average")
 
-        rating1 = Rating.objects.create(
+        Rating.objects.create(
             user=self.user,
             spotify_id="album123",
             content_type=self.album_content_type,
@@ -731,7 +731,7 @@ class RatingDatabaseConstraintTests(TestCase):
             score=80,
         )
 
-        rating2 = Rating.objects.create(
+        Rating.objects.create(
             user=self.user,
             spotify_id="album123",
             content_type=self.album_content_type,
