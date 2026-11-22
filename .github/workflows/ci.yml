@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rate_system
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # Dummy values so settings.py can load. Real secrets are never needed in CI.
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rate_system
+      DJANGO_SECRET_KEY: ci-only-not-a-real-secret
+      SPOTIFY_CLIENT_ID: ci
+      SPOTIFY_CLIENT_SECRET: ci
+      MAILGUN_API_KEY: ci
+      MAILGUN_SENDER_DOMAIN: ci.example.com
+      DEFAULT_FROM_EMAIL: ci@example.com
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install Poetry
+        run: pipx install poetry
+      - name: Cache virtualenv
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: poetry-${{ hashFiles('poetry.lock') }}
+      - name: Install dependencies
+        run: poetry install --no-root
+      - name: black
+        run: poetry run black . --check --exclude 'music_rating/models.py'
+      - name: flake8
+        run: poetry run flake8 . --ignore=E501,W503
+      - name: mypy
+        run: poetry run mypy .
+      - name: pytest
+        run: poetry run pytest
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build

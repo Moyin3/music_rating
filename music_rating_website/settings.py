@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import environ
-import sys
 import os
 from datetime import timedelta
 import dj_database_url
@@ -27,8 +26,8 @@ DEBUG = env.bool("DEBUG", default=False)
 
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='postgresql://moyin@localhost:5432/rate_system',
+    "default": dj_database_url.config(
+        default="postgresql://moyin@localhost:5432/rate_system",
         conn_max_age=600,
         conn_health_checks=True,
     )
@@ -39,7 +38,6 @@ SPOTIFY_CLIENT_ID = env("SPOTIFY_CLIENT_ID")
 SPOTIFY_CLIENT_SECRET = env("SPOTIFY_CLIENT_SECRET")
 
 FRONTEND_URL = env("FRONTEND_URL", default="http://127.0.0.1:5173")
-
 
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["127.0.0.1", "localhost"])
@@ -69,7 +67,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "music_rating",
     "debug_toolbar",
-    'rest_framework',
+    "rest_framework",
     "corsheaders",
     "api",
     "rest_framework.authtoken",
@@ -80,7 +78,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.google",
     "dj_rest_auth.registration",
     "rest_framework_simplejwt",
-    "rest_framework_simplejwt.token_blacklist"
+    "rest_framework_simplejwt.token_blacklist",
 ]
 
 MIDDLEWARE = [
@@ -122,27 +120,27 @@ TEMPLATES = [
         },
     },
 ]
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
 ACCOUNT_CONFIRM_EMAIL_ON_GET = False
 
 ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*']
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*"]
 
-ACCOUNT_LOGIN_METHODS = {'username', 'email'}
+ACCOUNT_LOGIN_METHODS = {"username", "email"}
 
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 ANYMAIL = {
-       "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
-       "MAILGUN_SENDER_DOMAIN": env("MAILGUN_SENDER_DOMAIN"),
-       "MAILGUN_API_URL": "https://api.eu.mailgun.net/v3",
-   }
+    "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
+    "MAILGUN_SENDER_DOMAIN": env("MAILGUN_SENDER_DOMAIN"),
+    "MAILGUN_API_URL": "https://api.eu.mailgun.net/v3",
+}
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
 EMAIL_TIMEOUT = 10
@@ -160,11 +158,7 @@ ACCOUNT_RATE_LIMITS = {
 SITE_ID = 1
 
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
-SOCIALACCOUNT_PROVIDERS = {
-  'google': {
-      'EMAIL_AUTHENTICATION': True
-  }
-}
+SOCIALACCOUNT_PROVIDERS = {"google": {"EMAIL_AUTHENTICATION": True}}
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
@@ -188,14 +182,14 @@ REST_AUTH = {
     "JWT_AUTH_COOKIE": "access",
     "JWT_AUTH_REFRESH_COOKIE": "refresh",
     "JWT_AUTH_HTTPONLY": True,
-    "JWT_AUTH_SECURE": False, #True in production
+    "JWT_AUTH_SECURE": False,  # True in production
     "JWT_AUTH_SAMESITE": "Lax",
     "JWT_AUTH_RETURN_EXPIRATION": True,
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes = 15),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days = 7),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": True,
@@ -237,12 +231,14 @@ STATIC_URL = "/static/"
 # This production code might break development mode, so we check whether we're in DEBUG mode
 if not DEBUG:
     # Tell Django to copy static assets into a path called `staticfiles` (this is specific to Render)
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
     STORAGES = {
-      "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-      "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
-  }
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+        },
+    }
 
 FRONTEND_URL = env("FRONTEND_URL", default="http://127.0.0.1:5173")
 CORS_ALLOWED_ORIGINS = [FRONTEND_URL]
@@ -270,7 +266,7 @@ LOGGING = {
             "class": "logging.StreamHandler",
         },
     },
-    "root":{
+    "root": {
         "handlers": ["console"],
         "level": "DEBUG",
     },

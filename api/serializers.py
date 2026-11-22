@@ -1,43 +1,61 @@
 from rest_framework import serializers
-from music_rating.models import RateSystem, Rating, Song, UserProfile, Song, Album, Single, EP, Artist
-from music_rating.utils.ratingHelpers import album_rating_for_rate_system_2, artist_rating_for_rate_system_2
+from music_rating.models import (
+    RateSystem,
+    Rating,
+    Song,
+    UserProfile,
+    Album,
+    Single,
+    EP,
+    Artist,
+)
+from music_rating.utils.ratingHelpers import (
+    album_rating_for_rate_system_2,
+    artist_rating_for_rate_system_2,
+)
 from django.contrib.contenttypes.models import ContentType
 import logging
 
 logger = logging.getLogger(__name__)
 
+
 class RateSystemSerializer(serializers.ModelSerializer):
     class Meta:
         model = RateSystem
-        fields = ['key', 'description']
+        fields = ["key", "description"]
+
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source = "user.username", read_only = True)
+    username = serializers.CharField(source="user.username", read_only=True)
 
     class Meta:
         model = UserProfile
-        fields = ['user', 'bio', "username"]
+        fields = ["user", "bio", "username"]
+
 
 class RatingSerializer(serializers.ModelSerializer):
-    score = serializers.IntegerField(required = False)
+    score = serializers.IntegerField(required=False)
     content_type = serializers.CharField()
+
     class Meta:
         model = Rating
         fields = "__all__"
         read_only_fields = ["user"]
-    
-    def typeToContentTypeLookUp(self, type) -> ContentType: 
+
+    def typeToContentTypeLookUp(self, type) -> ContentType:
         if type == "track":
             type = "song"
-        return ContentType.objects.get_by_natural_key(app_label="music_rating", model = type)
-    
+        return ContentType.objects.get_by_natural_key(
+            app_label="music_rating", model=type
+        )
+
     def validate(self, attrs):
         rate_system = attrs.get("rate_system")
 
         if rate_system.key != "average" and "score" not in attrs:
-            raise serializers.ValidationError({
-                "score": "This field is required for this rating system."
-            })
+            raise serializers.ValidationError(
+                {"score": "This field is required for this rating system."}
+            )
 
         return attrs
 
@@ -47,8 +65,6 @@ class RatingSerializer(serializers.ModelSerializer):
         content_type = self.typeToContentTypeLookUp(validated_data["content_type"])
         spotify_id = validated_data["spotify_id"]
         name = validated_data["name"]
-
-
 
         if rate_system.key == "average":
             model = content_type.model
@@ -70,7 +86,7 @@ class RatingSerializer(serializers.ModelSerializer):
 
         rating, _ = Rating.objects.update_or_create(
             user=user,
-            name = name,
+            name=name,
             spotify_id=spotify_id,
             content_type=content_type,
             rate_system=rate_system,
@@ -78,14 +94,12 @@ class RatingSerializer(serializers.ModelSerializer):
                 "score": validated_data["score"],
                 "optional_writing": validated_data.get("optional_writing"),
                 "album_spotify_id": validated_data.get("album_spotify_id"),
-                "artist_spotify_id": validated_data.get("artist_spotify_id")
+                "artist_spotify_id": validated_data.get("artist_spotify_id"),
             },
         )
 
-
-
         return rating
-    
+
     def validate_score(self, value):
         try:
             value = int(value)
@@ -97,30 +111,37 @@ class RatingSerializer(serializers.ModelSerializer):
 
         return value
 
+
 class SongSerializer(serializers.ModelSerializer):
     class Meta:
         model = Song
-        fields = ['spotify_id', 'album_spotify_id']
+        fields = ["spotify_id", "album_spotify_id"]
+
 
 class AlbumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Album
-        fields = ['spotify_id', 'artist_spotify_id']
+        fields = ["spotify_id", "artist_spotify_id"]
+
 
 class SingleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Single
-        fields = ['spotify_id']
+        fields = ["spotify_id"]
+
 
 class EPSerializer(serializers.ModelSerializer):
     class Meta:
         model = EP
-        fields = ['spotify_id']
+        fields = ["spotify_id"]
+
 
 class ArtistSerializer(serializers.ModelSerializer):
-    class Meta: 
+    class Meta:
         model = Artist
-        fields = ['spotify_id']
+        fields = ["spotify_id"]
+
+
 """
 class RatingWriteSerializer(serializers.Serializer):
     score = serializers.IntegerField(min_value=0, max_value=100, required=True)
