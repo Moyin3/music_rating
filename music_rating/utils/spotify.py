@@ -145,9 +145,15 @@ class SpotifyUtils:
             artist_other = self.get_artist_albums(parsed["spotify_id"], "single", token)
 
             parsed["artist_name"] = data.get("name")
+            if not parsed["artist_albums"]:
+                return None
+                #Will have to error handle this problem, inserted it because CI currently doesn't like that .get could called on something that's None
             parsed["artist_albums"] = [
                 (album["id"], album["name"]) for album in artist_albums.get("items", [])
             ]
+            if not parsed["artist_other"]:
+                return None
+                #Read Comment above
             parsed["artist_singles"] = [
                 (album["id"], album["name"])
                 for album in artist_other.get("items", [])

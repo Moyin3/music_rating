@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.auth import get_user_model
-from music_rating.views import (
+from music_rating.utils.ratingHelpers import (
     album_rating_for_rate_system_2,
     artist_rating_for_rate_system_2,
     album_rating_for_rate_system_1,
